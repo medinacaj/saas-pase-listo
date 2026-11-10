@@ -84,7 +84,11 @@ function renderReferences(){
   '</div></article>';
  }).join("");
 }
-function render(){renderOverview();renderEvents();renderOrders();renderPartners();renderReferences();}
+function render(){
+ renderOverview();renderEvents();renderOrders();renderPartners();renderReferences();
+ $(".ref-art img").forEach(img=>img.addEventListener("error",()=>img.remove(),{once:true}));
+}
+
 async function initialize(){
  try{
   const [a,b]=await Promise.all([fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"})]);
