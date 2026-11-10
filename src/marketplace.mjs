@@ -142,7 +142,7 @@ function openDetail(id){
 function closeModal(which,restore=true){
  const node=$(which);node.hidden=true;
  if(which==="#checkout-backdrop")ui.checkout=null;
- if($("#detail-backdrop").hidden&&$("#checkout-backdrop").hidden)document.body.classList.remove("dialog-open");
+ if(["#detail-backdrop","#checkout-backdrop","#login-backdrop","#orders-backdrop"].every(selector=>$(selector).hidden))document.body.classList.remove("dialog-open");
  if(restore&&ui.lastFocus?.isConnected)ui.lastFocus.focus();
 }
 
@@ -163,7 +163,7 @@ async function refreshBuyer(){
   buyer=response.authenticated===true?response.buyer:null;
  }catch{buyerApiReady=false;buyer=null;}
  const trigger=$("#buyer-account-trigger");
- if(trigger)trigger.textContent=buyer?"Mi cuenta · Salir":"Iniciar sesión";
+ if(trigger)trigger.textContent=buyer?"Mi cuenta":"Iniciar sesión";
  return buyerApiReady;
 }
 function renderLoginForm(mode="login",message=""){
@@ -184,6 +184,7 @@ async function showLogin(eventId=null,typeId=null){
  ui.authPending=eventId&&typeId?{eventId,typeId}:null;
  closeModal("#detail-backdrop",false);
  if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop",false);
+ if(!$("#orders-backdrop").hidden)closeModal("#orders-backdrop",false);
  await refreshBuyer();
  $("#login-backdrop").hidden=false;document.body.classList.add("dialog-open");
  renderLoginForm();
@@ -221,6 +222,40 @@ function orderSuccess(order){
  const event=selectedEvent(order.eventId);
  $("#checkout-content").innerHTML='<div class="demo-success"><div class="success-symbol" aria-hidden="true">✓</div><div class="detail-kicker">PEDIDO DE PRUEBA REGISTRADO</div><h2 id="checkout-title">¡Simulación completada!</h2><p>Este registro de prueba está asociado a tu cuenta de desarrollo. No hay pago, reserva real ni entrada válida.</p><div class="demo-receipt"><span>N.º de simulación</span><strong>'+esc(order.id)+'</strong><span>Evento</span><strong>'+esc(event?.title||"Evento DEMO")+'</strong><span>Total teórico</span><strong>'+clp(order.pricing.totalClp)+'</strong></div><button type="button" data-close-checkout class="checkout-submit">Volver a la cartelera ↗</button></div>';
 }
+function orderDate(value){
+ const d=new Date(value);
+ return Number.isFinite(d.getTime())
+  ?new Intl.DateTimeFormat("es-CL",{dateStyle:"medium",timeZone:"America/Santiago"}).format(d)
+  :"Fecha no disponible";
+}
+async function showAccount(){
+ await refreshBuyer();
+ if(!buyer){await showLogin();return;}
+ ui.lastFocus=document.activeElement;
+ $("#orders-backdrop").hidden=false;
+ document.body.classList.add("dialog-open");
+ $("#orders-dialog").focus();
+ const content=$("#buyer-orders-content");
+ content.textContent="Cargando pedidos de prueba…";
+ try{
+  const response=await buyerRequest("orders",undefined,"GET");
+  if($("#orders-backdrop").hidden)return;
+  const orders=Array.isArray(response.orders)?response.orders:[];
+  const cards=orders.slice(0,50).map(order=>{
+   const event=store?.events.find(e=>e.id===order.eventId);
+   const status=order.status==="demo_confirmed"?"Registrado · DEMO":"Anulado · DEMO";
+   const amount=Number.isFinite(order.pricing?.totalClp)?order.pricing.totalClp:0;
+   return '<article class="buyer-order-card"><div class="buyer-order-top"><strong>'+esc(event?.title||"Evento de prueba")+'</strong><span>'+esc(status)+'</span></div>'+
+    '<p>'+esc(order.id)+' · '+esc(order.quantity)+' entrada(s) · '+esc(orderDate(order.createdAt))+'</p>'+
+    '<div class="buyer-order-total"><span>Valor simulado</span><strong>'+clp(amount)+'</strong></div></article>';
+  }).join("");
+  content.innerHTML=orders.length
+   ?'<p class="orders-count">'+orders.length+' pedido(s) de prueba · se muestran hasta 50 recientes</p><div class="buyer-orders-list">'+cards+'</div>'
+   :'<p class="orders-empty">Todavía no tienes pedidos de prueba.</p>';
+ }catch(err){
+  if(!$("#orders-backdrop").hidden)content.textContent=err.message;
+ }
+}
 function resetFilters(){ui.query="";ui.category="Todos";ui.city="all";ui.period="all";$("#event-search").value="";$("#date-filter").value="all";filters();renderCards();}
 async function start(){
  try{
@@ -254,6 +289,7 @@ async function start(){
   const type=target.closest("[data-select-ticket]");
   if(type){openCheckout(type.dataset.event,type.dataset.selectTicket).catch(e=>alert(e.message));return;}
   if(target.closest("[data-close-login]")||target.id==="login-backdrop"){closeLogin();return;}
+  if(target.closest("[data-close-orders]")||target.id==="orders-backdrop"){closeModal("#orders-backdrop");return;}
   const switchAuth=target.closest("[data-switch-auth]");
   if(switchAuth){renderLoginForm(switchAuth.dataset.switchAuth);return;}
   if(target.closest("[data-close-detail]")||target.id==="detail-backdrop"){closeModal("#detail-backdrop");return;}
@@ -268,13 +304,20 @@ async function start(){
   renderCheckout(ui.checkout.eventId,type,qty);
  });
 
- $("#buyer-account-trigger").addEventListener("click",async()=>{
-  await refreshBuyer();
-  if(!buyer){showLogin();return;}
-  if(confirm("¿Cerrar sesión del comprador en este navegador?")){
-   try{await buyerRequest("logout",{});}catch{}
-   buyer=null;await refreshBuyer();
-  }
+ $("#buyer-account-trigger").addEventListener("click",()=>{
+  showAccount().catch(err=>console.error("PaseListo",err.message));
+ });
+ $("#buyer-logout").addEventListener("click",async()=>{
+  const button=$("#buyer-logout");
+  button.disabled=true;
+  try{
+   await buyerRequest("logout",{});
+   buyer=null;
+   closeModal("#orders-backdrop");
+   await refreshBuyer();
+  }catch(err){
+   $("#buyer-orders-content").textContent=err.message;
+  }finally{button.disabled=false;}
  });
  $("#buyer-auth-content").addEventListener("submit",async ev=>{
   if(ev.target.id!=="buyer-auth-form")return;
@@ -327,10 +370,10 @@ async function start(){
   }
  });
  document.addEventListener("keydown",ev=>{
-  if(ev.key==="Escape"){if(!$("#login-backdrop").hidden)closeLogin();else if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop");else if(!$("#detail-backdrop").hidden)closeModal("#detail-backdrop");return;}
+  if(ev.key==="Escape"){if(!$("#login-backdrop").hidden)closeLogin();else if(!$("#orders-backdrop").hidden)closeModal("#orders-backdrop");else if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop");else if(!$("#detail-backdrop").hidden)closeModal("#detail-backdrop");return;}
   if(ev.key==="/"&&!["INPUT","SELECT","TEXTAREA"].includes(document.activeElement?.tagName)){ev.preventDefault();$("#event-search").focus();}
   if(ev.key!=="Tab")return;
-  const panel=!$("#login-backdrop").hidden?$("#login-dialog"):!$("#checkout-backdrop").hidden?$("#checkout-dialog"):!$("#detail-backdrop").hidden?$("#event-dialog"):null;if(!panel)return;
+  const panel=!$("#login-backdrop").hidden?$("#login-dialog"):!$("#orders-backdrop").hidden?$("#orders-dialog"):!$("#checkout-backdrop").hidden?$("#checkout-dialog"):!$("#detail-backdrop").hidden?$("#event-dialog"):null;if(!panel)return;
   const focusables=$$("button:not([disabled]),select,input,a[href]",panel).filter(el=>el.getClientRects().length);
   if(!focusables.length)return;
   if(ev.shiftKey&&document.activeElement===focusables[0]){ev.preventDefault();focusables.at(-1).focus();}
