@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createCheckoutState } from "../src/checkout-state.mjs";
+import { createCheckoutState, canSubmitCheckout } from "../src/checkout-state.mjs";
 
 test("un reintento del mismo formulario DEMO conserva la misma clave", () => {
  let count = 0;
@@ -44,4 +44,28 @@ test("la cartelera consulta aforo del servidor DEMO y desactiva compras sin cupo
  assert.match(code, /buyerRequest\("inventory",undefined,"GET"\)/);
  assert.match(code, /remainingFor\(event\.id,t\.id\)/);
  assert.match(code, /insufficient\?'disabled':''/);
+});
+
+test("un reintento de respuesta perdida conserva clave incluso sin cupos libres", () => {
+ let serial=0;
+ const next=()=>String(++serial).padStart(12,"0");
+ const initial=createCheckoutState(null,"event-a","general",2,next);
+ assert.equal(canSubmitCheckout(initial,2),true);
+ assert.equal(canSubmitCheckout(initial,1),false);
+ initial.attempted=true;
+ const retry=createCheckoutState(initial,"event-a","general",2,next);
+ assert.equal(retry.attempted,true);
+ assert.equal(retry.requestId,initial.requestId);
+ assert.equal(canSubmitCheckout(retry,0),true);
+ assert.equal(serial,1);
+ const newSelection=createCheckoutState(retry,"event-a","general",1,next);
+ assert.equal(newSelection.attempted,false);
+ assert.equal(canSubmitCheckout(newSelection,0),false);
+ assert.notEqual(newSelection.requestId,retry.requestId);
+});
+test("el checkout permite recuperar respuestas ambiguas y bloquea conflictos confirmados", async () => {
+ const code=await readFile(new URL("../src/marketplace.mjs",import.meta.url),"utf8");
+ assert.match(code,/checkout\.attempted=true;/);
+ assert.match(code,/if\(err\.status===409\)checkout\.attempted=false/);
+ assert.match(code,/canSubmitCheckout\(ui\.checkout,remaining\)/);
 });
