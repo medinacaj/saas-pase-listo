@@ -23,7 +23,7 @@ async function fixture(t) {
   });
   return { status: resp.status, data: await resp.json(), cookie: resp.headers.get("set-cookie")?.split(";")[0] || "" };
  };
- return { request, filePath };
+ return { request, filePath, origin };
 }
 test("sin sesión no se puede crear un pedido; no existe el alias ficticio", async t => {
  const { request } = await fixture(t);
@@ -80,4 +80,12 @@ test("protección CSRF: rechaza origen externo y ausencia del encabezado exigido
  const body = { email: "muestra@example.test", password: "Prueba-Hipotetica-123456789" };
  assert.equal((await request("register", { method: "POST", body, originHeader: "http://example.com" })).status, 403);
  assert.equal((await request("register", { method: "POST", body, header: "" })).status, 403);
+});
+
+test("servidor de compradores entrega el sistema visual compartido", async t => {
+ const { origin } = await fixture(t);
+ const response = await fetch(origin + "/src/brand-system.css");
+ assert.equal(response.status, 200);
+ assert.match(response.headers.get("content-type"), /text\/css/);
+ assert.match(await response.text(), /--pl-lime/);
 });
