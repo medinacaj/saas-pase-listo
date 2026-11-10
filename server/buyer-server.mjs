@@ -86,9 +86,13 @@ const cookie = (token, secure = false) => "pl_session=" + (token || "") +
   "; HttpOnly; SameSite=Strict; Path=/; " + (token ? "Max-Age=1800" : "Max-Age=0") + (secure ? "; Secure" : "");
 const assetTypes = new Map([
   ["/", ["index.html", "text/html"]], ["/index.html", ["index.html", "text/html"]],
+  ["/evento.html", ["evento.html", "text/html"]],
   ["/admin.html", ["admin.html", "text/html"]], ["/organizador.html", ["organizador.html", "text/html"]],
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
   ["/src/marketplace.mjs", ["src/marketplace.mjs", "text/javascript"]],
+  ["/src/event-page.mjs", ["src/event-page.mjs", "text/javascript"]],
+  ["/src/event-page-domain.mjs", ["src/event-page-domain.mjs", "text/javascript"]],
+  ["/src/event-page.css", ["src/event-page.css", "text/css"]],
   ["/src/commerce-domain.mjs", ["src/commerce-domain.mjs", "text/javascript"]],
   ["/src/checkout-state.mjs", ["src/checkout-state.mjs", "text/javascript"]],
   ["/src/portal.css", ["src/portal.css", "text/css"]],
