@@ -14,7 +14,7 @@ test("semana vigente de Chile va de lunes a domingo, incluso entre meses y años
 });
 
 test("prioriza eventos reales y DEMO de la semana, con enlaces por ID único",()=>{
- const refs=[{id:"real-1",title:"Concierto",city:"Santiago",date:"2026-11-09"},
+ const refs=[{id:"real-1",title:"Concierto",city:"Santiago",date:"2026-11-10"},
   {id:"real-2",title:"Feria",city:"Concepción",date:"2026-11-17"}];
  const demos=[{id:"demo-1",title:"Teatro",city:"Valparaíso",date:"2026-11-15",status:"published"},
   {id:"draft",title:"Borrador",date:"2026-11-12",status:"draft"},
@@ -25,6 +25,8 @@ test("prioriza eventos reales y DEMO de la semana, con enlaces por ID único",()
  assert.deepEqual(selected.upcoming.map(e=>e.id),["real-2"]);
  assert.equal(selected.week[0].kind,"reference");
  assert.equal(selected.week[1].kind,"demo");
+ const past=weeklyEventSelection([{id:"past",title:"Ayer",date:"2026-11-09"}],[],"2026-11-10");
+ assert.equal(past.weekCount,0);
 });
 
 test("un evento de varios días figura mientras transcurre la semana",()=>{
