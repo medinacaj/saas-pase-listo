@@ -79,8 +79,6 @@ function renderReferences(){
   return '<article class="reference-card"><div class="ref-art" style="--tone:'+tone+'"><div class="no-poster">'+esc(e.title)+'</div>'+img+'</div>'+
   '<div class="reference-info"><span class="status reference">EJEMPLO · NO A LA VENTA</span><p><strong>'+esc(e.title)+'</strong></p><small class="internal-event-id">ID interno: <code>'+esc(e.id)+'</code></small><p>'+esc(e.venue)+' · '+esc(e.city)+'<br>'+esc(e.date)+'</p>'+
   '<small>'+esc(e.posterCredit)+' · derechos comerciales no acreditados</small>'+
-
-
   '</div></article>';
  }).join("");
 }
