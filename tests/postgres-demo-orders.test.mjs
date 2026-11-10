@@ -267,6 +267,26 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
       [user.email]
     );
     assert.equal(cleared.rows[0].n, 0);
+
+    const concurrent = await Promise.all(Array.from({length:12},(_,i) =>
+      request(i % 2 ? originA : originB, "login", {
+        method: "POST", body: wrongCredentials
+      })
+    ));
+    assert.equal(concurrent.filter(result=>result.status===401).length,8);
+    assert.equal(concurrent.filter(result=>result.status===429).length,4);
+
+    const duplicateBuyer = { email: "pg-same-register@example.test", password: "Same-Registration-Passphrase-123" };
+    const registrations = await Promise.all([
+      request(originA, "register", { method: "POST", body: duplicateBuyer }),
+      request(originB, "register", { method: "POST", body: duplicateBuyer })
+    ]);
+    assert.deepEqual(registrations.map(result=>result.status).sort(),[201,409]);
+    const oneBuyer = await poolA.query(
+      "SELECT count(*)::int AS n FROM demo_buyers WHERE email = $1",
+      [duplicateBuyer.email]
+    );
+    assert.equal(oneBuyer.rows[0].n,1);
   });
 
 });
