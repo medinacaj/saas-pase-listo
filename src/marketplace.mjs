@@ -1,5 +1,5 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
-import { createCheckoutState } from "./checkout-state.mjs";
+import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -173,7 +173,11 @@ async function buyerRequest(path,payload,method="POST"){
  if(payload!==undefined)headers["Content-Type"]="application/json";
  const response=await fetch("/api/buyer/"+path,{method,credentials:"same-origin",headers,...(payload!==undefined?{body:JSON.stringify(payload)}:{})});
  const data=await response.json().catch(()=>({}));
- if(!response.ok)throw Error(data.error||"No fue posible completar la solicitud");
+ if(!response.ok){
+  const error=Error(data.error||"No fue posible completar la solicitud");
+  error.status=response.status;
+  throw error;
+ }
  return data;
 }
 async function refreshBuyer(){
@@ -220,7 +224,7 @@ function renderCheckout(eventId,typeId,qty=1){
  const e=selectedEvent(eventId);if(!e)return;
  ui.checkout=createCheckoutState(ui.checkout,eventId,typeId,qty);
  const ticket=e.ticketTypes.find(t=>t.id===typeId);if(!ticket)return;
- const remaining=remainingFor(eventId,typeId),insufficient=remaining<qty;
+ const remaining=remainingFor(eventId,typeId),insufficient=!canSubmitCheckout(ui.checkout,remaining);
  let summary;
  try{summary=quote(store,eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
  $("#checkout-content").innerHTML='<div class="checkout-head"><div class="detail-kicker">CUENTA VERIFICADA · COMPRA DE PRUEBA</div><h2 id="checkout-title">Tus entradas.</h2><p>'+esc(e.title)+' · '+esc(date(e.date))+' · '+esc(e.venue)+'</p><p class="signed-buyer">Sesión iniciada: '+esc(buyer.email)+'</p></div><form id="demo-checkout" class="checkout-form"><div class="checkout-controls"><label>Tipo de entrada<select name="ticketType">'+e.ticketTypes.map(t=>'<option value="'+esc(t.id)+'" '+(t.id===typeId?"selected":"")+'>'+esc(t.name)+'</option>').join("")+'</select></label><label>Cantidad<select name="quantity">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'" '+(n===qty?"selected":"")+'>'+n+'</option>').join("")+'</select></label></div><div class="fee-summary"><div><span>Entrada base × '+qty+'</span><strong>'+clp(summary.faceValueClp)+'</strong></div><div><span>Cargo por servicio × '+qty+'</span><strong>'+clp(summary.serviceFeeClp)+'</strong></div><div class="fee-total"><span>Total del comprador</span><strong>'+clp(summary.totalClp)+'</strong></div><small>Los cargos de esta simulación están incluidos. No se efectuará ningún cobro.</small></div>'+(insufficient?'<p class="load-error" role="alert">Solo quedan '+remaining+' cupos de prueba para esta selección.</p>':'')+'<label class="ack"><input type="checkbox" required name="acceptDemo"> Entiendo que es una simulación sin pago, reserva ni boleto válido.</label><button type="submit" class="checkout-submit" '+(insufficient?'disabled':'')+'>Continuar pedido de prueba · '+clp(summary.totalClp)+' ↗</button></form>';
@@ -368,6 +372,7 @@ async function start(){
   try{
    await refreshBuyer();
    if(!buyer){await showLogin(checkout.eventId,checkout.typeId);return;}
+   checkout.attempted=true;
    const order=await buyerRequest("orders",{
     eventId:checkout.eventId,
     ticketTypeId:checkout.typeId,
@@ -376,9 +381,10 @@ async function start(){
    });
    if(ui.checkout===checkout)orderSuccess(order);
   }catch(err){
+   if(err.status===409)checkout.attempted=false;
    await refreshInventory();
    if(ui.checkout===checkout&&form.isConnected){
-    if(remainingFor(checkout.eventId,checkout.typeId)<checkout.qty){
+    if(!canSubmitCheckout(checkout,remainingFor(checkout.eventId,checkout.typeId))){
      renderCheckout(checkout.eventId,checkout.typeId,checkout.qty);
      return;
     }
