@@ -67,22 +67,22 @@ Con Node.js 22 o superior, ejecuta `npm run api:buyers` y abre **http://127.0.0.
 
 El servidor de prueba utiliza `scrypt` con sal aleatoria para derivar el hash de la contraseña, sesiones HttpOnly/SameSite con expiración, límites de intentos, comprobación de origen y escritura local en `.local/buyer-demo.json`. Los pedidos se vinculan al identificador de usuario de la sesión, no a un alias suministrado por el formulario.
 
-**No es una solución productiva.** No tiene verificación de correo, recuperación de cuenta, MFA, cifrado TLS, alta disponibilidad ni persistencia SQL. No exponer el puerto a Internet ni usar datos reales. Para el despliegue definitivo, integrar autenticación administrada y una base de datos segura en un hosting de backend.
+**No es una solución productiva.** No tiene verificación de correo, recuperación de cuenta, MFA, cifrado TLS ni alta disponibilidad. PostgreSQL es opcional y experimental; no existe persistencia SQL productiva. No exponer el puerto a Internet ni usar datos reales. Para el despliegue definitivo, integrar autenticación administrada y una base de datos segura en un hosting de backend.
 
 
 ## Persistencia PostgreSQL experimental (solo DEMO local)
 
-Existe una modalidad opcional con PostgreSQL para probar concurrencia de pedidos de prueba entre varias conexiones. **No es una solución productiva de boletería**: las cuentas y sesiones siguen almacenadas en un JSON local, sin MFA, TLS propio, pagos, conciliación ni tickets válidos.
+Existe una modalidad opcional con PostgreSQL para probar concurrencia de pedidos y sesiones compartidas entre varias instancias. **No es una solución productiva de boletería**: sus cuentas son ficticias y no cuenta con MFA, TLS público, verificación de correo, pagos, conciliación ni tickets válidos.
 
 1. Usa Node.js 22+ y una base PostgreSQL **dedicada y descartable**. Instala dependencias mediante `npm install`.
-2. Aplica la migración una vez: `psql "$PASELISTO_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f db/001_demo_inventory_orders.sql`. Se requiere PostgreSQL 16 o superior para las pruebas CI actuales.
+2. Aplica **ambas migraciones en orden**: `psql "$PASELISTO_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f db/001_demo_inventory_orders.sql` y después `psql "$PASELISTO_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f db/002_demo_buyers_sessions.sql`. Se utiliza PostgreSQL 16 en CI.
 3. Configura `PASELISTO_DEMO_DATABASE_URL` con la URL de conexión de esa base **de desarrollo**, sin compartir la contraseña.
 4. Ejecuta `npm run api:buyers` y abre `http://127.0.0.1:8082`.
 
-Sin `PASELISTO_DEMO_DATABASE_URL`, el servidor conserva el modo anterior `JSON` en `.local/buyer-demo.json`. **No existe una migración automática** de pedidos JSON a PostgreSQL: iniciar la modalidad PostgreSQL utiliza su propio inventario de prueba y su propio historial de pedidos. No intercambies ambos modos sobre datos que necesites preservar.
+Sin `PASELISTO_DEMO_DATABASE_URL`, el servidor conserva el modo anterior `JSON` en `.local/buyer-demo.json`. Con PostgreSQL, **cuentas, hashes scrypt, sesiones (solo hash del token), pedidos e inventario** se almacenan en la base de desarrollo; no se crea un archivo JSON para compradores. **No existe una migración automática** entre ambos modos: las cuentas, sesiones y pedidos anteriores no se trasladan. No intercambies modos sobre datos que necesites preservar.
 
-La modalidad PostgreSQL utiliza las tablas `demo_ticket_stock` y `demo_orders`: el inventario se modifica dentro de la misma transacción que inserta el pedido, bloqueando la fila con `FOR UPDATE`, y una restricción única protege `(buyer_id, request_id)`. Los reintentos con la misma solicitud devuelven el registro anterior y las solicitudes distintas compiten por los cupos. **No modificar directamente `sold` ni `capacity` en entornos reales**; los cambios de aforo requieren un flujo administrativo seguro aún no implementado.
+La modalidad PostgreSQL utiliza las tablas `demo_ticket_stock`, `demo_orders`, `demo_buyers` y `demo_buyer_sessions`: el inventario se modifica dentro de la misma transacción que inserta el pedido, bloqueando la fila con `FOR UPDATE`, y una restricción única protege `(buyer_id, request_id)`. Los reintentos con la misma solicitud devuelven el registro anterior y las solicitudes distintas compiten por los cupos. **No modificar directamente `sold` ni `capacity` en entornos reales**; los cambios de aforo requieren un flujo administrativo seguro aún no implementado.
 
 Para correr las pruebas de integración con PostgreSQL se necesita la variable `PASELISTO_DEMO_DATABASE_URL`. Las pruebas **vacían las tablas DEMO** antes de ejecutarse; jamás usar una base con información que deba conservarse. GitHub Actions levanta un contenedor PostgreSQL descartable para esas pruebas.
 
-**Limitaciones pendientes:** cuentas/sesiones con almacenamiento compartido, verificación de correo, seguridad y gestión de propietarios, pagos y conciliación, reservas con expiración, claves/QR firmados, controles tributarios y protección de datos. Esta etapa prepara operaciones SQL transaccionales pero no habilita ventas reales.
+**Limitaciones pendientes:** control de intentos de acceso distribuido entre servidores, verificación de correo, MFA, recuperación de cuenta, gestión autenticada de propietarios, pagos y conciliación, reservas con expiración, claves/QR firmados, controles tributarios y protección de datos. Esta etapa prepara operaciones SQL transaccionales pero no habilita ventas reales.
