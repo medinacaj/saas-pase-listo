@@ -1,4 +1,5 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
+import { eventDetailHref } from "./event-page-domain.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -39,7 +40,7 @@ function realPoster(event,eager=false){
 }
 function realCard(event){
  return '<article class="event-card reference-event">'+
-  '<div class="poster-button">'+realPoster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></div>'+
+  '<div class="poster-button">'+realPoster(event)+</div>'+
   '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
   '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
   '<p class="event-subtitle">'+esc(event.subtitle)+'</p>'+
@@ -50,8 +51,6 @@ function realCard(event){
 function openRealDetail(id){
  const e=realSamples.find(x=>x.id===id);if(!e)return;
  ui.lastFocus=document.activeElement;
- let source="";
- try{const u=new URL(e.sourceUrl);if(u.protocol==="https:")source=u.href;}catch{/* no external link */}
  const end=e.endDate&&e.endDate!==e.date?" al "+date(e.endDate):"";
  $("#detail-content").innerHTML='<div class="detail-layout"><div class="detail-cover">'+realPoster(e)+'<span class="detail-art-label">AFICHE PROMOCIONAL DE TERCERO · LICENCIA NO ACREDITADA</span></div>'+
   '<div class="detail-info"><div class="detail-kicker">REFERENCIA VISUAL · NO A LA VENTA</div>'+
@@ -61,7 +60,7 @@ function openRealDetail(id){
   '<div><dt>Recinto</dt><dd>'+esc(e.venue)+' · '+esc(e.city)+'</dd></div>'+
   '<div><dt>Organiza</dt><dd>'+esc(e.organizer)+'</dd></div></dl>'+
   '<div class="reference-disclaimer"><strong>Venta en PaseListo no habilitada.</strong><p>Para habilitar una ficha comercial, nuestro equipo debe acreditar el contrato B2B, permisos sobre el cartel, cupos y condiciones de venta.</p></div>'+
-  (source?'<p class="reference-source"><a href="'+esc(source)+'" target="_blank" rel="noopener noreferrer">Ver fuente oficial de la fecha y recinto ↗</a></p>':"")+
+  
   '<small class="reference-rights">'+esc(e.posterCredit||"Afiche promocional externo")+' · reproducción comercial pendiente de autorización.</small></div></div>';
  $("#detail-backdrop").hidden=false;document.body.classList.add("dialog-open");$("#event-dialog").focus();installImages();
 }
@@ -69,7 +68,7 @@ function openRealDetail(id){
 
 function card(event){
  return '<article class="event-card">'+
-  '<div class="poster-button">'+poster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></div>'+
+  '<div class="poster-button">'+poster(event)+</div>'+
   '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
   '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
   '<p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
@@ -236,9 +235,9 @@ async function start(){
  document.addEventListener("click",ev=>{
   const target=ev.target;
   const real=target.closest("[data-real-detail]");
-  if(real){openRealDetail(real.dataset.realDetail);return;}
+  if(real){location.assign(eventDetailHref(real.dataset.realDetail));return;}
   const d=target.closest("[data-detail]");
-  if(d){openDetail(d.dataset.detail);return;}
+  if(d){location.assign(eventDetailHref(d.dataset.detail));return;}
   const cat=target.closest("[data-category]");
   if(cat){ui.category=cat.dataset.category;renderCards();return;}
   const type=target.closest("[data-select-ticket]");
@@ -313,5 +312,14 @@ async function start(){
  window.addEventListener("storage",ev=>{
   if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();}).catch(()=>{});}
  });
+ const params=new URLSearchParams(location.search);
+ const selected=params.get("checkout"),ticket=params.get("type");
+ if(selected&&ticket&&selected.length<=160&&ticket.length<=100){
+  const event=selectedEvent(selected);
+  if(event?.ticketTypes.some(t=>t.id===ticket)){
+   history.replaceState(null,"",location.pathname+location.hash);
+   openCheckout(selected,ticket).catch(error=>console.error("PaseListo",error.message));
+  }
+ }
 }
 start();
