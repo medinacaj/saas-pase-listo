@@ -9,6 +9,7 @@ import { promisify } from "node:util";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { seedCommerce, simulateOrder, available, quote } from "../src/commerce-domain.mjs";
+import { createPostgresDemoOrders } from "./postgres-demo-orders.mjs";
 
 const derive = promisify(scrypt);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -97,7 +98,7 @@ const assetTypes = new Map([
   ["/data/eventos-clientes-demo.json", ["data/eventos-clientes-demo.json", "application/json"]],
   ["/data/eventos-reales-referencia.json", ["data/eventos-reales-referencia.json", "application/json"]]
 ]);
-export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.json") } = {}) {
+export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.json"), ordersBackend = null } = {}) {
   const dbPath = resolve(filePath);
   const sessions = new Map();
   const attempts = new Map();
@@ -109,7 +110,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
     await writeFile(stage, JSON.stringify(value), { flag: "wx", mode: 0o600 });
     await rename(stage, dbPath);
   };
-  const ready = (async () => {
+  const fileReady = (async () => {
     try {
       const value = JSON.parse(await readFile(dbPath, "utf8"));
       if (value.version !== 1 || !Array.isArray(value.buyers) || !Array.isArray(value.market?.orders)) throw Error("Archivo local de usuarios no válido");
@@ -120,6 +121,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       await persist(db);
     }
   })();
+  const ready = ordersBackend ? fileReady.then(() => ordersBackend.initialize()) : fileReady;
   const mutate = (work) => {
     const task = serial.then(async () => {
       await ready;
@@ -162,27 +164,30 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         return;
       }
       if (req.method === "GET" && path === "inventory") {
-        const events = db.market.events.filter(e => e.status === "published").map(e => ({
-          eventId: e.id,
-          ticketTypes: e.ticketTypes.map(t => {
-            const preview = quote(db.market, e.id, t.id, 1, { availabilityRequired: false });
-            return {
-              ticketTypeId: t.id,
-              remaining: available(db.market, e.id, t.id),
-              unitBaseClp: preview.unitBaseClp,
-              feePerTicketClp: preview.feePerTicketClp
-            };
-          })
-        }));
-        toJson(res, 200, { events, updatedAt: db.market.updatedAt });
+        const events = ordersBackend
+          ? await ordersBackend.inventory()
+          : db.market.events.filter(e => e.status === "published").map(e => ({
+              eventId: e.id,
+              ticketTypes: e.ticketTypes.map(t => {
+                const preview = quote(db.market, e.id, t.id, 1, { availabilityRequired: false });
+                return {
+                  ticketTypeId: t.id,
+                  remaining: available(db.market, e.id, t.id),
+                  unitBaseClp: preview.unitBaseClp,
+                  feePerTicketClp: preview.feePerTicketClp
+                };
+              })
+            }));
+        toJson(res, 200, { events, updatedAt: ordersBackend ? null : db.market.updatedAt });
         return;
       }
       if (req.method === "GET" && path === "orders") {
         const session = activeSession(req, sessions);
         if (!session || !db.buyers.some(b => b.id === session.buyerId)) throw bad(401, "Debes iniciar sesión para consultar pedidos");
-        const orders = db.market.orders
-          .filter(o => o.buyerId === session.buyerId)
-          .map(buyerOrder);
+        const source = ordersBackend
+          ? await ordersBackend.ordersForBuyer(session.buyerId)
+          : db.market.orders.filter(o => o.buyerId === session.buyerId);
+        const orders = source.map(buyerOrder);
         toJson(res, 200, { orders });
         return;
       }
@@ -246,17 +251,22 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       if (path === "orders") {
         const requestId = String(payload.requestId || "");
         if (!/^[a-z0-9-]{12,70}$/i.test(requestId)) throw bad(422, "Identificador de solicitud inválido");
-        const order = await mutate(async next => {
-          const existing = next.market.orders.find(o => o.buyerId === session.buyerId && o.requestId === requestId);
-          if (existing) {
-            if (existing.eventId !== payload.eventId || existing.ticketTypeId !== payload.ticketTypeId || existing.quantity !== payload.quantity) throw bad(409, "Solicitud repetida con otros datos");
-            return existing;
-          }
-          if (next.market.orders.length >= 2000) throw bad(429, "Límite de pedidos de demostración alcanzado");
-          const created = simulateOrder(next.market, { eventId: payload.eventId, ticketTypeId: payload.ticketTypeId, quantity: payload.quantity, buyerId: session.buyerId });
-          created.requestId = requestId;
-          return created;
-        });
+        const order = ordersBackend
+          ? await ordersBackend.create({
+              buyerId: session.buyerId, eventId: payload.eventId,
+              ticketTypeId: payload.ticketTypeId, quantity: payload.quantity, requestId
+            })
+          : await mutate(async next => {
+              const existing = next.market.orders.find(o => o.buyerId === session.buyerId && o.requestId === requestId);
+              if (existing) {
+                if (existing.eventId !== payload.eventId || existing.ticketTypeId !== payload.ticketTypeId || existing.quantity !== payload.quantity) throw bad(409, "Solicitud repetida con otros datos");
+                return existing;
+              }
+              if (next.market.orders.length >= 2000) throw bad(429, "Límite de pedidos de demostración alcanzado");
+              const created = simulateOrder(next.market, { eventId: payload.eventId, ticketTypeId: payload.ticketTypeId, quantity: payload.quantity, buyerId: session.buyerId });
+              created.requestId = requestId;
+              return created;
+            });
         toJson(res, 201, buyerOrder(order));
         return;
       }
@@ -270,7 +280,21 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
   return { server, ready, filePath: dbPath };
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const app = buildBuyerServer();
-  app.ready.then(() => app.server.listen(8082, "127.0.0.1", () => console.log("PaseListo login de prueba: http://127.0.0.1:8082")))
-    .catch(err => { console.error("No se pudo iniciar servidor local de prueba:", err.message); process.exit(1); });
+  // Optional PostgreSQL DEMO mode. Requires a dedicated database with the
+  // migration applied; never point this server at production customer data.
+  let pool = null;
+  let ordersBackend = null;
+  if (process.env.PASELISTO_DEMO_DATABASE_URL) {
+    const { Pool } = await import("pg");
+    pool = new Pool({ connectionString: process.env.PASELISTO_DEMO_DATABASE_URL, max: 8 });
+    ordersBackend = createPostgresDemoOrders({ pool, catalog: fixture });
+  }
+  const app = buildBuyerServer({ ordersBackend });
+  app.ready.then(() => app.server.listen(8082, "127.0.0.1", () => console.log(
+    "PaseListo DEMO local (" + (ordersBackend ? "PostgreSQL" : "JSON") + "): http://127.0.0.1:8082"
+  ))).catch(async err => {
+    console.error("No se pudo iniciar servidor local de prueba:", err.message);
+    await pool?.end();
+    process.exit(1);
+  });
 }
