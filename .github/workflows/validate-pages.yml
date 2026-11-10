@@ -19,6 +19,7 @@ jobs:
           node --check src/marketplace.mjs
           node --check src/commerce-domain.mjs
           node --check src/event-page.mjs
+          node --check src/venue-zones.mjs
           node --check src/event-page-domain.mjs
           node --check src/control.mjs
       - name: Verify event cards and catalogs
@@ -38,5 +39,14 @@ jobs:
           assert.ok(!script.includes('poster-arrow'));
           assert.ok(!script.includes('Ver fuente oficial de la fecha y recinto'));
           assert.ok(script.includes('eventDetailHref('));
-          console.log('Event cards and event catalogs are valid.');
+          const details=readFileSync('evento.html','utf8');
+          const detailJs=readFileSync('src/event-page.mjs','utf8');
+          const zones=readFileSync('src/venue-zones.mjs','utf8');
+          assert.ok(details.includes('id="venue-zone-map"'), 'Zone map container missing');
+          assert.ok(details.includes('id="venue-zone-legend"'), 'Zone legend missing');
+          assert.ok(detailJs.includes('renderVenueMap(event,store,reference,inventory)'), 'Zone map not rendered');
+          assert.ok(detailJs.includes('data-ticket-zone'), 'Map not linked to ticket prices');
+          assert.ok(detailJs.includes('SIN PLANO VERIFICADO'), 'Unverified venue warning missing');
+          assert.ok(zones.includes('ZONE_COLORS'), 'Category color palette missing');
+          console.log('Event cards, catalogs and colored zone diagrams are valid.');
           JS
