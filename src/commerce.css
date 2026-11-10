@@ -92,7 +92,6 @@
 .card-hitbox{position:absolute;inset:0;z-index:15;width:100%;height:100%;opacity:0;border:0;background:transparent;cursor:pointer;border-radius:14px;padding:0}
 .card-hitbox:focus-visible{opacity:1;outline:3px solid #507a32;outline-offset:4px;background:#CFF47A0D}
 .event-card:hover .poster-img{transform:scale(1.045)}
-.event-card:hover .poster-arrow{transform:translate(3px,-3px);background:#E2FFA2}
 .event-card:hover .card-heading{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
 .card-heading{font-family:var(--display);font-size:clamp(23px,2.3vw,30px);letter-spacing:-.5px;line-height:1.14;margin:8px 0 3px;font-weight:600}
 .events-grid .card-heading{font-size:25px}
