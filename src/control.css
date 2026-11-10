@@ -24,3 +24,8 @@
 .ref-art img{position:absolute;inset:0;z-index:2;width:100%;height:100%;object-fit:cover}
 .vis-label{font-size:10px;font-weight:600;color:#889789}
 @media(max-width:550px){.ref-art{min-height:170px}.ref-art .no-poster{min-height:170px}}
+
+
+/* Stable event identifiers are visible in the Central Control only. */
+.internal-event-id{display:block;margin-top:6px;color:#627467;font-size:10px;font-weight:500;line-height:1.5}
+.internal-event-id code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;color:#3f604e;overflow-wrap:anywhere;word-break:break-word}
