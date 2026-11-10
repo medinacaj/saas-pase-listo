@@ -130,3 +130,29 @@ test("solicitudes concurrentes de compradores distintos no comparten idempotenci
  const saved = JSON.parse(await readFile(filePath, "utf8"));
  assert.equal(saved.market.orders.length, 2);
 });
+
+test("historial de pedidos requiere sesión y no expone pedidos de otros compradores", async t => {
+ const { request } = await fixture(t);
+ assert.equal((await request("orders")).status, 401);
+ const [first, second] = await Promise.all([
+  request("register", { method: "POST", body: { email: "historial-uno@example.test", password: "Historial-Prueba-123456" } }),
+  request("register", { method: "POST", body: { email: "historial-dos@example.test", password: "Historial-Prueba-654321" } })
+ ]);
+ assert.equal(first.status, 201);
+ assert.equal(second.status, 201);
+ const initial = await request("orders", { cookie: second.cookie });
+ assert.equal(initial.status, 200);
+ assert.deepEqual(initial.data.orders, []);
+ const purchase = await request("orders", { method: "POST", cookie: first.cookie,
+  body: { eventId: "demo-noches-aurora", ticketTypeId: "general", quantity: 1, requestId: "history-purchase-0001" } });
+ assert.equal(purchase.status, 201);
+ const ownerHistory = await request("orders", { cookie: first.cookie });
+ assert.equal(ownerHistory.status, 200);
+ assert.equal(ownerHistory.data.orders.length, 1);
+ assert.equal(ownerHistory.data.orders[0].id, purchase.data.id);
+ assert.equal(ownerHistory.data.orders[0].pricing.currency, "CLP");
+ assert.equal(ownerHistory.data.orders[0].buyerId, undefined);
+ assert.equal(ownerHistory.data.orders[0].requestId, undefined);
+ const otherHistory = await request("orders", { cookie: second.cookie });
+ assert.deepEqual(otherHistory.data.orders, []);
+});
