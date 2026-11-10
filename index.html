@@ -8,9 +8,9 @@
 <meta name="robots" content="noindex,nofollow">
 <title>PaseListo — Los mejores eventos comienzan aquí</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./src/portal.css">
+<link rel="stylesheet" href="./src/portal.css?v=20261110-weekly">
 <link rel="stylesheet" href="./src/commerce.css">
-<script type="module" src="./src/marketplace.mjs?v=20261110-restored-listings"></script>
+<script type="module" src="./src/marketplace.mjs?v=20261110-weekly"></script>
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -19,6 +19,13 @@
 <a class="brand" href="#inicio" aria-label="PaseListo inicio"><span class="brand-icon" aria-hidden="true">✳</span><span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span></a>
 <nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
 <div class="head-actions"><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
+</div>
+<div class="week-strip" id="week-strip" aria-label="Agenda de eventos de esta semana" hidden>
+ <div class="week-strip-inner">
+  <div class="week-strip-label"><strong>ESTA SEMANA</strong><span id="week-strip-range"></span></div>
+  <div class="week-strip-events" id="week-strip-events" aria-live="polite"></div>
+  <a class="week-strip-all" href="./index.html#cartelera">Toda la agenda <span aria-hidden="true">→</span></a>
+ </div>
 </div>
 </header>
 <main id="contenido">
