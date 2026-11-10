@@ -68,6 +68,39 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
     assert.equal(type.feePerTicketClp,2000);
   });
 
+  await t.test("dos pools reutilizan la misma solicitud simultánea sin duplicar ventas", async () => {
+    await reset();
+    await Promise.all([a.initialize(), b.initialize()]);
+    await poolA.query(
+      "UPDATE demo_ticket_stock SET capacity=1 WHERE event_id=$1 AND ticket_type_id=$2",
+      ["demo-noches-aurora","general"]
+    );
+    const request={
+      buyerId:"buyer-33333333-3333-4333-8333-333333333333",
+      eventId:"demo-noches-aurora",ticketTypeId:"general",
+      quantity:1,requestId:"postgres-same-key-0001"
+    };
+    const responses=await Promise.all(
+      Array.from({length:10},(_,i)=>(i%2?b:a).create(request))
+    );
+    assert.equal(new Set(responses.map(o=>o.id)).size,1);
+    assert.equal(new Set(responses.map(o=>o.requestId)).size,1);
+    const persisted=await poolA.query(
+      "SELECT sold FROM demo_ticket_stock WHERE event_id=$1 AND ticket_type_id=$2",
+      [request.eventId,request.ticketTypeId]
+    );
+    assert.equal(persisted.rows[0].sold,1);
+    const count=await poolB.query(
+      "SELECT count(*)::int AS total FROM demo_orders WHERE buyer_id=$1",
+      [request.buyerId]
+    );
+    assert.equal(count.rows[0].total,1);
+    await assert.rejects(
+      b.create({...request,quantity:2}),
+      error=>error.status===409
+    );
+  });
+
   await t.test("sesión HTTP utiliza PostgreSQL y el historial aísla los compradores", async t => {
     await reset();
     await Promise.all([a.initialize(),b.initialize()]);
