@@ -21,6 +21,13 @@
 <nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
 <div class="head-actions"><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
 </div>
+<div class="week-strip" id="week-strip" aria-label="Agenda de eventos de esta semana" hidden>
+ <div class="week-strip-inner">
+  <div class="week-strip-label"><strong>ESTA SEMANA</strong><span id="week-strip-range"></span></div>
+  <div class="week-strip-events" id="week-strip-events" aria-live="polite"></div>
+  <a class="week-strip-all" href="./index.html#cartelera">Toda la agenda <span aria-hidden="true">→</span></a>
+ </div>
+</div>
 </header>
 <main id="contenido">
 <div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras requieren una sesión validada. GitHub Pages no acepta pedidos.</div>
