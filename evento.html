@@ -45,8 +45,19 @@
    </div>
    <div class="event-page-grid">
     <div class="event-page-primary">
+     <section class="event-page-section venue-map-section" aria-labelledby="venue-map-heading">
+      <div class="event-page-section-label">01 / DISTRIBUCIÓN POR SECTORES</div>
+      <h2 id="venue-map-heading">Mapa de zonas.</h2>
+      <p class="venue-map-intro" id="venue-map-intro">Explora las categorías de entrada y sus colores.</p>
+      <div class="venue-map-panel">
+       <div id="venue-zone-map" class="venue-map-art" aria-label="Plano de sectores del evento"></div>
+       <div id="venue-zone-legend" class="venue-map-legend" aria-label="Clasificación de entradas"></div>
+      </div>
+      <p id="venue-zone-selection" class="venue-map-selection" role="status" aria-live="polite"></p>
+      <p id="venue-map-accuracy" class="venue-map-disclaimer"></p>
+     </section>
      <section class="event-page-section" aria-labelledby="venue-heading">
-      <div class="event-page-section-label">01 / INFORMACIÓN ÚTIL</div>
+      <div class="event-page-section-label">02 / INFORMACIÓN ÚTIL</div>
       <h2 id="venue-heading">Sobre el recinto.</h2>
       <p id="venue-description"></p>
       <div class="event-page-location"><span aria-hidden="true">⌖</span><span id="venue-location"></span></div>
@@ -61,12 +72,12 @@
       <p class="event-page-note" id="venue-note"></p>
      </section>
      <section class="event-page-section event-weather-section" aria-labelledby="weather-heading">
-      <div class="event-page-section-label">02 / PLANIFICA TU VISITA</div>
+      <div class="event-page-section-label">03 / PLANIFICA TU VISITA</div>
       <div class="event-weather-title"><h2 id="weather-heading">El clima ese día.</h2><span class="weather-soft-dot" aria-hidden="true"></span></div>
       <div id="event-weather" class="event-weather-content" role="status" aria-live="polite">Comprobando disponibilidad del pronóstico…</div>
      </section>
      <section class="event-page-section" aria-labelledby="conditions-heading">
-      <div class="event-page-section-label">03 / ANTES DE ASISTIR</div>
+      <div class="event-page-section-label">04 / ANTES DE ASISTIR</div>
       <h2 id="conditions-heading">Lo que debes saber.</h2>
       <p id="event-conditions"></p>
      </section>
