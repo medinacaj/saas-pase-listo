@@ -1,74 +1,56 @@
-# PaseListo · Portal de espectáculos y SaaS para organizadores
-## Estado actual — noviembre de 2026
+# PaseListo — Ticketera B2B2C para espectáculos y recintos
 
-**Frontend público editorial disponible en GitHub Pages:** https://medinacaj.github.io/saas-pase-listo/
+**Modelo de negocio:** empresas productoras, recintos y promotores contratan PaseListo para publicar espectáculos y vender entradas al público **en la propia plataforma**. PaseListo opera tecnología, distribución, cobro de cargos de servicio, emisión futura de boletos y control de acceso.
 
-- Portada de cultura en vivo con identidad independiente de RutaTicket; ficha y afiche promocional de eventos.
-- **14 eventos referenciados** de fuentes oficiales en Santiago, Concepción, Valparaíso, Antofagasta y Pichilemu.
-- Buscador, categorías, filtro de ciudad y fecha, favoritos locales, fichas con procedencia del cartel y enlaces a la venta oficial.
-- Los carteles proceden de enlaces externos; su **licencia de reproducción comercial está pendiente de verificar**. No se presentan imágenes inexistentes como oficiales.
-- Panel privado de demostración funcional disponible en https://medinacaj.github.io/saas-pase-listo/organizador.html; no tiene autenticación real.
-- Backend experimental Node.js local en server/, con JSON en disco y pruebas HTTP; **no está desplegado ni conectado al portal GitHub Pages**.
-- Para diseño, fuentes, derechos y criterios de lanzamiento consultar [PORTAL_PUBLICO_Y_FUENTES.md](docs/PORTAL_PUBLICO_Y_FUENTES.md).
+## Abrir las dos superficies web desde GitHub Pages
 
-**No somos vendedor ni representante de los eventos de terceros listados.** Las compras se realizan exclusivamente en sus respectivas páginas de venta oficial. No hay pasarela, tickets válidos, pagos ni venta operativa por PaseListo.
+- **Tienda para compradores (demostración):** https://medinacaj.github.io/saas-pase-listo/
+- **Consola B2B para organizadores (demostración):** https://medinacaj.github.io/saas-pase-listo/organizador.html
+- Laboratorio técnico histórico de entradas: https://medinacaj.github.io/saas-pase-listo/laboratorio.html
 
----
+**¡Importante!** Este prototipo es **100% ficticio**: ocho eventos inventados, tres organizadores sintéticos, afiches gráficos DEMO, tarifas y acuerdos ilustrativos. **No se cobran fondos, no se aceptan tarjetas, no se emiten entradas reales, no hay reservas ni autenticación segura.** Los datos se guardan en el localStorage del navegador y los cambios son visibles entre ambas páginas **solo en el mismo navegador/dispositivo**.
 
-**Estado: primer MVP de demostración local (v0.1). No es un SaaS operativo ni un sistema de cobro habilitado.**
+El portal no es un diario de eventos, un agregador de noticias ni un afiliado a otros vendedores. La lista anterior de espectáculos reales de terceros fue retirada de la versión web para evitar aparentar que existe un contrato con sus productores.
 
-Interfaz web para productores/organizadores de eventos, independiente de RutaTicket (transporte). Mantiene el alcance aprobado en [requisitos SaaS](docs/REQUISITOS_SAAS.md).
+## Qué permite probar ahora
 
-## Disponible en esta primera entrega
-- Panel de eventos para **dos organizaciones ficticias** con vista separada por organización.
-- Alta de eventos sintéticos, aforo, precio referencial en VES y listado de eventos.
-- Emisión y anulación de entradas DEMO con códigos de prueba y validación de acceso de un solo uso.
-- Indicadores, actividad y mensajes de estado; vista adaptable a móviles.
-- Pruebas de dominio de organización ajena, aforo, anulaciones y doble uso en una sesión.
-- Sin servicios externos, dependencias de producción, anuncios, telemetría ni despliegue.
+**Comprador:**
+- Buscar eventos y filtrar por ciudad, categoría o fecha.
+- Abrir ficha, consultar recinto, productor, fecha y tipos de entradas.
+- Seleccionar hasta seis entradas ficticias, ver cupos demo y **precio final en pesos chilenos**, separando precio base y cargo de servicio.
+- Ejecutar un **pedido de prueba** con alias ficticio, sin pagos, datos de tarjeta ni emisión válida.
 
-**Limitaciones importantes:** todos los datos existen únicamente en el almacenamiento local del navegador (solo en este dispositivo y sujeto a reinicio mediante el botón). El selector de organización **no es autenticación ni aislamiento SaaS real**. Sin control simultáneo entre dispositivos, pasarela, QR firmados, base de datos, cuentas, pedidos legales o tickets con validez comercial. No introducir datos reales.
+**Productor o recinto:**
+- Elegir una empresa **ficticia** en el panel empresarial (no es un login).
+- Publicar un evento inventado con ciudad, recinto, fecha, categoría, aforo, precio y color del afiche. Puede incorporar URL de imagen propia indicando que tiene derechos, aunque la demo **no verifica** esas autorizaciones.
+- Consultar pedidos simulados, métricas, tarifa de servicio y participación ilustrativa del recinto.
+- Anular pedidos ficticios, que liberan inventario local.
+- Probar toda la operación entre el panel y la tienda del mismo navegador.
+
+**Tecnología:**
+- Motor independiente de negocio en `src/commerce-domain.mjs`; tests de comisiones, inventario, aislamiento lógico y operaciones DEMO.
+- **API Node.js de desarrollo** en `server/marketplace-api.mjs`: tokens separados por organizador, endpoints HTTP autenticados, archivo JSON local, idempotencia y serialización de transacciones **solo en un proceso**, con tests. No desplegada públicamente.
+- Código y evidencia de pruebas en la solicitud de cambios [PR #2](https://github.com/medinacaj/saas-pase-listo/pull/2).
 
 ## Ejecutar localmente
 
-Requiere Python 3 y navegador actual:
+Para visualizar solo la tienda y panel: con Python 3 ejecuta `python3 -m http.server 8080` y abre http://localhost:8080.
 
-```sh
-python3 -m http.server 8080
-```
+Para verificar la aplicación, con Node 22+: `npm run check`.
 
-Abrir **http://localhost:8080**. No abrir index.html con file:// por tratarse de módulos ES.
+Para probar el **servidor local de comercio**, configura la variable `PASELISTO_DEMO_KEYS` como un objeto JSON con tres tokens aleatorios distintos de al menos 24 caracteres, bajo `org-aurora`, `org-escena` y `org-nexo`. Luego ejecuta `npm run api:commerce`. Escucha únicamente en `127.0.0.1:8081`; la tienda estática aún no está conectada a ese servicio.
 
-## Validar reglas
+El servidor anterior `npm run api:dev` conserva el laboratorio de tickets; no corresponde a ventas comerciales.
 
-Requiere Node.js 20 o superior (sin npm install):
+## Próximos hitos imprescindibles
 
-```sh
-npm test
-npm run check
-```
+1. Contratos B2B reales y validación de organizadores, recintos, derechos de afiches e identidad.
+2. PostgreSQL + RLS, autenticación, MFA, permisos por empresa, inventario transaccional, reservas con expiración y multiinstancia.
+3. Procesador de pagos autorizado con webhook firmado, idempotencia, reembolsos, conciliación, liquidaciones, impuestos y contabilidad verificables.
+4. Emisión de entradas con QR firmado, transferencias/validación en puerta y prevención de reutilización.
+5. Políticas de privacidad y consentimiento, protección al comprador, condiciones de espectáculo, cumplimiento legal y despliegue seguro.
+6. Reservas, preventas, paquetes, promociones, mapas de asientos y analítica empresarial. Exclusividad, precios dinámicos y reventa solamente tras validación legal y de producto.
 
-El CI ejecuta las pruebas en PR y cambios en main. La interfaz no se ha verificado en un navegador real en esta entrega.
+Consulta [Modelo B2B2C](docs/MODELO_B2B2C.md) y [Requisitos SaaS](docs/REQUISITOS_SAAS.md).
 
-## Próximos hitos
-Leer [Arquitectura y etapas](docs/ARQUITECTURA_Y_HITOS.md): autenticación segura, backend PostgreSQL/RLS, emisión atómica, QR firmado, cobros autorizados, suscripciones SaaS, privacidad y validación legal. No activar ventas ni desplegar comercialmente sin revisión y aprobación.
-
-
-## Abrir la versión web desde GitHub (sin dominio)
-
-**[Abrir PaseListo en GitHub Pages](https://medinacaj.github.io/saas-pase-listo/)**. GitHub Pages publicó el frontend de demostración a partir de la rama exclusiva `gh-pages`, sin incorporar `server/` ni datos privados.
-
-La web funciona en el navegador, guarda únicamente datos **ficticios** en `localStorage` de ese dispositivo y permite restablecerlos. **No hay autenticación real ni sincronización entre dispositivos.** Usar alias inventados, nunca datos de compradores o pasajeros reales.
-
-## API backend de desarrollo (Node.js, local; no disponible en GitHub Pages)
-
-Se añadió un servidor HTTP funcional en `server/index.mjs` con:
-
-- Endpoints JSON `/api/v1/health`, `/api/v1/snapshot` y operaciones de gestión/boletos según el producto.
-- Autorización DEMO por token Bearer distinto para cada organización, sin aceptar el tenant indicado por el navegador.
-- Mutaciones serializadas en un proceso Node.js, protección de doble uso/asiento y claves de idempotencia opcionales; persiste datos sintéticos mediante escritura atómica en `.local/`.
-- Pruebas HTTP automatizadas, aislamiento de operadores y transacciones de demostración.
-
-**No es un backend de producción:** usa JSON en disco en vez de PostgreSQL, tiene credenciales de desarrollo, no resuelve consistencia entre varios servidores, no admite cuentas reales ni cumple aún requisitos regulatorios de boletería. El frontend de GitHub Pages utiliza almacenamiento local y **todavía no consume esta API**, que queda preparada para la integración segura posterior.
-
-Para usar el backend en tu ordenador, configura dos tokens aleatorios largos en `TICKETING_DEMO_KEYS` y ejecuta `npm run api:dev`. El servidor escucha **solo en 127.0.0.1:8080**. Consulta el ejemplo de configuración en [backend de desarrollo](docs/BACKEND_DESARROLLO.md).
+**GitHub Pages solo sirve frontend estático. No es hosting de backend comercial.** No introducir datos reales en esta demostración.

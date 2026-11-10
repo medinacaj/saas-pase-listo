@@ -62,3 +62,10 @@ Repositorio de producto: `medinacaj/saas-pase-listo`. Fuente histórica: `medina
 El producto incluye una portada de descubrimiento y fichas editoriales que **no se confunden con el SaaS transaccional del organizador**. Versión: https://medinacaj.github.io/saas-pase-listo/ . Se registró un catálogo curado de 14 eventos de Chile con fuente oficial primaria y enlaces de compra externos, filtros y favoritos locales. Las imágenes promocionales se enlazan a fuentes externas: sus derechos comerciales **no están verificados** y se requiere permiso antes de explotar el portal como negocio. Ver docs/PORTAL_PUBLICO_Y_FUENTES.md.
 
 El backend Node.js local sirve pruebas de aislamiento y concurrencia monoproceso; no constituye SaaS ni se ejecuta en GitHub Pages. La compra real, las credenciales, la BD PostgreSQL y pagos autorizados siguen pendientes. RutaTicket mantiene su propia UX de operador y no debe compartir plantilla de portal cultural.
+
+
+## Aclaración del propietario · 10/11/2026 — Ticketera B2B2C, no portal editorial
+
+PaseListo es la **infraestructura comercial de publicación, distribución y venta de entradas propias** de productores y recintos **contratados**, con catálogo público, checkout y control de emisión/validación. Ya no es un agregador que deriva compradores a Ticketmaster/PuntoTicket. Los organizadores establecen el precio base; PaseListo calcula y muestra cargos por servicio y acuerdos de reparto B2B de forma transparente. El régimen de exclusividades, precios variables, reventa y uso de datos exige evaluación independiente y **no se habilita por defecto**. No se venden datos personales. Ver `docs/MODELO_B2B2C.md`.
+
+La demo actual: ocho eventos 100% inventados, tres empresas ficticias, afiches tipográficos DEMO, checkout sin cobro y panel de organizadores sin autenticación. La publicación en GitHub Pages no representa un servicio comercial activo. Los carteles de terceros sin licencia acreditada y conciertos reales sin contrato fueron retirados de la web pública.
