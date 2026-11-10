@@ -60,23 +60,24 @@ test("la semana real del 9 al 15 de noviembre tiene eventos contrastados",async(
  assert.ok(sources.every(e=>!e.ticketTypes&&!e.priceClp&&!e.posterUrl));
 });
 
-test("el encabezado público y la ficha cargan la misma agenda semanal compacta",async()=>{
+test("el carrusel reemplaza la franja semanal sin quitar las tarjetas de cartelera",async()=>{
  const [index,page,market,details,css,server]=await Promise.all([
   read("../index.html"),read("../evento.html"),read("../src/marketplace.mjs"),
-  read("../src/event-page.mjs"),read("../src/portal.css"),
+  read("../src/event-page.mjs"),read("../src/hero-carousel.css"),
   read("../server/buyer-server.mjs")
  ]);
- for(const html of [index,page]){
-  assert.ok(html.includes('id="week-strip"'));
-  assert.ok(html.includes('id="week-strip-events"'));
-  assert.ok(html.includes('id="week-strip-range"'));
- }
- assert.ok(market.includes("renderWeekStrip(realSamples,publishedEvents(store))"));
- assert.ok(details.includes("renderWeekStrip(refs.events||[],store.events)"));
- assert.ok(css.includes(".week-strip-inner"));
- assert.ok(css.includes(".week-strip-events"));
- assert.ok(server.includes('["/src/week-events.mjs", ["src/week-events.mjs", "text/javascript"]]'));
- const renderer=await read("../src/week-events.mjs");
- assert.ok(renderer.includes('eventDetailHref(event.id)'));
- assert.ok(renderer.includes("Sin eventos esta semana"));
+ assert.ok(index.includes('class="hero hero-carousel"'));
+ assert.ok(index.includes('id="hero-carousel-controls"'));
+ assert.ok(index.includes('id="hero-carousel-dots"'));
+ assert.ok(index.includes('id="hero-poster"'));
+ assert.ok(index.includes('id="real-events-grid"'));
+ assert.ok(index.includes('id="events-grid"'));
+ assert.ok(!index.includes('id="week-strip"'));
+ assert.ok(!page.includes('id="week-strip"'));
+ assert.ok(!details.includes('renderWeekStrip('));
+ assert.ok(market.includes("renderFeatured()"));
+ assert.ok(market.includes("chooseHero("));
+ assert.ok(css.includes(".hero-carousel-controls"));
+ assert.ok(server.includes('["/src/hero-carousel.mjs", ["src/hero-carousel.mjs", "text/javascript"]]'));
+ assert.ok(server.includes('["/src/hero-carousel.css", ["src/hero-carousel.css", "text/css"]]'));
 });
