@@ -113,3 +113,17 @@ test("cada evento tiene un identificador interno único y aparece solo en el con
  assert.ok(control.includes("esc(e.id)"));
  assert.doesNotMatch(marketplace,/ID interno:/);
 });
+
+
+test("el círculo verde con flecha desaparece en todas las tarjetas, sin perder interacción",async()=>{
+ const portalCss=await read("../src/portal.css");
+ const commerceCss=await read("../src/commerce.css");
+ assert.doesNotMatch(marketplace,/poster-arrow/);
+ assert.doesNotMatch(portalCss,/poster-arrow/);
+ assert.doesNotMatch(commerceCss,/poster-arrow/);
+ // Ambas tarjetas conservan la superposición accesible y clicable.
+ assert.match(marketplace,/class="card-hitbox" type="button" data-real-detail=/);
+ assert.match(marketplace,/class="card-hitbox" type="button" data-detail=/);
+ assert.match(marketplace,/class="event-meta"/);
+ assert.match(marketplace,/short\\(event\\.date\\)/);
+});
