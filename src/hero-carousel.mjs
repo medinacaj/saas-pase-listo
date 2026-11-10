@@ -17,15 +17,21 @@ export function selectHeroEvents(references, demos, today = chileToday(), limit 
  for(const event of [...clean(references,"reference"),...clean(demos,"demo")]){
   if(!unique.has(event.id))unique.set(event.id,event);
  }
- return [...unique.values()].sort((a,b)=>{
-  const weight=e=>{
-   // Prefer genuinely current-week announcements, then editorial priority.
-   const thisWeek=e.date<=end && (e.endDate||e.date)>=today;
-   return (thisWeek?1000:0) + Math.min(100,Math.max(0,Number(e.heroPriority)||0)) +
-    (e.featured===true?15:0);
-  };
-  return weight(b)-weight(a)||a.date.localeCompare(b.date)||a.title.localeCompare(b.title,"es");
- }).slice(0,safeLimit);
+ const events=[...unique.values()];
+ const weight=e=>Math.min(100,Math.max(0,Number(e.heroPriority)||0))+(e.featured===true?10:0);
+ const rank=(a,b)=>weight(b)-weight(a)||a.date.localeCompare(b.date)||a.title.localeCompare(b.title,"es");
+ const inWeek=events.filter(e=>e.date<=end&&(e.endDate||e.date)>=today).sort(rank);
+ const upcoming=events.filter(e=>e.date>end).sort(rank);
+ // Keep a prominent mix: four current-week shows and up to two upcoming
+ // highlights with approved reference posters, if available.
+ const slots=Math.min(4,safeLimit);
+ const picked=[...inWeek.slice(0,slots),...upcoming.slice(0,safeLimit-slots)];
+ const seen=new Set(picked.map(e=>e.id));
+ for(const event of [...inWeek.slice(slots),...upcoming.slice(safeLimit-slots)]){
+  if(picked.length>=safeLimit)break;
+  if(!seen.has(event.id)){picked.push(event);seen.add(event.id);}
+ }
+ return picked.slice(0,safeLimit);
 }
 
 export function splitHeroTitle(title,subtitle="") {
