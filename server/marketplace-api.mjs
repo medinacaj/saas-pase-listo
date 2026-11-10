@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { createDemoApi } from "./runtime.mjs";
-import { seedCommerce, createOrganizerEvent, organizerEvents, ordersForOrganizer, statsForOrganizer, simulateOrder, cancelSimulatedOrder } from "../src/commerce-domain.mjs";
+import { seedCommerce, createOrganizerEvent, organizerEvents, ordersForOrganizer, statsForOrganizer } from "../src/commerce-domain.mjs";
 const staticRoot=resolve(dirname(fileURLToPath(import.meta.url)),"..");
 const catalog=JSON.parse(readFileSync(resolve(staticRoot,"data/eventos-clientes-demo.json"),"utf8"));
 function seed(){
@@ -19,11 +19,6 @@ function view(store,tenantId){
   contract:store.contract,
   notice:"Servidor local de DEMO; sin pagos, reservas ni emisión real"
  };
-}
-function simulateScoped(store,tenantId,payload){
- const event=store.events.find(e=>e.id===payload.eventId && e.organizerId===tenantId);
- if(!event)throw Error("Evento no encontrado para este organizador");
- return simulateOrder(store,payload);
 }
 export function buildMarketplaceServer({tokens,filePath=resolve(staticRoot,".local","commerce.json")}){
  return createDemoApi({
@@ -41,9 +36,7 @@ export function buildMarketplaceServer({tokens,filePath=resolve(staticRoot,".loc
    })),
    view,
    actions:{
-    "/api/v1/market/events":(s,tenant,p)=>createOrganizerEvent(s,tenant,p),
-    "/api/v1/market/orders":(s,tenant,p)=>simulateScoped(s,tenant,p),
-    "/api/v1/market/orders/cancel":(s,tenant,p)=>cancelSimulatedOrder(s,tenant,p.orderId)
+    "/api/v1/market/events":(s,tenant,p)=>createOrganizerEvent(s,tenant,p)
    }
   }
  });

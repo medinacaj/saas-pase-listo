@@ -78,3 +78,8 @@ El **Centro de Control es propiedad y uso del operador PaseListo**, y administra
 El portal de compradores sí puede mostrar fichas de eventos anunciados con **afiches promocionales reales**, pero en esta etapa solo como **referencias de diseño no contratadas**: no tienen checkout, precio, stock, ni se atribuye venta a PaseListo. La venta real exige contrato B2B, autorización sobre el material gráfico, validación de inventario y pagos. Los eventos ficticios están separados para probar el checkout sin engaños. Referencias: `data/eventos-reales-referencia.json`; ejemplos de compra: `data/eventos-clientes-demo.json`.
 
 Panel web central de demostración: https://medinacaj.github.io/saas-pase-listo/admin.html. Tienda: https://medinacaj.github.io/saas-pase-listo/.
+
+
+## Requisito de autenticación del comprador (prioritario, 10/11/2026)
+
+Se prohíbe la compra como invitado y se elimina cualquier alias ficticio del checkout. Antes de pagar, el cliente debe estar **registrado y autenticado mediante correo y contraseña**; el backend comprueba su sesión en cada orden y reserva, vinculándola a su cuenta. GitHub Pages, sin backend, debe impedir registros/pedidos reales. Un servidor Node local solo permite simular el acceso sin datos reales. Implementación pendiente para producción: servicio de identidad con confirmación de correo, recuperación de contraseña, MFA opcional, protección anti bots, sesiones seguras y autorización.

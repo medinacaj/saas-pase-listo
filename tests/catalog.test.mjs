@@ -82,3 +82,13 @@ test("portada ya no duplica destacados ni presenta bloques comerciales innecesar
  assert.match(portal,/id="real-events-grid"/);
  assert.match(portal,/id="events-grid"/);
 });
+
+test("la selección de entradas requiere login de servidor, sin alias ni pedidos desde localStorage",()=>{
+ assert.doesNotMatch(portal,/Alias ficticio/);
+ assert.match(portal,/id="login-backdrop"/);
+ assert.match(marketplace,/function showLogin|async function showLogin/);
+ assert.match(marketplace,/refreshBuyer\(\)/);
+ assert.match(marketplace,/buyerRequest\("orders"/);
+ assert.doesNotMatch(marketplace,/simulateOrder\(/);
+ assert.doesNotMatch(marketplace,/name="alias"/);
+});

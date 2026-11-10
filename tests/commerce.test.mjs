@@ -16,7 +16,7 @@ test("cargo de servicio y total se muestran sin ocultar comisiones", () => {
 test("la compra DEMO consume cupos, bloquea exceso y puede anularse", () => {
  const s=seedCommerce(catalog);
  const before=available(s,"demo-noches-aurora","general");
- const order=simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:3,alias:"Cliente de prueba"});
+ const order=simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:3,buyerId:"buyer-demo-001"});
  assert.equal(order.status,"demo_confirmed");
  assert.equal(available(s,"demo-noches-aurora","general"),before-3);
  assert.throws(()=>cancelSimulatedOrder(s,"org-escena",order.id),/otra organización/);
@@ -37,7 +37,7 @@ test("dos organizadores no consultan ni publican eventos de otro",()=>{
 });
 test("no incluye cobro real, QR válido ni datos de pago",()=>{
  const s=seedCommerce(catalog);
- const o=simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,alias:"Invitado de prueba"});
+ const o=simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,buyerId:"buyer-demo-001"});
  assert.match(o.id,/^SIM-/);
  assert.equal(o.status,"demo_confirmed");
  assert.equal(o.pricing.note.includes("sin procesamiento de pagos"),true);
@@ -48,7 +48,7 @@ test("no incluye cobro real, QR válido ni datos de pago",()=>{
 test("almacenamiento local persiste únicamente una demo por navegador",()=>{
  const db=new Map(),memory={getItem:key=>db.get(key)||null,setItem:(key,v)=>db.set(key,v),removeItem:key=>db.delete(key)};
  const state=seedCommerce(catalog);
- simulateOrder(state,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,alias:"Invitado de prueba"});
+ simulateOrder(state,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,buyerId:"buyer-demo-001"});
  assert.equal(saveCommerce(state,memory),true);
  assert.equal(loadCommerce(catalog,memory).orders.length,1);
 });

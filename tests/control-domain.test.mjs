@@ -7,8 +7,8 @@ const fixtures=JSON.parse(await readFile(new URL("../data/eventos-clientes-demo.
 const refs=JSON.parse(await readFile(new URL("../data/eventos-reales-referencia.json",import.meta.url),"utf8"));
 test("control central consolida todas las organizaciones sin ser panel de un organizador",()=>{
  const s=seedCommerce(fixtures);
- simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:2,alias:"Persona ficticia"});
- simulateOrder(s,{eventId:"demo-luces-del-sur",ticketTypeId:"vip",quantity:1,alias:"Comprador sintético"});
+ simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:2,buyerId:"buyer-demo-001"});
+ simulateOrder(s,{eventId:"demo-luces-del-sur",ticketTypeId:"vip",quantity:1,buyerId:"buyer-demo-001"});
  const o=ownerOverview(s);
  assert.equal(o.organizers,3);
  assert.equal(o.orders,2);
@@ -42,8 +42,8 @@ test("cargos y reparto B2B son configurables solo como simulación",()=>{
 });
 test("control central puede anular operaciones ficticias sin modificar otras",()=>{
  const s=seedCommerce(fixtures);
- const a=simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,alias:"Comprador DEMO"});
- const b=simulateOrder(s,{eventId:"demo-luces-del-sur",ticketTypeId:"vip",quantity:1,alias:"Comprador DEMO"});
+ const a=simulateOrder(s,{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,buyerId:"buyer-demo-001"});
+ const b=simulateOrder(s,{eventId:"demo-luces-del-sur",ticketTypeId:"vip",quantity:1,buyerId:"buyer-demo-001"});
  ownerCancelDemo(s,a.id);
  assert.equal(ownerOverview(s).orders,1);
  assert.equal(ownerOrders(s).find(x=>x.id===b.id).status,"demo_confirmed");

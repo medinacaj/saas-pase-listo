@@ -14,7 +14,7 @@ PaseListo es **la ticketera del propietario**, no un software de autoservicio pa
 ## Dos tipos de espectáculos, sin confundir permisos
 
 1. **Referencias visuales reales:** seis espectáculos anunciados en Chile, con fechas verificadas y afiches promocionales de terceros enlazados externamente: Gorillaz, Fauna Primavera, Camila, Deep Purple, Cirque du Soleil / Alegría y 31 Minutos. Se usan únicamente para mostrar cómo lucirían fichas reales. **No hay contrato de venta con PaseListo, autorización comercial del afiche, precios o cupos nuestros.** Por eso **no tienen botón de compra**.
-2. **Eventos de ensayo comercial:** ocho espectáculos y tres productores **inventados**. Estos permiten recorrer el checkout DEMO (precio base + cargo por servicio + total), generar pedidos ficticios, modificar cupos y controlar comisiones en el mismo navegador.
+2. **Eventos de ensayo comercial:** ocho espectáculos y tres productores **inventados**. Estos muestran tipos de entradas y tarifas. El checkout solo se habilita con inicio de sesión verificado por servidor; GitHub Pages bloquea el pedido al no disponer de backend.
 
 Los datos promocionales reales están en `data/eventos-reales-referencia.json` con sus `sourceUrl`, `posterSourceUrl` y `posterCredit`. No copiamos los archivos de afiches a GitHub y su uso comercial está pendiente de autorización. Si alguna imagen externa no carga, se muestra un fallback tipográfico.
 
@@ -35,7 +35,7 @@ Los datos promocionales reales están en `data/eventos-reales-referencia.json` c
 
 - Portal HTML/CSS/JS en `index.html`, `src/marketplace.mjs`, `src/commerce.css`, `src/portal.css`.
 - Centro de control en `admin.html`, `src/control.mjs`, `src/control-domain.mjs`, `src/control.css`.
-- Reglas de negocio DEMO en `src/commerce-domain.mjs`; los datos ficticios solo persisten en `localStorage` del mismo navegador. **No hay backend conectado al portal publicado.**
+- Reglas de negocio DEMO en `src/commerce-domain.mjs`; los datos del catálogo y panel ficticio persisten en `localStorage` del mismo navegador. **Los pedidos de comprador ya no se escriben desde el navegador**. **No hay backend conectado al portal publicado.**
 - API Node experimental en `server/marketplace-api.mjs`, con tokens de demostración por organización, idempotencia y archivo JSON local, **sin autenticación de propietario** y no desplegada públicamente. No utilizar para operaciones reales.
 - Pruebas Node.js: `npm run check` (requiere Node 22+).
 - Código de desarrollo en [PR #2](https://github.com/medinacaj/saas-pase-listo/pull/2); la rama `gh-pages` contiene solo assets públicos de demostración.
@@ -47,3 +47,24 @@ PaseListo firma acuerdos B2B con recintos o promotores y opera una ticketera cen
 Para vender de verdad falta: control privado del propietario mediante autenticación y MFA, backend y PostgreSQL, inventario concurrente, reservas y expiración, pagos autorizados, conciliación/liquidaciones, QR firmado y antifraude, permisos comerciales de afiches, contratos con organizadores, derechos del consumidor y privacidad. No se venden datos personales.
 
 Consulta también [Modelo de negocio](docs/MODELO_B2B2C.md) y [Requisitos SaaS](docs/REQUISITOS_SAAS.md).
+
+
+## Regla obligatoria de compra: cuenta con correo y contraseña
+
+**No se puede comprar como invitado ni utilizar alias ficticios.** El flujo correcto es:
+
+1. Seleccionar un evento y tipo de entrada.
+2. **Ingresar con correo electrónico y contraseña**, o crear una cuenta que quede verificada por el backend.
+3. El servidor confirma una sesión vigente y solo entonces habilita el checkout.
+4. Todo pedido se envía al servidor con la sesión asociada al comprador. El servidor revalida cantidad, tipo de entrada, cupo e idempotencia.
+5. El envío de entradas reales, el pago, el restablecimiento de contraseña, verificación de correo y antifraude se incorporarán en la etapa productiva.
+
+**GitHub Pages no dispone de un servidor de autenticación:** allí el usuario puede ver la interfaz de acceso, pero **no escribir credenciales ni completar un pedido**. No se almacena una contraseña en `localStorage`, no se inventan sesiones y no se ofrece el alias anterior.
+
+### Pruebas locales de registro e ingreso
+
+Con Node.js 22 o superior, ejecuta `npm run api:buyers` y abre **http://127.0.0.1:8082**. Solo utiliza un correo ficticio de pruebas y una contraseña exclusiva creada para la demo de al menos 12 caracteres; no uses contraseñas reales.
+
+El servidor de prueba utiliza `scrypt` con sal aleatoria para derivar el hash de la contraseña, sesiones HttpOnly/SameSite con expiración, límites de intentos, comprobación de origen y escritura local en `.local/buyer-demo.json`. Los pedidos se vinculan al identificador de usuario de la sesión, no a un alias suministrado por el formulario.
+
+**No es una solución productiva.** No tiene verificación de correo, recuperación de cuenta, MFA, cifrado TLS, alta disponibilidad ni persistencia SQL. No exponer el puerto a Internet ni usar datos reales. Para el despliegue definitivo, integrar autenticación administrada y una base de datos segura en un hosting de backend.

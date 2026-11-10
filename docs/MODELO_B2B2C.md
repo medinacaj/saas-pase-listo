@@ -65,3 +65,8 @@ La nueva normativa de protección de datos Ley 21.719 figura con entrada en vige
 En el prototipo `admin.html` y `src/control.mjs` implementan una demostración central de operaciones de **todas las empresas a la vez**. `organizador.html` redirige a `admin.html`. Esta simulación es completamente pública y carece de login; en producción deberá exigirse backend autenticado con roles de propietario y operadores.
 
 Para poblar visualmente el portal existen **seis eventos reales con afiches promocionales originales de terceros** de muestra, verificados en fuentes primarias pero no autorizados para vender ni con permiso comercial acreditado para los afiches. No hay precio, comisión ni inventario de PaseListo para ellos. Los ocho eventos ficticios sí permiten simular el checkout. Esta separación seguirá siendo obligatoria hasta la firma de acuerdos.
+
+
+## Acceso obligatorio para comprar · 10/11/2026
+
+El propietario exige **login con correo y contraseña** para completar cualquier pedido. Se elimina el campo «Alias ficticio» y la compra anónima. El portal debe verificar sesión de backend antes de mostrar el checkout; todas las operaciones deben volver a validarse del lado servidor. La web GitHub Pages no permite iniciar sesión ni comprar mientras no exista hosting de autenticación, y debe permanecer cerrada por defecto. El servidor Node de prueba `server/buyer-server.mjs` incorpora registro, contraseña derivada con `scrypt`, sesión HttpOnly/SameSite, control de origen, límites de intentos y pedidos DEMO asociados al comprador, pero no es apto para producción. Pendientes: proveedor de identidad, verificación de correo, MFA, reset, PostgreSQL y pagos.
