@@ -1,6 +1,7 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
-import { renderWeekStrip } from "./week-events.mjs";
+import { selectHeroEvents, splitHeroTitle } from "./hero-carousel.mjs";
+import { weekBounds } from "./week-events.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -124,12 +125,101 @@ function renderCards(){
  installImages();
 }
 
-function renderFeatured(){
- const first=realEvents().find(e=>e.featured)||realEvents()[0]||null;
- if(first)$("#hero-poster").innerHTML='<button class="hero-art-button" type="button" data-real-detail="'+esc(first.id)+'" aria-label="Ver ficha de '+esc(first.title)+'">'+realPoster(first,true)+'<span class="hero-poster-bottom"><small>EVENTO DE REFERENCIA · SIN VENTA</small><strong>'+esc(first.title)+' ↗</strong></span></button>';
- else $("#hero-poster").innerHTML='<div class="hero-no-poster"><span>✳</span><strong>Eventos en vivo.</strong></div>';
+let heroSlides=[];
+let heroIndex=0;
+let heroTimer=null;
+let heroPaused=false;
+let heroHover=false;
+function scheduleHero(){
+ if(heroTimer!==null){clearInterval(heroTimer);heroTimer=null;}
+ const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+ if(heroSlides.length<2||heroPaused||heroHover||reduceMotion||document.hidden)return;
+ heroTimer=window.setInterval(()=>{
+  heroIndex=(heroIndex+1)%heroSlides.length;
+  showHeroSlide();
+ },6500);
+}
+function showHeroSlide(manual=false){
+ const event=heroSlides[heroIndex];
+ if(!event)return;
+ const {main,accent}=splitHeroTitle(event.title,event.subtitle);
+ $("#hero-title-main").textContent=main;
+ $("#hero-title-accent").textContent=accent;
+ $("#hero-feature-kicker").textContent=event.date<=current()
+   ?"EN CARTELERA · EVENTO DESTACADO"
+   :event.date<=weekBounds(current()).end
+    ?"ESTA SEMANA · DESTACADOS":"PRÓXIMAMENTE · DESTACADOS";
+ $("#hero-feature-summary").textContent=event.subtitle||event.genre||"Descubre los detalles del evento.";
+ $("#hero-feature-date").textContent=date(event.date)+
+  (event.endDate&&event.endDate!==event.date?" al "+date(event.endDate):"")+
+  (event.time?" · "+event.time+" h":"");
+ $("#hero-feature-venue").textContent=event.venue+" · "+event.city;
+ $("#hero-feature-notice").textContent=event.kind==="reference"
+  ?"REFERENCIA · SIN VENTA":"EVENTO FICTICIO · DEMO";
+ const href=eventDetailHref(event.id);
+ $("#hero-feature-link").href=href;
+ $("#hero-feature-link").setAttribute("aria-label","Ver ficha de "+event.title);
+ $("#hero-slide-count").textContent=String(heroIndex+1).padStart(2,"0")+
+  " / "+String(heroSlides.length).padStart(2,"0");
+ const card=$("#hero-poster");
+ const artwork=event.kind==="reference"?realPoster(event,true):poster(event);
+ card.style.setProperty("--hero-accent",/^#[a-f0-9]{6}$/i.test(event.accent||"")?event.accent:"#d2f58b");
+ card.classList.toggle("hero-poster-typographic",!event.posterUrl);
+ card.innerHTML='<a class="hero-art-link" href="'+esc(href)+'" aria-label="Ver ficha de '+esc(event.title)+'">'+
+  artwork+'<span class="hero-poster-bottom"><small>'+
+  (event.kind==="reference"?"EVENTO DE REFERENCIA · SIN VENTA":"EVENTO DEMO · SIN COMPRA REAL")+
+  '</small><strong>'+esc(event.title)+' <span aria-hidden="true">↗</span></strong></span></a>';
+ $("#hero-carousel-dots").querySelectorAll("[data-hero-index]").forEach(dot=>{
+  const active=Number(dot.dataset.heroIndex)===heroIndex;
+  dot.classList.toggle("is-active",active);
+  dot.setAttribute("aria-pressed",String(active));
+ });
+ if(manual)$("#hero-carousel-live").textContent=
+  "Destacado "+(heroIndex+1)+" de "+heroSlides.length+": "+event.title;
+ for(const node of [$("#hero-feature-content"),card]){
+  node.classList.remove("is-changing");
+  void node.offsetWidth;
+  node.classList.add("is-changing");
+ }
  installImages();
 }
+function chooseHero(index,manual=true){
+ if(heroSlides.length===0)return;
+ heroIndex=(index%heroSlides.length+heroSlides.length)%heroSlides.length;
+ showHeroSlide(manual);
+ scheduleHero();
+}
+function renderFeatured(){
+ heroSlides=selectHeroEvents(realSamples,publishedEvents(store),current(),6);
+ heroIndex=0;
+ const dots=$("#hero-carousel-dots");
+ dots.replaceChildren();
+ heroSlides.forEach((event,index)=>{
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="hero-carousel-dot";
+  button.dataset.heroIndex=String(index);
+  button.setAttribute("aria-label","Ver destacado "+(index+1)+": "+event.title);
+  button.setAttribute("aria-pressed","false");
+  dots.append(button);
+ });
+ if(!heroSlides.length){
+  $("#hero-feature-kicker").textContent="PRÓXIMOS EVENTOS EN CHILE";
+  $("#hero-feature-summary").textContent="Explora la cartelera disponible.";
+  $("#hero-feature-title").textContent="Tu próxima gran noche.";
+  $("#hero-feature-link").href="#cartelera";
+  $("#hero-poster").innerHTML='<div class="hero-no-poster"><span>✳</span><strong>Eventos en vivo.</strong></div>';
+  $("#hero-carousel-controls").hidden=true;
+  scheduleHero();
+  return;
+ }
+ $("#hero-carousel-controls").hidden=heroSlides.length<2;
+ const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches===true;
+ $("#hero-carousel-controls").querySelector("[data-hero-toggle]").hidden=reduceMotion;
+ showHeroSlide();
+ scheduleHero();
+}
+
 function selectedEvent(id){return store.events.find(e=>e.id===id&&e.status==="published");}
 function openDetail(id){
  const event=selectedEvent(id);if(!event)return;
@@ -223,13 +313,36 @@ async function start(){
   store=loadCommerce(catalog);
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
-  renderWeekStrip(realSamples,publishedEvents(store));
+
   refreshBuyer();
  }catch(err){
   $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
   $("#events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
   console.error("PaseListo",err.message);return;
  }
+ const heroControls=$("#hero-carousel-controls");
+ heroControls.addEventListener("click",ev=>{
+  const target=ev.target.closest("button");
+  if(!target)return;
+  if(target.hasAttribute("data-hero-step")){
+   chooseHero(heroIndex+Number(target.dataset.heroStep));
+  }else if(target.hasAttribute("data-hero-index")){
+   chooseHero(Number(target.dataset.heroIndex));
+  }else if(target.hasAttribute("data-hero-toggle")){
+   heroPaused=!heroPaused;
+   target.textContent=heroPaused?"Reanudar":"Pausar";
+   target.setAttribute("aria-label",heroPaused?"Reanudar carrusel":"Pausar carrusel");
+   scheduleHero();
+  }
+ });
+ const hero=$("#inicio");
+ hero.addEventListener("mouseenter",()=>{heroHover=true;scheduleHero();});
+ hero.addEventListener("mouseleave",()=>{heroHover=false;scheduleHero();});
+ hero.addEventListener("focusin",()=>{heroHover=true;scheduleHero();});
+ hero.addEventListener("focusout",ev=>{
+  if(!hero.contains(ev.relatedTarget)){heroHover=false;scheduleHero();}
+ });
+ document.addEventListener("visibilitychange",scheduleHero);
  $("#event-search").addEventListener("input",ev=>{ui.query=ev.target.value;renderCards();});
  $("#city-filter").addEventListener("change",ev=>{ui.city=ev.target.value;renderCards();});
  $("#date-filter").addEventListener("change",ev=>{ui.period=ev.target.value;renderCards();});
@@ -312,7 +425,7 @@ async function start(){
   else if(!ev.shiftKey&&document.activeElement===focusables.at(-1)){ev.preventDefault();focusables[0].focus();}
  });
  window.addEventListener("storage",ev=>{
-  if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();renderWeekStrip(realSamples,publishedEvents(store));}).catch(()=>{});}
+  if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();}).catch(()=>{});}
  });
  const params=new URLSearchParams(location.search);
  const selected=params.get("checkout"),ticket=params.get("type");
