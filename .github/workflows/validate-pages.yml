@@ -1,0 +1,42 @@
+name: Validar cartelera pública PaseListo
+on:
+  push:
+    branches: [gh-pages]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify browser modules parse correctly
+        run: |
+          node --check src/marketplace.mjs
+          node --check src/commerce-domain.mjs
+          node --check src/event-page.mjs
+          node --check src/event-page-domain.mjs
+          node --check src/control.mjs
+      - name: Verify event cards and catalogs
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const script=readFileSync('src/marketplace.mjs','utf8');
+          const demo=JSON.parse(readFileSync('data/eventos-clientes-demo.json','utf8'));
+          const refs=JSON.parse(readFileSync('data/eventos-reales-referencia.json','utf8'));
+          assert.ok(demo.events.length >= 8, 'Missing demo events');
+          assert.ok(refs.events.length >= 6, 'Missing reference events');
+          assert.match(script, /function realCard\(event\)/);
+          assert.match(script, /function card\(event\)/);
+          assert.ok(script.includes("realPoster(event)+'</div>'"));
+          assert.ok(script.includes("poster(event)+'</div>'"));
+          assert.ok(!script.includes('poster-arrow'));
+          assert.ok(!script.includes('Ver fuente oficial de la fecha y recinto'));
+          assert.ok(script.includes('eventDetailHref('));
+          console.log('Event cards and event catalogs are valid.');
+          JS
