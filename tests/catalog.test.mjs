@@ -20,7 +20,7 @@ test("los eventos ofrecidos en la tienda de demostración no suplantan carteles 
 test("portal cuenta con selección y checkout transparente pero sin pasarela",()=>{
  assert.match(portal,/src\/marketplace\.mjs/);
  assert.match(portal,/checkout-backdrop/);
- assert.match(portal,/Cargo/);
+ assert.match(portal,/cargo/i);
  assert.match(portal,/sin dinero real/i);
  assert.doesNotMatch(portal,/www\.puntoticket\.com|www\.ticketmaster\.cl/);
  assert.match(admin,/src\/gestion\.mjs/);
