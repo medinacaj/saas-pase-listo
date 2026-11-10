@@ -219,3 +219,29 @@ test("peticiones simultáneas distintas no sobrepasan el último aforo DEMO", as
   .ticketTypes.find(t=>t.ticketTypeId==="general").remaining;
  assert.equal(remaining,0);
 });
+
+test("inventario DEMO muestra tarifa final por entrada, incluso al agotarse",async t=>{
+ const {request}=await fixture(t,{capacity:1});
+ const getType=async()=>{
+  const result=await request("inventory");
+  assert.equal(result.status,200);
+  return result.data.events.find(e=>e.eventId==="demo-noches-aurora")
+   .ticketTypes.find(t=>t.ticketTypeId==="general");
+ };
+ const before=await getType();
+ assert.equal(before.remaining,1);
+ assert.equal(before.unitBaseClp,15000);
+ assert.equal(before.feePerTicketClp,2000);
+ const registered=await request("register",{method:"POST",body:{
+  email:"tarifa-demo@example.test",password:"Tarifa-Demo-123456789"
+ }});
+ const order=await request("orders",{method:"POST",cookie:registered.cookie,body:{
+  eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,requestId:"tarifa-order-0001"
+ }});
+ assert.equal(order.status,201);
+ assert.equal(order.data.pricing.totalClp,before.unitBaseClp+before.feePerTicketClp);
+ const after=await getType();
+ assert.equal(after.remaining,0);
+ assert.equal(after.unitBaseClp,before.unitBaseClp);
+ assert.equal(after.feePerTicketClp,before.feePerTicketClp);
+});
