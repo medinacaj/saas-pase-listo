@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-10",
+  "version": "2026-11-10-images-fix",
   "purpose": "Muestras visuales de eventos reales anunciados, SOLO PARA MOSTRAR DISEÑO. Ninguno está contratado con PaseListo, no existe venta o cupo disponible en nuestra plataforma.",
   "rights": "Las imágenes son afiches promocionales publicados por terceros con licencia de reutilización comercial NO acreditada. Referencias externas con crédito, no copiadas al repositorio.",
   "events": [
@@ -16,11 +16,12 @@
       "time": null,
       "organizer": "DG Medios",
       "sourceUrl": "https://dgmedios.com/proximos-shows/gorillaz-en-chile-2026",
-      "posterUrl": "https://www.rockaxis.com/rxidashboard/wisi_photos/1772206047_Gorillaz%202.png",
-      "posterSourceUrl": "https://www.rockaxis.com/vanguardia/articulo/50367/gorillaz-cumbres-y-causas/",
-      "posterCredit": "Gráfica promocional difundida por Rockaxis / DG Medios",
+      "posterUrl": "https://pbs.twimg.com/media/HCK_3RuWUAAUZcU.jpg",
+      "posterSourceUrl": "https://x.com/dgmedioschile/status/2027399064497651785",
+      "posterCredit": "Afiche promocional difundido por DG Medios (publicación oficial)",
       "featured": true,
-      "accent": "#f8af41"
+      "accent": "#f8af41",
+      "posterFallbackUrl": "https://www.rockaxis.com/rxidashboard/wisi_photos/1772206047_Gorillaz%202.png"
     },
     {
       "id": "ref-fauna-primavera-2026",
@@ -39,7 +40,8 @@
       "posterSourceUrl": "https://www.rockaxis.com/rock/noticia/50805/revelan-cartel-de-fauna-primavera-2026-the-strokes-new-order-fka-twigs-y-mas/",
       "posterCredit": "Afiche del festival difundido por Rockaxis",
       "featured": true,
-      "accent": "#e7bb9b"
+      "accent": "#e7bb9b",
+      "posterFallbackUrl": "https://uchile-media-storage.nyc3.cdn.digitaloceanspaces.com/2026/06/cartel-fauna-primavera-1-678x847.jpg"
     },
     {
       "id": "ref-camila-2026",

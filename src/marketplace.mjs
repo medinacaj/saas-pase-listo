@@ -25,21 +25,25 @@ function poster(event){
  return '<div class="poster-frame demo-poster" style="--poster-accent:'+tone+'"><div class="demo-poster-inner"><span class="demo-art-top">PASELISTO · EVENTO DEMO</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-subtitle">'+esc(event.subtitle)+'</span><span class="demo-art-bottom">'+esc(event.city)+' / '+esc(event.date)+'</span></div>'+image+'</div>';
 }
 
-function realPoster(event){
+
+function realPoster(event,eager=false){
  const tone=/^#[0-9a-f]{6}$/i.test(event.accent||"")?event.accent:"#E9D8BF";
- let src="";
- try{const u=new URL(event.posterUrl);if(u.protocol==="https:")src=u.href;}catch{/* fallback */}
+ let src="",backup="";
+ try{const u=new URL(event.posterUrl);if(u.protocol==="https:")src=u.href;}catch{/* Visible fallback */}
+ try{const u=new URL(event.posterFallbackUrl);if(u.protocol==="https:")backup=u.href;}catch{/* No secondary source */}
  return '<div class="poster-frame real-poster" style="--poster-accent:'+tone+'">'+
-  '<div class="demo-poster-inner"><span class="demo-art-top">AFICHE REAL · REFERENCIA</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-bottom">NO A LA VENTA EN PASELISTO</span></div>'+
-  (src?'<img src="'+esc(src)+'" alt="Afiche promocional de '+esc(event.title)+' publicado por un tercero" class="poster-img reference-poster" loading="lazy" decoding="async" referrerpolicy="no-referrer">':"")+'</div>';
+  '<div class="demo-poster-inner"><span class="demo-art-top">CARTEL NO DISPONIBLE</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-bottom">AFICHE DE TERCERO · REFERENCIA</span></div>'+
+  (src?'<img src="'+esc(src)+'"'+(backup?' data-fallback="'+esc(backup)+'"':"")+' alt="Afiche promocional de '+esc(event.title)+'" class="poster-img reference-poster" loading="'+(eager?"eager":"lazy")+'" decoding="async" referrerpolicy="no-referrer">':"")+'</div>';
 }
 function realCard(event){
- return '<article class="event-card reference-event"><button class="poster-button" type="button" data-real-detail="'+esc(event.id)+'" aria-label="Ver ejemplo de ficha: '+esc(event.title)+'">'+
-  realPoster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></button>'+
+ return '<article class="event-card reference-event">'+
+  '<div class="poster-button">'+realPoster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></div>'+
   '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
-  '<button class="event-title-button" type="button" data-real-detail="'+esc(event.id)+'"><h3>'+esc(event.title)+'</h3></button>'+
-  '<p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
-  '<div class="event-bottom real-bottom"><span>Ejemplo visual · Sin venta por PaseListo</span><button type="button" data-real-detail="'+esc(event.id)+'" aria-label="Ver ficha de referencia">↗</button></div></div></article>';
+  '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
+  '<p class="event-subtitle">'+esc(event.subtitle)+'</p>'+
+  '<div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
+  '<div class="event-bottom real-bottom"><span>Solo referencia · Sin venta</span><span aria-hidden="true">↗</span></div></div>'+
+  '<button class="card-hitbox" type="button" data-real-detail="'+esc(event.id)+'" aria-label="Ver ficha de '+esc(event.title)+'. Ejemplo sin venta en PaseListo"></button></article>';
 }
 function openRealDetail(id){
  const e=realSamples.find(x=>x.id===id);if(!e)return;
@@ -60,11 +64,32 @@ function openRealDetail(id){
  $("#detail-backdrop").hidden=false;document.body.classList.add("dialog-open");$("#event-dialog").focus();installImages();
 }
 
+
 function card(event){
- return '<article class="event-card"><button class="poster-button" type="button" data-detail="'+esc(event.id)+'" aria-label="Ver entradas para '+esc(event.title)+'">'+poster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></button><div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div><button class="event-title-button" data-detail="'+esc(event.id)+'"><h3>'+esc(event.title)+'</h3></button><p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div><div class="event-bottom"><span>Desde '+clp(minPrice(event))+' · precio final DEMO</span><button type="button" data-detail="'+esc(event.id)+'" aria-label="Seleccionar entradas para '+esc(event.title)+'">↗</button></div></div></article>';
+ return '<article class="event-card">'+
+  '<div class="poster-button">'+poster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></div>'+
+  '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
+  '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
+  '<p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
+  '<div class="event-bottom"><span>Desde '+clp(minPrice(event))+' · total DEMO</span><span aria-hidden="true">↗</span></div></div>'+
+  '<button class="card-hitbox" type="button" data-detail="'+esc(event.id)+'" aria-label="Ver entradas de prueba para '+esc(event.title)+'"></button></article>';
 }
 function installImages(){
- $(".owner-poster, .reference-poster").forEach(img=>{const done=()=>img.closest(".poster-frame")?.classList.toggle("loaded",img.naturalWidth>0);img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});if(img.complete)done();});
+ $$(".owner-poster, .reference-poster").forEach(img=>{
+  if(img.dataset.imageBound==="1")return;
+  img.dataset.imageBound="1";
+  const frame=img.closest(".poster-frame");
+  const loaded=()=>{if(img.naturalWidth>0)frame?.classList.add("loaded");};
+  const failed=()=>{
+   const fallback=img.dataset.fallback;
+   if(fallback&&!img.dataset.tried){img.dataset.tried="1";img.src=fallback;return;}
+   frame?.classList.add("image-failed");
+   img.remove();
+  };
+  img.addEventListener("load",loaded,{once:true});
+  img.addEventListener("error",failed);
+  if(img.complete){if(img.naturalWidth>0)loaded();else failed();}
+ });
 }
 function filters(){
  const categories=["Todos","Música","Festivales","Comedia","Teatro","Familia","Experiencias"];
@@ -96,11 +121,11 @@ function renderCards(){
  $$("[data-category]").forEach(el=>{el.classList.toggle("active",el.dataset.category===ui.category);el.setAttribute("aria-pressed",String(el.dataset.category===ui.category));});
  installImages();
 }
+
 function renderFeatured(){
- const items=realEvents().filter(e=>e.featured).slice(0,3);
- $("#featured-grid").innerHTML=items.map(realCard).join("");
- const first=items[0]||realEvents()[0];
- if(first)$("#hero-poster").innerHTML='<button class="hero-art-button" type="button" data-real-detail="'+esc(first.id)+'" aria-label="Ver referencia de '+esc(first.title)+'">'+realPoster(first)+'<span class="hero-poster-bottom"><small>AFICHE REAL · SOLO EJEMPLO</small><strong>'+esc(first.title)+' ↗</strong></span></button>';
+ const first=realEvents().find(e=>e.featured)||realEvents()[0]||null;
+ if(first)$("#hero-poster").innerHTML='<button class="hero-art-button" type="button" data-real-detail="'+esc(first.id)+'" aria-label="Ver ficha de '+esc(first.title)+'">'+realPoster(first,true)+'<span class="hero-poster-bottom"><small>EVENTO DE REFERENCIA · SIN VENTA</small><strong>'+esc(first.title)+' ↗</strong></span></button>';
+ else $("#hero-poster").innerHTML='<div class="hero-no-poster"><span>✳</span><strong>Eventos en vivo.</strong></div>';
  installImages();
 }
 function selectedEvent(id){return store.events.find(e=>e.id===id&&e.status==="published");}
@@ -148,7 +173,7 @@ async function start(){
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
  }catch(err){
-  $("#featured-grid").innerHTML='<p class="load-error">No se pudo cargar el catálogo de prueba.</p>';
+  $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
   $("#events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
   console.error("PaseListo",err.message);return;
  }
