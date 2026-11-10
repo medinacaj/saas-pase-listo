@@ -1,19 +1,96 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171719">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="PaseListo, demostración local de gestión de eventos y entradas.">
-  <meta name="robots" content="noindex,nofollow">
-  <title>PaseListo · Panel de eventos — Demo</title>
-  <link rel="stylesheet" href="./src/styles.css">
-  <script type="module" src="./src/app.mjs"></script>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="PaseListo: descubre música, festivales, comedia, teatro y experiencias en Chile. Agenda editorial en demostración; compra siempre en el canal oficial.">
+  <meta property="og:title" content="PaseListo · Lo que viene, se vive">
+  <meta property="og:description" content="Una manera nueva de descubrir espectáculos en Chile. Agenda informativa, sin venta directa.">
+  <meta property="og:type" content="website">
+  <title>PaseListo — Lo que viene, se vive.</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/portal.css">
+  <script type="module" src="./src/portal.mjs"></script>
 </head>
 <body>
   <a class="skip" href="#contenido">Saltar al contenido</a>
-  <div id="app" aria-live="off">
-    <main class="loading"><h1>PaseListo</h1><p>Preparando demostración local…</p></main>
+  <div id="portal">
+    <header class="site-head">
+      <div class="head-inner">
+        <a class="brand" href="#inicio" aria-label="PaseListo, inicio">
+          <span class="brand-icon" aria-hidden="true">✳</span>
+          <span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span>
+        </a>
+        <nav class="head-nav" aria-label="Navegación principal">
+          <a href="#cartelera">Cartelera</a>
+          <a href="#destacados">En portada</a>
+          <a href="#como-funciona">Cómo funciona</a>
+        </nav>
+        <div class="head-actions">
+          <button class="heart-link" type="button" data-show-favorites aria-label="Mostrar eventos guardados">♡ <span>Mis favoritos</span> <span id="favorite-count" class="favorite-count" hidden>0</span></button>
+          <a class="organizer-link" href="./organizador.html" title="Abrir demo para organizadores">Soy organizador <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </header>
+    <main id="contenido">
+      <section id="inicio" class="hero" aria-labelledby="hero-title">
+        <div class="hero-inner">
+          <div class="hero-text">
+            <div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span> TU AGENDA CULTURAL, A TU MANERA</div>
+            <h1 id="hero-title">Lo que viene,<br><em>se vive.</em><span class="hero-asterisk" aria-hidden="true">✳</span></h1>
+            <p>Conciertos que esperas, festivales que se recuerdan y noches que todavía no sabes que necesitas.</p>
+            <a class="hero-cta" href="#cartelera">Explorar cartelera <span aria-hidden="true">↗</span></a>
+            <div class="hero-legal">Agenda editorial de demostración · Sin venta de entradas propia</div>
+          </div>
+          <div class="hero-visual">
+            <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+            <div class="hero-poster" id="hero-poster" aria-label="Espectáculo destacado"></div>
+            <span class="hero-sticker">NOCHES<br>QUE CUENTAN<span aria-hidden="true">✴</span></span>
+            <div class="hero-ticket"><span class="vertical-dots">● ● ●</span><span>PARA CONTAR<br>DESPUÉS</span><strong>EN VIVO<span aria-hidden="true">↗</span></strong></div>
+          </div>
+        </div>
+        <div class="hero-footer"><span>CHILE · AGENDA CULTURAL</span><span>DESLIZA PARA DESCUBRIR ↓</span><span id="hero-current-date">EDICIÓN NOV. 2026</span></div>
+      </section>
+      <section id="destacados" class="featured section-wrap" aria-labelledby="featured-title">
+        <div class="section-eyebrow"><span class="eyebrow-line"></span> SELECCIÓN EDITORIAL / 01</div>
+        <div class="section-heading"><div><h2 id="featured-title">En el <em>radar.</em></h2><p>Lo más interesante de las próximas semanas, con fuentes verificables.</p></div><a href="#cartelera" class="text-link">Ver todos los eventos <span aria-hidden="true">↗</span></a></div>
+        <div id="featured-grid" class="featured-grid" aria-live="polite"></div>
+      </section>
+      <section class="ticker" aria-label="Experiencias en la agenda"><div class="ticker-content" aria-hidden="true">MÚSICA EN VIVO <span>✳</span> FESTIVALES <span>✳</span> COMEDIA <span>✳</span> EXPERIENCIAS <span>✳</span> MÚSICA EN VIVO <span>✳</span> FESTIVALES <span>✳</span> COMEDIA <span>✳</span> EXPERIENCIAS <span>✳</span></div></section>
+      <section id="cartelera" class="catalog section-wrap" aria-labelledby="catalog-title">
+        <div class="section-eyebrow"><span class="eyebrow-line"></span> ENCUENTRA TU PRÓXIMO PLAN / 02</div>
+        <div class="section-heading"><div><h2 id="catalog-title">La <em>cartelera.</em></h2><p>Una agenda para explorar a tu ritmo. Fechas y fichas con enlace a las fuentes originales.</p></div><span id="event-count" class="count-pill">Cargando cartelera…</span></div>
+        <div class="filter-surface">
+          <div class="search-row">
+            <label class="search-field" for="event-search"><span aria-hidden="true">⌕</span><input type="search" id="event-search" placeholder="Artista, espectáculo, lugar o ciudad…" autocomplete="off"><kbd>/</kbd></label>
+            <label class="select-wrap"><span>Ciudad</span><select id="city-filter"><option value="all">Todas las ciudades</option></select></label>
+            <label class="select-wrap"><span>Cuándo</span><select id="date-filter"><option value="all">Próximas fechas</option><option value="month">Este mes</option><option value="thirty">30 días</option><option value="later">Más adelante</option></select></label>
+          </div>
+          <div id="category-list" class="category-list" role="group" aria-label="Filtrar por categoría"></div>
+        </div>
+        <div class="catalog-toolbar"><span id="results-description" aria-live="polite">Preparando resultados…</span><button id="clear-filters" type="button" hidden>Limpiar filtros ↗</button></div>
+        <div id="events-grid" class="events-grid"></div>
+        <div id="empty-state" class="empty-state" hidden><div aria-hidden="true">✳</div><h3>No encontramos ese plan.</h3><p>Prueba otra ciudad, categoría o palabra clave.</p><button type="button" data-clear-filters>Ver toda la cartelera</button></div>
+        <p class="catalog-footnote">Información verificada con publicaciones de organizadores y tiqueteras el 10 de noviembre de 2026. Los eventos pueden cambiar; comprueba condiciones, precios, stock y horarios en el sitio de venta oficial antes de comprar.</p>
+      </section>
+      <section class="organizer-spotlight" id="como-funciona">
+        <div class="spotlight-inner">
+          <div class="spotlight-burst" aria-hidden="true">✳</div>
+          <div class="spotlight-copy"><span class="light-eyebrow">UN ESPACIO PARA QUIENES CREAN EXPERIENCIAS</span><h2>Tu evento merece<br>más que un <em>botón de compra.</em></h2><p>La otra cara de PaseListo será una plataforma para organizar, publicar y gestionar tus propios eventos y entradas. Ya existe una primera demo de operaciones; el servicio comercial sigue en construcción.</p><a href="./organizador.html" class="spotlight-button">Conocer la demo para organizadores <span aria-hidden="true">↗</span></a></div>
+          <div class="spotlight-art" aria-hidden="true"><div class="art-text">TU<br>PRÓXIMO<br>GRAN<br>EVENTO<span>↗</span></div><div class="art-stamp">PASELISTO<br>EDICIÓN CERO</div></div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="footer-top"><a class="footer-brand" href="#inicio">paselisto<span>.</span></a><p>Para lo que vale la pena salir.</p></div><div class="footer-bottom"><span>© PaseListo · Prototipo editorial · 2026</span><span>No afiliado a las tiqueteras o productores mostrados.</span><a href="./organizador.html">Panel demo organizador ↗</a></div><div class="footer-disclaimer">Las imágenes promocionales se cargan desde sus fuentes originales para una demostración editorial. La autorización para uso comercial está pendiente. PaseListo no procesa pagos ni emite entradas para estos espectáculos.</div></footer>
+  </div>
+  <div class="detail-backdrop" id="detail-backdrop" hidden>
+    <section class="detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" id="event-dialog" tabindex="-1">
+      <button class="detail-close" type="button" data-close-detail aria-label="Cerrar ficha">✕</button>
+      <div id="detail-content"></div>
+    </section>
   </div>
 </body>
 </html>
