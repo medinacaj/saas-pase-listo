@@ -56,3 +56,29 @@ test("el acceso administrativo es de control CENTRAL y la página empresarial an
  assert.match(admin,/VERSIÓN PÚBLICA Y SIN LOGIN/);
  assert.match(former,/url=\.\/admin\.html/);
 });
+
+test("todas las tarjetas se abren pulsando cualquier área y no contienen botones anidados",()=>{
+ assert.match(marketplace,/class="card-hitbox"/);
+ assert.match(marketplace,/data-real-detail/);
+ assert.match(marketplace,/data-detail/);
+ assert.match(marketplace,/class="poster-button"/);
+ assert.doesNotMatch(marketplace,/<button class="poster-button"/);
+ assert.match(marketplace,/class="card-heading"/);
+});
+test("los afiches visibles usan querySelectorAll y tienen fallback de error",async()=>{
+ const style=await read("../src/commerce.css");
+ assert.match(marketplace,/\$\$\("\.owner-poster, \.reference-poster"\)\.forEach/);
+ assert.doesNotMatch(marketplace,/\$\("\.owner-poster, \.reference-poster"\)\.forEach/);
+ assert.match(marketplace,/img\.addEventListener\("error",failed\)/);
+ assert.match(marketplace,/img\.dataset\.fallback/);
+ assert.match(style,/\.real-poster \.reference-poster,\.demo-poster \.owner-poster\{opacity:1/);
+ assert.match(style,/\.card-hitbox\{position:absolute;inset:0/);
+});
+test("portada ya no duplica destacados ni presenta bloques comerciales innecesarios",()=>{
+ assert.doesNotMatch(portal,/id="featured-grid"/);
+ assert.doesNotMatch(portal,/class="ticker"/);
+ assert.doesNotMatch(portal,/class="purchase-steps/);
+ assert.doesNotMatch(portal,/class="organizer-spotlight"/);
+ assert.match(portal,/id="real-events-grid"/);
+ assert.match(portal,/id="events-grid"/);
+});
