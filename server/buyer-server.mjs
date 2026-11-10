@@ -90,6 +90,8 @@ const assetTypes = new Map([
   ["/admin.html", ["admin.html", "text/html"]], ["/organizador.html", ["organizador.html", "text/html"]],
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
   ["/src/marketplace.mjs", ["src/marketplace.mjs", "text/javascript"]],
+  ["/src/hero-carousel.mjs", ["src/hero-carousel.mjs", "text/javascript"]],
+  ["/src/hero-carousel.css", ["src/hero-carousel.css", "text/css"]],
   ["/src/event-page.mjs", ["src/event-page.mjs", "text/javascript"]],
   ["/src/event-page-domain.mjs", ["src/event-page-domain.mjs", "text/javascript"]],
   ["/src/week-events.mjs", ["src/week-events.mjs", "text/javascript"]],
