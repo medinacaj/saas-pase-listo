@@ -86,7 +86,7 @@ export function quote(store, eventId, ticketTypeId, quantityInput) {
   const venueShareClp = Math.round(serviceFeeClp * venueShareBps / 10000);
   return { eventId, ticketTypeId, quantity, currency:"CLP", unitBaseClp:baseClp, faceValueClp, feePerTicketClp, serviceFeeClp, totalClp, venueShareClp, platformShareClp: serviceFeeClp - venueShareClp, note:"Simulación de cobro; sin procesamiento de pagos, impuestos ni recaudación" };
 }
-export function simulateOrder(store, { eventId, ticketTypeId, quantity, alias }) {
+export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId }) {
   const pricing = quote(store, eventId, ticketTypeId, quantity);
   const event = eventOrFail(store, eventId);
   const order = {
@@ -95,7 +95,7 @@ export function simulateOrder(store, { eventId, ticketTypeId, quantity, alias })
     organizerId:event.organizerId,
     eventId, ticketTypeId,
     quantity:pricing.quantity,
-    alias:text(alias,2,55,"Alias ficticio"),
+    buyerId:text(buyerId,8,100,"Identificador de comprador autenticado"),
     pricing,
     createdAt:iso()
   };

@@ -18,11 +18,11 @@
 <div class="head-inner">
 <a class="brand" href="#inicio" aria-label="PaseListo inicio"><span class="brand-icon" aria-hidden="true">✳</span><span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span></a>
 <nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
-<div class="head-actions"><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
+<div class="head-actions"><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
 </div>
 </header>
 <main id="contenido">
-<div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras de prueba usan eventos ficticios.</div>
+<div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras requieren una sesión validada. GitHub Pages no acepta pedidos.</div>
 <section class="hero" id="inicio">
 <div class="hero-inner"><div class="hero-text">
 <div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span> TU PRÓXIMO ESPECTÁCULO</div>
@@ -62,6 +62,15 @@
 <section class="detail-dialog marketplace-dialog" id="event-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" tabindex="-1">
 <button class="detail-close" type="button" data-close-detail aria-label="Cerrar ficha">✕</button>
 <div id="detail-content"></div>
+</section></div>
+<div class="detail-backdrop" id="login-backdrop" hidden>
+<section class="checkout-dialog buyer-login-dialog" role="dialog" aria-modal="true" aria-labelledby="login-title" id="login-dialog" tabindex="-1">
+<button class="detail-close" type="button" data-close-login aria-label="Cerrar acceso">✕</button>
+<div class="detail-kicker">CUENTA PASELISTO</div>
+<h2 id="login-title">Accede para continuar.</h2>
+<p class="login-description">Para comprar entradas es obligatorio ingresar con tu correo electrónico y contraseña.</p>
+<div id="buyer-auth-content"></div>
+<p class="buyer-login-note">La página pública es una demostración. El registro y el inicio de sesión solo funcionan en el servidor local de desarrollo; no introduzcas credenciales personales reales.</p>
 </section></div>
 <div class="detail-backdrop" id="checkout-backdrop" hidden>
 <section class="checkout-dialog" id="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title" tabindex="-1">
