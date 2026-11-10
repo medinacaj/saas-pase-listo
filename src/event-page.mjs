@@ -27,7 +27,7 @@ const safePoster = value => {
 function renderPoster(event,reference) {
  const color=/^#[a-f0-9]{6}$/i.test(event.accent||"")?event.accent:"#cff47a";
  const fallback='<div class="demo-poster-inner">'+
-  '<span class="demo-art-top">'+(reference?"AFICHE DE REFERENCIA":"EVENTO DEMO · PASELISTO")+'</span>'+
+  '<span class="demo-art-top">'+(reference?(event.posterUrl?"AFICHE DE REFERENCIA":"FICHA INFORMATIVA · SIN VENTA"):"EVENTO DEMO · PASELISTO")+'</span>'+
   '<span class="demo-art-symbol" aria-hidden="true">✳</span>'+
   '<span class="demo-art-title">'+esc(event.title)+'</span>'+
   '<span class="demo-art-subtitle">'+esc(event.subtitle)+'</span>'+
