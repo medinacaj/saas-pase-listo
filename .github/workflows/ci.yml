@@ -8,10 +8,27 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: paselisto_test
+          POSTGRES_USER: demo_test
+          POSTGRES_PASSWORD: demo_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U demo_test -d paselisto_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PASELISTO_DEMO_DATABASE_URL: postgresql://demo_test:demo_test_only@127.0.0.1:5432/paselisto_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: npm install --no-audit --no-fund
       - run: npm run check
