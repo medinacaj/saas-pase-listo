@@ -8,11 +8,11 @@
 <meta name="description" content="Ficha individual de evento en PaseListo: fecha, recinto, categorías de entradas y previsión meteorológica cuando esté disponible.">
 <title>Detalle de evento · PaseListo</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./src/portal.css">
+<link rel="stylesheet" href="./src/portal.css?v=20261110-weekly">
 <link rel="stylesheet" href="./src/commerce.css">
 <link rel="stylesheet" href="./src/brand-system.css">
 <link rel="stylesheet" href="./src/event-page.css?v=20261110-zones">
-<script type="module" src="./src/event-page.mjs?v=20261110-zones"></script>
+<script type="module" src="./src/event-page.mjs?v=20261110-weekly"></script>
 </head>
 <body>
 <a class="skip" href="#event-content">Saltar al detalle del evento</a>
@@ -22,6 +22,13 @@
   <nav class="head-nav" aria-label="Navegación principal"><a href="./index.html#cartelera">Explorar eventos</a></nav>
   <div class="head-actions"><a class="event-header-link" href="./index.html#cartelera">Volver a la cartelera <span aria-hidden="true">↗</span></a></div>
  </div>
+<div class="week-strip" id="week-strip" aria-label="Agenda de eventos de esta semana" hidden>
+ <div class="week-strip-inner">
+  <div class="week-strip-label"><strong>ESTA SEMANA</strong><span id="week-strip-range"></span></div>
+  <div class="week-strip-events" id="week-strip-events" aria-live="polite"></div>
+  <a class="week-strip-all" href="./index.html#cartelera">Toda la agenda <span aria-hidden="true">→</span></a>
+ </div>
+</div>
 </header>
 <main id="event-content" class="event-page-main">
  <div class="demo-ribbon" role="note"><strong>Versión demostrativa.</strong> Los espectáculos de referencia no están a la venta; las compras simuladas solo funcionan en el servidor local.</div>
