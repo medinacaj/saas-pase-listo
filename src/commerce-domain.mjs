@@ -148,7 +148,8 @@ export function createOrganizerEvent(store, organizationId, input) {
     if (input.posterRightsConfirmed !== true) fail("Debes declarar que tienes autorización para publicar el cartel");
   }
   const normalizedDate = new Date(date + "T12:00:00Z");
-  if (normalizedDate.getTime() < Date.now() - 24 * 60 * 60 * 1000) fail("No se puede publicar un evento DEMO en el pasado");
+  const todayUtc = new Date().toISOString().slice(0,10);
+  if (date < todayUtc) fail("No se puede publicar un evento DEMO en el pasado");
   const result={
     id:"demo-creado-"+id().slice(0,12),organizerId:organizationId,title,
     subtitle:text(input.subtitle||"Evento publicado por organizador DEMO",3,100,"Subtítulo"),
