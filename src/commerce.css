@@ -137,3 +137,21 @@
 .switch-auth{border:0;background:transparent;text-decoration:underline;font-size:12px;font-weight:800;color:#486c37;padding:8px}
 .signed-buyer{font-size:11px;color:#507536;font-weight:700}
 @media(max-width:600px){.buyer-account-trigger{font-size:11px;padding:9px 10px}.buyer-login-dialog{padding:34px 18px 20px}}
+
+
+/* Cuenta del comprador: historial de pedidos ficticios en el mismo sistema visual. */
+.buyer-orders-dialog h2{font:600 clamp(32px,4.5vw,48px)/1.1 var(--display);letter-spacing:-1px;margin:14px 0 10px}
+.orders-intro,.orders-count,.orders-empty{font-size:12px;line-height:1.6;color:#687164}
+.orders-count{margin:18px 0 10px}
+.buyer-orders-list{display:grid;gap:11px;max-height:min(48vh,420px);overflow-y:auto;margin:18px 0 24px;padding:2px}
+.buyer-order-card{background:var(--pl-paper,#fffdf9);border:1px solid var(--pl-line,#e5e3de);border-radius:14px;padding:16px}
+.buyer-order-top,.buyer-order-total{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.buyer-order-top strong{font-size:14px;line-height:1.35}
+.buyer-order-top span{color:#496d37;background:#e8f5d2;font-size:10px;font-weight:800;border-radius:999px;padding:6px 9px;white-space:nowrap}
+.buyer-order-card p{color:#747b70;font-size:11px;line-height:1.5;margin:11px 0}
+.buyer-order-total{border-top:1px solid var(--pl-line,#e5e3de);padding-top:11px;font-size:12px}
+.buyer-order-total span{color:#77796e}
+.buyer-order-total strong{font-size:15px}
+.buyer-orders-dialog #buyer-logout{margin-top:20px}
+.checkout-submit:disabled{opacity:.6;cursor:wait}
+@media(max-width:600px){.buyer-order-top{flex-wrap:wrap}.buyer-orders-list{max-height:45vh}}
