@@ -106,3 +106,10 @@ En `evento.html?id=<ID>`, las fichas de eventos ficticios presentan un esquema d
 **Importante:** el dibujo es **ilustrativo**, no un plano de butacas, un mapa geográfico, una garantía de ubicación ni una asignación de asientos. Ordena las categorías por precio de mayor a menor exclusivamente como referencia visual. Los eventos reales que se muestran como referencias no tienen un plano oficial verificado ni tarifas contratadas: en ellos aparece un esquema neutro de «sin plano verificado», sin fingir zonas, cupos o precios.
 
 Para un uso comercial futuro debe existir una configuración de recinto aprobada por el organizador, con geometrías de sectores y categorías asignadas, accesibilidad, aforos reales y precios respaldados por el servidor, además de una revisión previa de publicación.
+
+
+### Encabezado: eventos de la semana
+
+La navegación pública muestra una franja compacta **«Esta semana»** bajo el menú principal, tanto en `index.html` como en `evento.html`. Usa las semanas de lunes a domingo y la fecha local de `America/Santiago`; muestra hasta cuatro eventos futuros o aún en curso, con enlace a su propia ficha y etiqueta explícita **Referencia** o **DEMO**.
+
+Si no hay espectáculos esta semana, indica **«Sin eventos esta semana»** y ofrece los próximos del catálogo, sin presentar sus fechas como si fueran de la semana actual. La franja se calcula desde los datos existentes (sin eventos inventados) y es desplazable horizontalmente en móviles. La cartelera y el hero de inicio no se reemplazan. Su módulo es `src/week-events.mjs`.
