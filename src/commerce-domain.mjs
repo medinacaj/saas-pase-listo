@@ -133,7 +133,8 @@ export function createOrganizerEvent(store, organizationId, input) {
   const venue = text(input.venue,3,100,"Recinto");
   const city = text(input.city,2,50,"Ciudad");
   const date = String(input.date ?? "");
-  if (!/^\d{4}-\d\d-\d\d$/.test(date) || Number.isNaN(Date.parse(date + "T12:00:00Z")) || new Date(date + "T12:00:00Z").toISOString().slice(0,10) !== date) fail("Fecha inválida");
+  const parsedDate = /^\d{4}-\d\d-\d\d$/.test(date) ? Date.parse(date + "T12:00:00Z") : NaN;
+  if (!Number.isFinite(parsedDate) || new Date(parsedDate).toISOString().slice(0,10) !== date) fail("Fecha inválida");
   const time = String(input.time ?? "");
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) fail("Hora inválida");
   const category = String(input.category ?? "");
@@ -147,7 +148,6 @@ export function createOrganizerEvent(store, organizationId, input) {
     if (u.protocol !== "https:" || ![".jpg",".jpeg",".png",".webp"].some((ext) => u.pathname.toLowerCase().endsWith(ext))) fail("El cartel debe usar HTTPS y terminar en .jpg, .png o .webp");
     if (input.posterRightsConfirmed !== true) fail("Debes declarar que tienes autorización para publicar el cartel");
   }
-  const normalizedDate = new Date(date + "T12:00:00Z");
   const todayUtc = new Date().toISOString().slice(0,10);
   if (date < todayUtc) fail("No se puede publicar un evento DEMO en el pasado");
   const result={
