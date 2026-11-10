@@ -127,3 +127,14 @@ test("el círculo verde con flecha desaparece en todas las tarjetas, sin perder 
  assert.match(marketplace,/class="event-meta"/);
  assert.ok(marketplace.includes("short(event.date)"));
 });
+
+
+test("Centro de Control conserva atribución pero no publica enlaces externos en referencias",async()=>{
+ const control=await read("../src/control.mjs");
+ const references=control.slice(control.indexOf("function renderReferences()"),control.indexOf("function render(){"));
+ assert.ok(references.includes("e.posterCredit"));
+ assert.ok(references.includes("ID interno: <code>"));
+ assert.doesNotMatch(references,/Fuente oficial del evento|Procedencia del afiche/);
+ assert.doesNotMatch(references,/href=/);
+ assert.doesNotMatch(references,/sourceUrl|posterSourceUrl/);
+});
