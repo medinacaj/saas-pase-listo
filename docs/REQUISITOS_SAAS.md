@@ -55,3 +55,10 @@ Repositorio de producto: `medinacaj/saas-pase-listo`. Fuente histórica: `medina
 - **PaseListo v0.1:** interfaz local con datos sintéticos, reglas de negocio y pruebas de dominio en [PR #2](https://github.com/medinacaj/saas-pase-listo/pull/2).
 - CI Node 22 completado con resultado satisfactorio. Falta validación visual en navegador y pruebas de integración autenticada/concurrencia real.
 - El estado de negocio sigue **no operativo**; los requisitos de seguridad, pagos, backend y SaaS multicliente de este documento continúan abiertos.
+
+
+## Portal público editorial — actualización 2026-11-10
+
+El producto incluye una portada de descubrimiento y fichas editoriales que **no se confunden con el SaaS transaccional del organizador**. Versión: https://medinacaj.github.io/saas-pase-listo/ . Se registró un catálogo curado de 14 eventos de Chile con fuente oficial primaria y enlaces de compra externos, filtros y favoritos locales. Las imágenes promocionales se enlazan a fuentes externas: sus derechos comerciales **no están verificados** y se requiere permiso antes de explotar el portal como negocio. Ver docs/PORTAL_PUBLICO_Y_FUENTES.md.
+
+El backend Node.js local sirve pruebas de aislamiento y concurrencia monoproceso; no constituye SaaS ni se ejecuta en GitHub Pages. La compra real, las credenciales, la BD PostgreSQL y pagos autorizados siguen pendientes. RutaTicket mantiene su propia UX de operador y no debe compartir plantilla de portal cultural.

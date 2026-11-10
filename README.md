@@ -1,4 +1,19 @@
-# PaseListo · SaaS de boletería de eventos
+# PaseListo · Portal de espectáculos y SaaS para organizadores
+## Estado actual — noviembre de 2026
+
+**Frontend público editorial disponible en GitHub Pages:** https://medinacaj.github.io/saas-pase-listo/
+
+- Portada de cultura en vivo con identidad independiente de RutaTicket; ficha y afiche promocional de eventos.
+- **14 eventos referenciados** de fuentes oficiales en Santiago, Concepción, Valparaíso, Antofagasta y Pichilemu.
+- Buscador, categorías, filtro de ciudad y fecha, favoritos locales, fichas con procedencia del cartel y enlaces a la venta oficial.
+- Los carteles proceden de enlaces externos; su **licencia de reproducción comercial está pendiente de verificar**. No se presentan imágenes inexistentes como oficiales.
+- Panel privado de demostración funcional disponible en https://medinacaj.github.io/saas-pase-listo/organizador.html; no tiene autenticación real.
+- Backend experimental Node.js local en server/, con JSON en disco y pruebas HTTP; **no está desplegado ni conectado al portal GitHub Pages**.
+- Para diseño, fuentes, derechos y criterios de lanzamiento consultar [PORTAL_PUBLICO_Y_FUENTES.md](docs/PORTAL_PUBLICO_Y_FUENTES.md).
+
+**No somos vendedor ni representante de los eventos de terceros listados.** Las compras se realizan exclusivamente en sus respectivas páginas de venta oficial. No hay pasarela, tickets válidos, pagos ni venta operativa por PaseListo.
+
+---
 
 **Estado: primer MVP de demostración local (v0.1). No es un SaaS operativo ni un sistema de cobro habilitado.**
 
