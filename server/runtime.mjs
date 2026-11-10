@@ -108,7 +108,16 @@ export function createDemoApi({ seed, handlers, tokens, filePath, staticRoot }) 
     ["/src/styles.css", ["src/styles.css", "text/css"]],
     ["/src/app.mjs", ["src/app.mjs", "text/javascript"]],
     ["/src/domain.mjs", ["src/domain.mjs", "text/javascript"]],
-    ["/src/storage.mjs", ["src/storage.mjs", "text/javascript"]]
+    ["/src/storage.mjs", ["src/storage.mjs", "text/javascript"]],
+    ["/src/portal.css", ["src/portal.css", "text/css"]],
+    ["/src/commerce.css", ["src/commerce.css", "text/css"]],
+    ["/src/marketplace.mjs", ["src/marketplace.mjs", "text/javascript"]],
+    ["/src/commerce-domain.mjs", ["src/commerce-domain.mjs", "text/javascript"]],
+    ["/src/gestion.mjs", ["src/gestion.mjs", "text/javascript"]],
+    ["/src/gestion.css", ["src/gestion.css", "text/css"]],
+    ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
+    ["/organizador.html", ["organizador.html", "text/html"]],
+    ["/data/eventos-clientes-demo.json", ["data/eventos-clientes-demo.json", "application/json"]]
   ]);
   const server = createServer(async (req, res) => {
     const path = new URL(req.url || "/", "http://localhost").pathname;
@@ -130,6 +139,11 @@ export function createDemoApi({ seed, handlers, tokens, filePath, staticRoot }) 
           json(res, 404, { error: "Archivo no disponible" });
         }
         return;
+      }
+      if (req.method === "GET" && path === "/api/v1/public/events" && typeof handlers.publicEvents === "function") {
+        await ready;
+        await serial;
+        json(res, 200, { events: handlers.publicEvents(state), mode: "demo-local" }); return;
       }
       const tenantId = credentials(tokens, req.headers.authorization);
       if (!tenantId) { json(res, 401, { error: "Token DEMO requerido o inválido" }); return; }

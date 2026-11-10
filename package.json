@@ -7,8 +7,9 @@
   "scripts": {
     "dev": "python3 -m http.server 8080",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/domain.mjs && node --check src/app.mjs && node --check src/storage.mjs && node --check src/commerce-domain.mjs && node --check src/marketplace.mjs && node --check src/gestion.mjs && node --check server/runtime.mjs && node --check server/index.mjs && npm test",
-    "api:dev": "node server/index.mjs"
+    "check": "node --check src/domain.mjs && node --check src/app.mjs && node --check src/storage.mjs && node --check src/commerce-domain.mjs && node --check src/marketplace.mjs && node --check src/gestion.mjs && node --check server/runtime.mjs && node --check server/index.mjs && node --check server/marketplace-api.mjs && npm test",
+    "api:dev": "node server/index.mjs",
+    "api:commerce": "node server/marketplace-api.mjs"
   },
   "engines": {
     "node": ">=20"
