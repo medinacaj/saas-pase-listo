@@ -96,9 +96,9 @@ test("la selección de entradas requiere login de servidor, sin alias ni pedidos
 test("los afiches no llevan etiqueta flotante de fecha y conservan su fecha informativa",async()=>{
  const styles=await read("../src/portal.css");
  assert.doesNotMatch(marketplace,/class="card-date"/);
- assert.doesNotMatch(styles,/\\.card-date\\s*\\{/);
+ assert.equal(styles.includes(".card-date{"),false);
  assert.match(marketplace,/class="event-meta"/);
- assert.match(marketplace,/short\\(event\\.date\\)/);
+ assert.ok(marketplace.includes("short(event.date)"));
  assert.match(marketplace,/data-real-detail/);
  assert.match(marketplace,/data-detail/);
 });
@@ -110,6 +110,6 @@ test("cada evento tiene un identificador interno único y aparece solo en el con
  assert.equal(new Set(ids).size,ids.length);
  const control=await read("../src/control.mjs");
  assert.match(control,/ID interno: <code>/);
- assert.match(control,/esc\\(e\\.id\\)/);
+ assert.ok(control.includes("esc(e.id)"));
  assert.doesNotMatch(marketplace,/ID interno:/);
 });
