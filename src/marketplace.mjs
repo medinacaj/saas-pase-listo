@@ -15,7 +15,9 @@ let buyer=null;
 let buyerApiReady=false;
 let serverInventory=null;
 function remainingFor(eventId,typeId){
- return serverInventory?.get(eventId+"|"+typeId)??available(store,eventId,typeId);
+ // The local demo server owns stock. Never offer browser-only events as purchasable.
+ if(serverInventory!==null)return serverInventory.get(eventId+"|"+typeId)??0;
+ return available(store,eventId,typeId);
 }
 async function refreshInventory(){
  if(!buyerApiReady){serverInventory=null;return;}
@@ -31,7 +33,7 @@ async function refreshInventory(){
    }
   }
   serverInventory=next;
-  if(store)renderCards();
+  if(store){renderCards();syncDetailAvailability();}
  }catch{serverInventory=null;}
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
@@ -71,6 +73,7 @@ function realCard(event){
 }
 function openRealDetail(id){
  const e=realSamples.find(x=>x.id===id);if(!e)return;
+ ui.eventId=null;
  ui.lastFocus=document.activeElement;
  let source="";
  try{const u=new URL(e.sourceUrl);if(u.protocol==="https:")source=u.href;}catch{/* no external link */}
@@ -153,17 +156,30 @@ function renderFeatured(){
  installImages();
 }
 function selectedEvent(id){return store.events.find(e=>e.id===id&&e.status==="published");}
+function syncDetailAvailability(){
+ if($("#detail-backdrop").hidden||!ui.eventId)return;
+ const event=selectedEvent(ui.eventId);
+ if(!event)return;
+ $("[data-remaining-type]",$("#detail-content")).forEach(node=>{
+  const type=event.ticketTypes.find(t=>t.id===node.dataset.remainingType);
+  if(type)node.textContent=remainingFor(event.id,type.id)+" cupos de prueba · valor base "+clp(type.priceClp);
+ });
+ $("[data-select-ticket]",$("#detail-content")).forEach(button=>{
+  button.disabled=remainingFor(event.id,button.dataset.selectTicket)<1;
+ });
+}
 function openDetail(id){
  const event=selectedEvent(id);if(!event)return;
  ui.lastFocus=document.activeElement;ui.eventId=id;
  const organizer=org(event.organizerId);
- const rows=event.ticketTypes.map(t=>'<div class="type-row"><div><strong>'+esc(t.name)+'</strong><small>'+remainingFor(event.id,t.id)+' cupos de prueba · valor base '+clp(t.priceClp)+'</small></div><div><strong>'+clp(quoteOrPrice(event,t))+'</strong><button type="button" data-select-ticket="'+esc(t.id)+'" data-event="'+esc(event.id)+'" '+(remainingFor(event.id,t.id)<1?"disabled":"")+'>Iniciar sesión para comprar ↗</button></div></div>').join("");
+ const rows=event.ticketTypes.map(t=>'<div class="type-row"><div><strong>'+esc(t.name)+'</strong><small data-remaining-type="'+esc(t.id)+'">'+remainingFor(event.id,t.id)+' cupos de prueba · valor base '+clp(t.priceClp)+'</small></div><div><strong>'+clp(quoteOrPrice(event,t))+'</strong><button type="button" data-select-ticket="'+esc(t.id)+'" data-event="'+esc(event.id)+'" '+(remainingFor(event.id,t.id)<1?"disabled":"")+'>Iniciar sesión para comprar ↗</button></div></div>').join("");
  $("#detail-content").innerHTML='<div class="detail-layout"><div class="detail-cover">'+poster(event)+'<span class="detail-art-label">ARTE FICTICIO · NO OFICIAL</span></div><div class="detail-info"><div class="detail-kicker">'+esc(event.category)+' <span>✳</span> '+esc(event.city)+'</div><h2 id="detail-title">'+esc(event.title)+'</h2><p class="detail-subtitle">'+esc(event.subtitle)+'</p><p class="detail-editorial">'+esc(event.description)+'</p><dl class="event-facts"><div><dt>Fecha</dt><dd>'+esc(date(event.date))+' · '+esc(event.time)+' h</dd></div><div><dt>Recinto</dt><dd>'+esc(event.venue)+'</dd></div><div><dt>Organiza</dt><dd>'+esc(organizer?.name||"Organizador")+'</dd></div></dl><div class="type-list"><h3>Elige una entrada</h3>'+rows+'</div><p class="detail-important">Precios finales de demostración en CLP, incluidos los cargos de servicio simulados. No hay venta ni emisión de tickets utilizables.</p></div></div>';
  $("#detail-backdrop").hidden=false;document.body.classList.add("dialog-open");$("#event-dialog").focus();
 }
 function closeModal(which,restore=true){
  const node=$(which);node.hidden=true;
  if(which==="#checkout-backdrop")ui.checkout=null;
+ if(which==="#detail-backdrop")ui.eventId=null;
  if(["#detail-backdrop","#checkout-backdrop","#login-backdrop","#orders-backdrop"].every(selector=>$(selector).hidden))document.body.classList.remove("dialog-open");
  if(restore&&ui.lastFocus?.isConnected)ui.lastFocus.focus();
 }
