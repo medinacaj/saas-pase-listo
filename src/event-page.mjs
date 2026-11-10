@@ -1,5 +1,6 @@
 import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
+import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => (
@@ -86,6 +87,28 @@ async function loadInventory() {
  }
 }
 
+function ticketSummary(event,type,store,inventory) {
+ const stockEvent=inventory.enabled ? inventory.events.find(e=>e.eventId===event.id) : null;
+ const remote=stockEvent?.ticketTypes?.find(t=>t.ticketTypeId===type.id);
+ let base,fee,remaining;
+ if(inventory.enabled){
+  base=remote?.unitBaseClp;fee=remote?.feePerTicketClp;remaining=remote?.remaining;
+  if(!Number.isSafeInteger(base)||!Number.isSafeInteger(fee)||!Number.isSafeInteger(remaining)){
+   base=type.priceClp;fee=null;remaining=0;
+  }
+ }else{
+  try{
+   const pricing=quote(store,event.id,type.id,1,{availabilityRequired:false});
+   base=pricing.unitBaseClp;fee=pricing.feePerTicketClp;
+  }catch{
+   base=type.priceClp;fee=null;
+  }
+ }
+ const total=fee===null?null:base+fee;
+ const canOrder=inventory.enabled&&Number.isSafeInteger(total)&&remaining>0;
+ return {base,fee,remaining,total,canOrder};
+}
+
 function renderTickets(event,store,reference,inventory) {
  const list=$("#event-ticket-list");
  if(reference){
@@ -94,31 +117,14 @@ function renderTickets(event,store,reference,inventory) {
   setText("#ticket-disclaimer","Sin botones de compra, tarifas supuestas ni enlaces de venta de terceros.");
   return;
  }
- const stockEvent=inventory.enabled ? inventory.events.find(e=>e.eventId===event.id) : null;
  list.innerHTML=event.ticketTypes.map(type=>{
-  const remote=stockEvent?.ticketTypes?.find(t=>t.ticketTypeId===type.id);
-  let base,fee,total,remaining;
-  if(inventory.enabled){
-   base=remote?.unitBaseClp;fee=remote?.feePerTicketClp;remaining=remote?.remaining;
-   if(!Number.isSafeInteger(base)||!Number.isSafeInteger(fee)||!Number.isSafeInteger(remaining)){
-    base=type.priceClp;fee=null;remaining=0;
-   }
-  }else{
-   try {
-    const pricing=quote(store,event.id,type.id,1,{availabilityRequired:false});
-    base=pricing.unitBaseClp;fee=pricing.feePerTicketClp;
-   }catch{
-    base=type.priceClp;fee=null;
-   }
-  }
-  total=fee===null?null:base+fee;
-  const canOrder=inventory.enabled&&Number.isSafeInteger(total)&&remaining>0;
+  const {base,fee,total,remaining,canOrder}=ticketSummary(event,type,store,inventory);
   const url="./index.html?checkout="+encodeURIComponent(event.id)+"&type="+encodeURIComponent(type.id);
   const action=canOrder
    ?'<a class="event-ticket-button" href="'+esc(url)+'">Continuar pedido de prueba ↗</a>'
    :'<button class="event-ticket-button" type="button" disabled>'+
      (inventory.enabled ? "No hay cupos de prueba" : "Compra demo solo en servidor local")+'</button>';
-  return '<div class="event-ticket-row"><div class="event-ticket-top"><div><strong>'+
+  return '<div class="event-ticket-row" data-ticket-zone="'+esc(type.id)+'"><div class="event-ticket-top"><div><strong>'+
     esc(type.name)+'</strong><small>'+(inventory.enabled
      ?esc(String(Math.max(0,remaining??0)))+' cupos de demostración'
      :"Categoría de ensayo")+'</small></div><strong class="event-ticket-total">'+
