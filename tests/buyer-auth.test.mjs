@@ -1,13 +1,24 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile, mkdtemp, rm } from "node:fs/promises";
+import { readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
+import { seedCommerce } from "../src/commerce-domain.mjs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildBuyerServer } from "../server/buyer-server.mjs";
 
-async function fixture(t) {
+async function fixture(t, { capacity = null } = {}) {
  const dir = await mkdtemp(join(tmpdir(), "paselisto-buyers-"));
  const filePath = join(dir, "state.json");
+ if(capacity !== null){
+  const catalog=JSON.parse(await readFile(new URL("../data/eventos-clientes-demo.json",import.meta.url),"utf8"));
+  const market=seedCommerce(catalog);
+  const event=market.events.find(e=>e.id==="demo-noches-aurora");
+  assert.ok(event,"Fixture must include demo-noches-aurora");
+  const ticket=event.ticketTypes.find(t=>t.id==="general");
+  assert.ok(ticket,"Fixture must include a general ticket");
+  ticket.capacity=capacity;
+  await writeFile(filePath,JSON.stringify({version:1,buyers:[],market,requests:[]}));
+ }
  const { server, ready } = buildBuyerServer({ filePath });
  await ready;
  await new Promise(done => server.listen(0, "127.0.0.1", done));
@@ -184,4 +195,27 @@ test("inventario público DEMO refleja pedidos sin descontar dos veces por reint
  assert.equal(count(await request("inventory")), before - 2);
  assert.equal((await request("orders", { method: "POST", cookie: registered.cookie, body: order })).status, 201);
  assert.equal(count(await request("inventory")), before - 2);
+});
+
+test("peticiones simultáneas distintas no sobrepasan el último aforo DEMO", async t => {
+ const { request, filePath } = await fixture(t, { capacity: 2 });
+ const registered=await request("register",{method:"POST",body:{
+  email:"ultimo-aforo@example.test",password:"Ultimo-Aforo-12345678"
+ }});
+ assert.equal(registered.status,201);
+ const attempts=await Promise.all(Array.from({length:8},(_,i)=>request("orders",{
+  method:"POST",cookie:registered.cookie,
+  body:{eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:1,
+   requestId:"overlap-order-"+String(i).padStart(5,"0")}
+ })));
+ assert.equal(attempts.filter(a=>a.status===201).length,2);
+ assert.equal(attempts.filter(a=>a.status===409).length,6);
+ assert.equal(new Set(attempts.filter(a=>a.status===201).map(a=>a.data.id)).size,2);
+ const persisted=JSON.parse(await readFile(filePath,"utf8"));
+ assert.equal(persisted.market.orders.length,2);
+ const inventory=await request("inventory");
+ assert.equal(inventory.status,200);
+ const remaining=inventory.data.events.find(e=>e.eventId==="demo-noches-aurora")
+  .ticketTypes.find(t=>t.ticketTypeId==="general").remaining;
+ assert.equal(remaining,0);
 });
