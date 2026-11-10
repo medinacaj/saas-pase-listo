@@ -88,3 +88,30 @@ test("precio visible mantiene desglose al agotarse un evento, sin permitir órde
  assert.throws(()=>simulateOrder(s,{eventId:event.id,ticketTypeId:"general",quantity:1,buyerId:"buyer-demo-001"}),/insuficientes/);
  assert.equal(s.orders.length,0);
 });
+
+test("identificadores de nuevos eventos son UUID completos, estables y sin colisiones",()=>{
+ const store=seedCommerce(catalog);
+ const form={title:"Evento interno",venue:"Recinto de prueba",city:"Concepción",date:"2027-06-12",time:"20:00",category:"Teatro",priceClp:1000,capacity:20};
+ const first=createOrganizerEvent(store,"org-aurora",form);
+ const second=createOrganizerEvent(store,"org-aurora",{...form,title:"Otro evento"});
+ assert.match(first.id,/^demo-creado-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+ assert.notEqual(first.id,second.id);
+ assert.equal(new Set(store.events.map(e=>e.id)).size,store.events.length);
+ assert.equal(store.audit.find(a=>a.entityId===first.id)?.entityId,first.id);
+ const memory=new Map();
+ const storage={getItem:key=>memory.get(key)||null,setItem:(key,v)=>memory.set(key,v),removeItem:key=>memory.delete(key)};
+ assert.equal(saveCommerce(store,storage),true);
+ assert.equal(loadCommerce(catalog,storage).events.find(e=>e.id===first.id).id,first.id);
+});
+
+test("el catálogo rechaza IDs duplicados y el almacenamiento local corrupto se descarta",()=>{
+ const duplicated=structuredClone(catalog);
+ duplicated.events[1].id=duplicated.events[0].id;
+ assert.throws(()=>seedCommerce(duplicated),/Identificadores de evento DEMO duplicados/);
+ const store=seedCommerce(catalog);
+ store.events[1].id=store.events[0].id;
+ const storage={getItem:()=>JSON.stringify(store)};
+ const recovered=loadCommerce(catalog,storage);
+ assert.equal(recovered.events.length,catalog.events.length);
+ assert.equal(new Set(recovered.events.map(e=>e.id)).size,recovered.events.length);
+});
