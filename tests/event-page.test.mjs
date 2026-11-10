@@ -65,3 +65,16 @@ test("servidor DEMO permite cargar la ficha y sus recursos estáticos",async()=>
   assert.ok(server.includes('["/'+asset+'", ["'+asset+'",'));
  }
 });
+
+
+test("recinto permite datos prácticos sin inventar los no confirmados",async()=>{
+ const html=await read("../evento.html");
+ const code=await read("../src/event-page.mjs");
+ const css=await read("../src/event-page.css");
+ for(const id of ["venue-address","venue-doors","venue-accessibility","venue-transport","venue-age","venue-entry"]){
+  assert.ok(html.includes('id="'+id+'"'));
+  assert.ok(code.includes('setText("#'+id+'"'));
+ }
+ assert.ok(code.includes('fallback="Por confirmar"'));
+ assert.ok(css.includes(".venue-details-grid"));
+});
