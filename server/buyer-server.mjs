@@ -38,6 +38,24 @@ const safePassword = (p) => {
   return p;
 };
 const publicBuyer = (buyer) => ({ id: buyer.id, email: buyer.email });
+// Keep organizer and platform revenue splits private. A buyer only needs their own
+// simulated ticket price, service fee, and total; never expose the stored ledger.
+const buyerOrder = (order) => ({
+  id: order.id,
+  status: order.status,
+  eventId: order.eventId,
+  ticketTypeId: order.ticketTypeId,
+  quantity: order.quantity,
+  createdAt: order.createdAt,
+  pricing: {
+    currency: order.pricing.currency,
+    unitBaseClp: order.pricing.unitBaseClp,
+    faceValueClp: order.pricing.faceValueClp,
+    feePerTicketClp: order.pricing.feePerTicketClp,
+    serviceFeeClp: order.pricing.serviceFeeClp,
+    totalClp: order.pricing.totalClp
+  }
+});
 const asBuffer = (value) => Buffer.from(value, "hex");
 const calculate = async (password, salt) => await derive(password, asBuffer(salt), 64, { N: 16384, r: 8, p: 1, maxmem: 32 * 1024 * 1024 });
 const bodyFrom = async (req) => {
@@ -159,8 +177,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         if (!session || !db.buyers.some(b => b.id === session.buyerId)) throw bad(401, "Debes iniciar sesión para consultar pedidos");
         const orders = db.market.orders
           .filter(o => o.buyerId === session.buyerId)
-          .map(({ id, status, eventId, ticketTypeId, quantity, pricing, createdAt }) =>
-            ({ id, status, eventId, ticketTypeId, quantity, pricing, createdAt }));
+          .map(buyerOrder);
         toJson(res, 200, { orders });
         return;
       }
@@ -235,7 +252,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
           created.requestId = requestId;
           return created;
         });
-        toJson(res, 201, order);
+        toJson(res, 201, buyerOrder(order));
         return;
       }
       throw bad(404, "Ruta desconocida");
