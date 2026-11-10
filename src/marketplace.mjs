@@ -1,5 +1,6 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
 import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
+import { eventDetailHref } from "./event-page-domain.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -93,8 +94,6 @@ function openRealDetail(id){
  const e=realSamples.find(x=>x.id===id);if(!e)return;
  ui.eventId=null;
  ui.lastFocus=document.activeElement;
- let source="";
- try{const u=new URL(e.sourceUrl);if(u.protocol==="https:")source=u.href;}catch{/* no external link */}
  const end=e.endDate&&e.endDate!==e.date?" al "+date(e.endDate):"";
  $("#detail-content").innerHTML='<div class="detail-layout"><div class="detail-cover">'+realPoster(e)+'<span class="detail-art-label">AFICHE PROMOCIONAL DE TERCERO · LICENCIA NO ACREDITADA</span></div>'+
   '<div class="detail-info"><div class="detail-kicker">REFERENCIA VISUAL · NO A LA VENTA</div>'+
@@ -104,7 +103,7 @@ function openRealDetail(id){
   '<div><dt>Recinto</dt><dd>'+esc(e.venue)+' · '+esc(e.city)+'</dd></div>'+
   '<div><dt>Organiza</dt><dd>'+esc(e.organizer)+'</dd></div></dl>'+
   '<div class="reference-disclaimer"><strong>Venta en PaseListo no habilitada.</strong><p>Para habilitar una ficha comercial, nuestro equipo debe acreditar el contrato B2B, permisos sobre el cartel, cupos y condiciones de venta.</p></div>'+
-  (source?'<p class="reference-source"><a href="'+esc(source)+'" target="_blank" rel="noopener noreferrer">Ver fuente oficial de la fecha y recinto ↗</a></p>':"")+
+  
   '<small class="reference-rights">'+esc(e.posterCredit||"Afiche promocional externo")+' · reproducción comercial pendiente de autorización.</small></div></div>';
  $("#detail-backdrop").hidden=false;document.body.classList.add("dialog-open");$("#event-dialog").focus();installImages();
 }
@@ -339,9 +338,9 @@ async function start(){
  document.addEventListener("click",ev=>{
   const target=ev.target;
   const real=target.closest("[data-real-detail]");
-  if(real){openRealDetail(real.dataset.realDetail);return;}
+  if(real){location.assign(eventDetailHref(real.dataset.realDetail));return;}
   const d=target.closest("[data-detail]");
-  if(d){openDetail(d.dataset.detail);return;}
+  if(d){location.assign(eventDetailHref(d.dataset.detail));return;}
   const cat=target.closest("[data-category]");
   if(cat){ui.category=cat.dataset.category;renderCards();return;}
   const type=target.closest("[data-select-ticket]");
@@ -447,5 +446,16 @@ async function start(){
  window.addEventListener("storage",ev=>{
   if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();}).catch(()=>{});}
  });
+ // Event-page CTA returns to the existing authenticated demo checkout.
+ // Reject unknown combinations instead of opening a checkout for a reference event.
+ const params=new URLSearchParams(location.search);
+ const checkoutEvent=params.get("checkout"),checkoutType=params.get("type");
+ if(checkoutEvent && checkoutType && checkoutEvent.length<=160 && checkoutType.length<=100){
+  const event=selectedEvent(checkoutEvent);
+  if(event?.ticketTypes.some(t=>t.id===checkoutType)){
+   history.replaceState(null,"",location.pathname+location.hash);
+   openCheckout(checkoutEvent,checkoutType).catch(error=>console.error("PaseListo",error.message));
+  }
+ }
 }
 start();
