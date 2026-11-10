@@ -10,6 +10,7 @@ import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { seedCommerce, simulateOrder, available, quote } from "../src/commerce-domain.mjs";
 import { createPostgresDemoOrders } from "./postgres-demo-orders.mjs";
+import { createPostgresDemoAuth } from "./postgres-demo-auth.mjs";
 
 const derive = promisify(scrypt);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -70,11 +71,12 @@ const bodyFrom = async (req) => {
   if (!value || Array.isArray(value) || typeof value !== "object") throw bad(400, "Objeto JSON requerido");
   return value;
 };
-const activeSession = (req, sessions) => {
+const activeSession = async (req, sessions, authBackend = null) => {
   const rawCookie = String(req.headers.cookie || "");
   const match = /(?:^|;\s*)pl_session=([0-9a-f]{64})(?:;|$)/.exec(rawCookie);
   if (!match) return null;
   const key = hashToken(match[1]);
+  if (authBackend) return authBackend.sessionForToken(key);
   const session = sessions.get(key);
   if (!session) return null;
   if (session.expiresAt <= Date.now()) { sessions.delete(key); return null; }
@@ -98,7 +100,8 @@ const assetTypes = new Map([
   ["/data/eventos-clientes-demo.json", ["data/eventos-clientes-demo.json", "application/json"]],
   ["/data/eventos-reales-referencia.json", ["data/eventos-reales-referencia.json", "application/json"]]
 ]);
-export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.json"), ordersBackend = null } = {}) {
+export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.json"), ordersBackend = null, authBackend = null } = {}) {
+  if (authBackend && !ordersBackend) throw Error("La autenticación SQL requiere también pedidos SQL en esta demo");
   const dbPath = resolve(filePath);
   const sessions = new Map();
   const attempts = new Map();
@@ -110,7 +113,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
     await writeFile(stage, JSON.stringify(value), { flag: "wx", mode: 0o600 });
     await rename(stage, dbPath);
   };
-  const fileReady = (async () => {
+  const fileReady = authBackend ? Promise.resolve() : (async () => {
     try {
       const value = JSON.parse(await readFile(dbPath, "utf8"));
       if (value.version !== 1 || !Array.isArray(value.buyers) || !Array.isArray(value.market?.orders)) throw Error("Archivo local de usuarios no válido");
@@ -121,7 +124,10 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       await persist(db);
     }
   })();
-  const ready = ordersBackend ? fileReady.then(() => ordersBackend.initialize()) : fileReady;
+  const ready = fileReady.then(async () => {
+    if (ordersBackend) await ordersBackend.initialize();
+    if (authBackend) await authBackend.initialize();
+  });
   const mutate = (work) => {
     const task = serial.then(async () => {
       await ready;
@@ -158,8 +164,8 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       }
       await ready;
       if (req.method === "GET" && path === "session") {
-        const session = activeSession(req, sessions);
-        const buyer = session ? db.buyers.find(u => u.id === session.buyerId) : null;
+        const session = await activeSession(req, sessions, authBackend);
+        const buyer = authBackend ? session?.buyer : (session ? db.buyers.find(u => u.id === session.buyerId) : null);
         toJson(res, 200, buyer ? { authenticated: true, buyer: publicBuyer(buyer) } : { authenticated: false });
         return;
       }
@@ -182,8 +188,8 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         return;
       }
       if (req.method === "GET" && path === "orders") {
-        const session = activeSession(req, sessions);
-        if (!session || !db.buyers.some(b => b.id === session.buyerId)) throw bad(401, "Debes iniciar sesión para consultar pedidos");
+        const session = await activeSession(req, sessions, authBackend);
+        if (!session || (!authBackend && !db.buyers.some(b => b.id === session.buyerId))) throw bad(401, "Debes iniciar sesión para consultar pedidos");
         const source = ordersBackend
           ? await ordersBackend.ordersForBuyer(session.buyerId)
           : db.market.orders.filter(o => o.buyerId === session.buyerId);
@@ -206,15 +212,20 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         const email = safeEmail(payload.email), password = safePassword(payload.password);
         const salt = randomBytes(16).toString("hex");
         const digest = (await calculate(password, salt)).toString("hex");
-        const result = await mutate(async (next) => {
-          if (next.buyers.some(b => b.email === email)) throw bad(409, "La cuenta ya existe en esta demo");
-          if (next.buyers.length >= 100) throw bad(429, "Límite de cuentas de prueba alcanzado");
-          const buyer = { id: "buyer-" + randomUUID(), email, salt, digest, createdAt: new Date().toISOString() };
-          next.buyers.push(buyer);
-          return publicBuyer(buyer);
-        });
+        const newId = "buyer-" + randomUUID();
+        const result = authBackend
+          ? publicBuyer(await authBackend.register({ id: newId, email, salt, digest }))
+          : await mutate(async (next) => {
+              if (next.buyers.some(b => b.email === email)) throw bad(409, "La cuenta ya existe en esta demo");
+              if (next.buyers.length >= 100) throw bad(429, "Límite de cuentas de prueba alcanzado");
+              const buyer = { id: newId, email, salt, digest, createdAt: new Date().toISOString() };
+              next.buyers.push(buyer);
+              return publicBuyer(buyer);
+            });
         const token = randomBytes(32).toString("hex");
-        sessions.set(hashToken(token), { buyerId: result.id, expiresAt: Date.now() + SESSION_MS });
+        const expiresAt = Date.now() + SESSION_MS;
+        if (authBackend) await authBackend.createSession({ tokenHash: hashToken(token), buyerId: result.id, expiresAt });
+        else sessions.set(hashToken(token), { buyerId: result.id, expiresAt });
         toJson(res, 201, { authenticated: true, buyer: result }, { "Set-Cookie": cookie(token) });
         return;
       }
@@ -223,8 +234,8 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         const attempt = attempts.get(email) || { count: 0, resetAt: Date.now() + 10 * 60_000 };
         if (attempt.resetAt < Date.now()) { attempt.count = 0; attempt.resetAt = Date.now() + 10 * 60_000; }
         if (attempt.count >= 8) throw bad(429, "Demasiados intentos. Vuelve a probar más adelante");
-        await serial;
-        const buyer = db.buyers.find(b => b.email === email);
+        if (!authBackend) await serial;
+        const buyer = authBackend ? await authBackend.findByEmail(email) : db.buyers.find(b => b.email === email);
         // A dummy derivation prevents the obvious fast path for an unknown account.
         const salt = buyer?.salt || randomBytes(16).toString("hex");
         const computed = await calculate(password, salt);
@@ -237,14 +248,17 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         }
         attempts.delete(email);
         const token = randomBytes(32).toString("hex");
-        sessions.set(hashToken(token), { buyerId: buyer.id, expiresAt: Date.now() + SESSION_MS });
+        const expiresAt = Date.now() + SESSION_MS;
+        if (authBackend) await authBackend.createSession({ tokenHash: hashToken(token), buyerId: buyer.id, expiresAt });
+        else sessions.set(hashToken(token), { buyerId: buyer.id, expiresAt });
         toJson(res, 200, { authenticated: true, buyer: publicBuyer(buyer) }, { "Set-Cookie": cookie(token) });
         return;
       }
-      const session = activeSession(req, sessions);
-      if (!session || !db.buyers.some(b => b.id === session.buyerId)) throw bad(401, "Debes iniciar sesión para comprar");
+      const session = await activeSession(req, sessions, authBackend);
+      if (!session || (!authBackend && !db.buyers.some(b => b.id === session.buyerId))) throw bad(401, "Debes iniciar sesión para comprar");
       if (path === "logout") {
-        sessions.delete(session.key);
+        if (authBackend) await authBackend.deleteSession(session.key);
+        else sessions.delete(session.key);
         toJson(res, 200, { authenticated: false }, { "Set-Cookie": cookie("") });
         return;
       }
@@ -284,12 +298,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   // migration applied; never point this server at production customer data.
   let pool = null;
   let ordersBackend = null;
+  let authBackend = null;
   if (process.env.PASELISTO_DEMO_DATABASE_URL) {
     const { Pool } = (await import("pg")).default;
     pool = new Pool({ connectionString: process.env.PASELISTO_DEMO_DATABASE_URL, max: 8 });
     ordersBackend = createPostgresDemoOrders({ pool, catalog: fixture });
+    authBackend = createPostgresDemoAuth({ pool });
   }
-  const app = buildBuyerServer({ ordersBackend });
+  const app = buildBuyerServer({ ordersBackend, authBackend });
   app.ready.then(() => app.server.listen(8082, "127.0.0.1", () => console.log(
     "PaseListo DEMO local (" + (ordersBackend ? "PostgreSQL" : "JSON") + "): http://127.0.0.1:8082"
   ))).catch(async err => {
