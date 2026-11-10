@@ -1,6 +1,7 @@
 import { seedDemo, createEvent, issueTicket, checkIn, cancelTicket, issuedCount, summary } from "./domain.mjs";
+import { loadDemo, saveDemo, clearDemo } from "./storage.mjs";
 
-const state = seedDemo();
+let state = loadDemo("paselisto", seedDemo);
 let tenantId = state.tenants[0].id;
 let currentEvent = "evt-a1";
 let message = "";
@@ -15,6 +16,7 @@ function run(action, success) {
   catch (e) { feedback(e.message, true); }
 }
 function render() {
+  saveDemo("paselisto", state);
   const events = state.events.filter((e) => e.tenantId === tenantId);
   if (!events.some((e) => e.id === currentEvent)) currentEvent = events[0]?.id || "";
   const selected = events.find((e) => e.id === currentEvent);
@@ -26,9 +28,9 @@ function render() {
     '<div class="side-label">ESPACIO DEMOSTRATIVO</div><label for="tenant">Organización</label><select id="tenant" class="field">' +
     state.tenants.map((o) => '<option value="' + esc(o.id) + '"' + (o.id === tenantId ? " selected" : "") + '>' + esc(o.name) + '</option>').join("") +
     '</select><nav aria-label="Secciones"><a class="nav-active" href="#contenido">Vista general</a><a href="#eventos">Eventos</a><a href="#entradas">Entradas y acceso</a><a href="#actividad">Actividad</a></nav>' +
-    '<div class="side-note">Cada organización tiene sus propios datos ficticios. Este selector no es autenticación SaaS.</div></aside>' +
+    '<div class="side-note">Cada organización tiene sus propios datos ficticios. Este selector no es autenticación SaaS.</div><button type="button" class="reset-demo" data-reset-demo>Restablecer demo</button></aside>' +
     '<main id="contenido" class="main"><div class="top"><div><p class="eyebrow">PANEL DEL ORGANIZADOR</p><h1>Control de eventos</h1><p class="subtitle">Organiza, emite entradas de prueba y valida accesos.</p></div><div class="top-chip">Versión 0.1 · demo</div></div>' +
-    '<div class="warning" role="note"><strong>Entorno demostrativo</strong> · Datos sintéticos en memoria. Sin venta, pago, QR firmado ni reserva real. Al recargar se restablece todo.</div>' +
+    '<div class="warning" role="note"><strong>Entorno demostrativo</strong> · Datos sintéticos locales. Sin venta, pago, QR firmado ni reserva real. Puedes restablecer la demo desde el menú.</div>' +
     (message ? '<p class="' + (error ? "notice error" : "notice") + '" role="status">' + esc(message) + '</p>' : "") +
     '<section class="metrics" aria-label="Indicadores"><article><span>Eventos</span><strong>' + kpis.events + '</strong><small>De esta organización</small></article>' +
     '<article><span>Entradas emitidas</span><strong>' + kpis.issued + '</strong><small>Sin contar anuladas</small></article>' +
@@ -62,5 +64,16 @@ app.addEventListener("submit", (ev) => {
   if (ev.target.id === "new-event") run(() => { currentEvent = createEvent(state, tenantId, data).id; }, "Evento de prueba creado.");
   if (ev.target.id === "new-ticket") run(() => issueTicket(state, tenantId, currentEvent, data.alias), "Entrada de prueba emitida (no existe pago real).");
   if (ev.target.id === "access") run(() => checkIn(state, tenantId, data.code), "Entrada de prueba validada. Un segundo uso será rechazado.");
+});
+app.addEventListener("click", (ev) => {
+  if (ev.target.closest("[data-reset-demo]")) {
+    if (confirm("¿Restablecer los datos ficticios de esta demostración?")) {
+      clearDemo("paselisto");
+      state = seedDemo();
+      tenantId = state.tenants[0].id;
+      currentEvent = "";
+      feedback("Demostración restablecida.");
+    }
+  }
 });
 render();
