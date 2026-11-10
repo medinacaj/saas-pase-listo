@@ -125,5 +125,5 @@ test("el círculo verde con flecha desaparece en todas las tarjetas, sin perder 
  assert.match(marketplace,/class="card-hitbox" type="button" data-real-detail=/);
  assert.match(marketplace,/class="card-hitbox" type="button" data-detail=/);
  assert.match(marketplace,/class="event-meta"/);
- assert.match(marketplace,/short\\(event\\.date\\)/);
+ assert.ok(marketplace.includes("short(event.date)"));
 });
