@@ -74,6 +74,7 @@ const assetTypes = new Map([
   ["/src/control.mjs", ["src/control.mjs", "text/javascript"]],
   ["/src/control-domain.mjs", ["src/control-domain.mjs", "text/javascript"]],
   ["/src/control.css", ["src/control.css", "text/css"]],
+  ["/src/brand-system.css", ["src/brand-system.css", "text/css"]],
   ["/data/eventos-clientes-demo.json", ["data/eventos-clientes-demo.json", "application/json"]],
   ["/data/eventos-reales-referencia.json", ["data/eventos-reales-referencia.json", "application/json"]]
 ]);
