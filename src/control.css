@@ -18,3 +18,9 @@
 @media(max-width:860px){.admin-layout{display:block}.sidebar{min-height:0;height:auto;position:relative;padding:14px;gap:9px}.sidebar-caption,.sidebar-foot{display:none}.sidebar nav{display:flex;overflow-x:auto;flex-wrap:nowrap;gap:5px}.sidebar nav a{flex-shrink:0;font-size:11px;padding:9px}.sidebar nav a span{white-space:nowrap}.brand{font-size:19px}.brand-icon{width:32px;height:32px;font-size:23px}.main{padding:22px 15px 40px}.overview-grid{grid-template-columns:1fr}.top{display:block}.top-tools{margin-top:18px}.region{margin-bottom:35px}}
 @media(max-width:550px){.section-head{display:block}.note-chip,.inline-link{display:inline-block;margin-top:12px}.metrics{gap:8px}.metrics article{padding:16px;min-height:122px}.metrics strong{font-size:23px}.admin-form{display:block}.admin-form>label,.admin-form>.pair{margin-bottom:12px}.pair{grid-template-columns:1fr}.compact-form{grid-template-columns:1fr}.reference-grid{grid-template-columns:1fr}.reference-card{display:grid;grid-template-columns:38% 62%}.reference-card img,.reference-card .no-poster{height:100%;min-height:170px}.gate-grid{grid-template-columns:1fr}.security-ribbon{font-size:11px}.top-tools{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.ref-art{position:relative;min-height:220px;overflow:hidden;background:var(--tone,#d7edc2)}
+.ref-art .no-poster{position:absolute;inset:0;width:100%;height:100%}
+.ref-art img{position:absolute;inset:0;z-index:2;width:100%;height:100%;object-fit:cover}
+.vis-label{font-size:10px;font-weight:600;color:#889789}
+@media(max-width:550px){.ref-art{min-height:170px}.ref-art .no-poster{min-height:170px}}
