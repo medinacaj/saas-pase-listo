@@ -1,4 +1,5 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
+import { createCheckoutState } from "./checkout-state.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -196,13 +197,7 @@ function closeLogin(){
 function renderCheckout(eventId,typeId,qty=1){
  if(!buyer||!buyerApiReady){showLogin(eventId,typeId);return;}
  const e=selectedEvent(eventId);if(!e)return;
- const previous=ui.checkout;
- ui.checkout={
-  eventId,typeId,qty,
-  requestId:previous?.eventId===eventId&&previous.typeId===typeId&&previous.qty===qty
-   ?previous.requestId:crypto.randomUUID(),
-  submitting:false
- };
+ ui.checkout=createCheckoutState(ui.checkout,eventId,typeId,qty);
  const ticket=e.ticketTypes.find(t=>t.id===typeId);if(!ticket)return;
  let summary;
  try{summary=quote(store,eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
