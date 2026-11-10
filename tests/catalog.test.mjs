@@ -20,15 +20,18 @@ test("ocho eventos ficticios permiten únicamente pedidos DEMO",()=>{
  }
  assert.match(demo.notice,/100% FICTICIOS/);
 });
-test("6 eventos reales tienen afiches promocionales con fuentes y no tienen venta ni aforo PaseListo",()=>{
+test("eventos externos mantienen fuentes contrastables sin ventas ni afiches obligatorios",()=>{
  assert.ok(refs.events.length>=6);
- const hosts=new Set(["dgmedios.com","www.puntoticket.com","www.cirquedusoleil.com"]);
+ const hosts=new Set(["dgmedios.com","www.puntoticket.com","www.cirquedusoleil.com","www.todoenconce.cl"]);
+ const ids=new Set();
  for(const e of refs.events){
   assert.match(e.id,/^ref-/);
+  assert.ok(!ids.has(e.id),"ID de referencia duplicado: "+e.id);
+  ids.add(e.id);
   assert.ok(e.title&&e.date&&e.city&&e.venue);
-  assert.equal(new URL(e.posterUrl).protocol,"https:");
   assert.ok(hosts.has(new URL(e.sourceUrl).hostname));
-  assert.equal(new URL(e.posterSourceUrl).protocol,"https:");
+  if(e.posterUrl)assert.equal(new URL(e.posterUrl).protocol,"https:");
+  if(e.posterSourceUrl)assert.equal(new URL(e.posterSourceUrl).protocol,"https:");
   assert.ok(e.posterCredit);
   assert.equal(Object.hasOwn(e,"ticketTypes"),false);
   assert.equal(Object.hasOwn(e,"priceClp"),false);
