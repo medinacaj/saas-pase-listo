@@ -1,5 +1,6 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
+import { renderWeekStrip } from "./week-events.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -222,6 +223,7 @@ async function start(){
   store=loadCommerce(catalog);
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
+  renderWeekStrip(realSamples,publishedEvents(store));
   refreshBuyer();
  }catch(err){
   $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
@@ -310,7 +312,7 @@ async function start(){
   else if(!ev.shiftKey&&document.activeElement===focusables.at(-1)){ev.preventDefault();focusables[0].focus();}
  });
  window.addEventListener("storage",ev=>{
-  if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();}).catch(()=>{});}
+  if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();renderWeekStrip(realSamples,publishedEvents(store));}).catch(()=>{});}
  });
  const params=new URLSearchParams(location.search);
  const selected=params.get("checkout"),ticket=params.get("type");
