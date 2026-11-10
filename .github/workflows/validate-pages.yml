@@ -17,6 +17,7 @@ jobs:
       - name: Verify browser modules parse correctly
         run: |
           node --check src/marketplace.mjs
+          node --check src/hero-carousel.mjs
           node --check src/commerce-domain.mjs
           node --check src/event-page.mjs
           node --check src/week-events.mjs
@@ -51,25 +52,27 @@ jobs:
           assert.ok(zones.includes('ZONE_COLORS'), 'Category color palette missing');
           const eventPage=readFileSync('evento.html','utf8');
           const page=readFileSync('index.html','utf8');
-          const css=readFileSync('src/portal.css','utf8');
-          const week=readFileSync('src/week-events.mjs','utf8');
-          for(const html of [page,eventPage]){
-            assert.ok(html.includes('id="week-strip"'), 'Weekly strip missing from public header');
-            assert.ok(html.includes('id="week-strip-events"'), 'Weekly items missing');
-          }
-          assert.ok(css.includes('.week-strip-inner'), 'Compact weekly header styling missing');
-          assert.ok(script.includes('renderWeekStrip(realSamples,publishedEvents(store))'));
-          assert.ok(detailJs.includes('renderWeekStrip(refs.events||[],store.events)'));
-          assert.ok(week.includes('weekBounds(today)'));
-          assert.ok(week.includes('eventDetailHref(event.id)'));
-          const { weeklyEventSelection }=await import('./src/week-events.mjs');
-          const current=weeklyEventSelection(refs.events,demo.events,'2026-11-10',24);
-          assert.ok(current.weekCount >= 16, 'Verified Chile events for Nov 10–15 missing from header');
-          assert.equal(current.week.length,current.weekCount, 'Verified weekly events must not be hidden by four-item limit');
-          assert.ok(current.week.some(e=>e.city==='Concepción'), 'Concepción weekly events missing');
-          assert.ok(current.week.some(e=>e.city==='Valparaíso'), 'Regional weekly events missing');
-          assert.ok(current.week.every(e=>refs.events.some(r=>r.id===e.id&&r.sourceUrl?.startsWith('https://'))),
-            'Every weekly reference needs verifiable public source');
-          console.log('Verified weekly Chile events:',current.weekCount);
-          console.log('Event cards, catalogs, color zones and weekly header are valid.');
+          const carouselCss=readFileSync('src/hero-carousel.css','utf8');
+          const carousel=readFileSync('src/hero-carousel.mjs','utf8');
+          assert.ok(page.includes('id="hero-carousel-controls"'), 'Main hero carousel controls missing');
+          assert.ok(page.includes('id="hero-carousel-dots"'), 'Hero slide indicators missing');
+          assert.ok(page.includes('id="hero-feature-link"'), 'Hero CTA missing');
+          assert.ok(page.includes('id="hero-poster"'), 'Hero poster missing');
+          assert.ok(page.includes('id="real-events-grid"') && page.includes('id="events-grid"'), 'Catalog grids missing');
+          assert.ok(!page.includes('id="week-strip"'), 'Incorrect weekly header strip still present');
+          assert.ok(!eventPage.includes('id="week-strip"'), 'Incorrect event-page header strip still present');
+          assert.ok(carouselCss.includes('.hero-carousel-dot.is-active'), 'Interactive carousel styling missing');
+          assert.ok(script.includes('selectHeroEvents(realSamples,publishedEvents(store),current(),6)'), 'Hero does not use curated catalog');
+          assert.ok(script.includes('window.setInterval('), 'Automatic rotation missing');
+          assert.ok(script.includes('data-hero-index'), 'Slide selection missing');
+          assert.ok(script.includes('prefers-reduced-motion'), 'Motion accessibility missing');
+          assert.ok(carousel.includes('weekBounds(today)'), 'Weekly priorities missing');
+          const { selectHeroEvents }=await import('./src/hero-carousel.mjs');
+          const highlights=selectHeroEvents(refs.events,demo.events,'2026-11-10',6);
+          assert.equal(highlights.length,6,'Need six featured event slides');
+          assert.equal(highlights[0].id,'ref-creamfields-2026','Headline must reflect curated weekly event');
+          assert.ok(highlights.some(e=>e.posterUrl),'Include a real upcoming poster');
+          assert.ok(highlights.every(e=>e.id&&e.date&&e.venue),'Featured event incomplete');
+          assert.ok(refs.events.filter(e=>e.date>='2026-11-10'&&e.date<='2026-11-15').length>=16,'Verified weekly catalog must remain complete');
+          console.log('Featured event carousel, catalog and event detail pages validated.');
           JS
