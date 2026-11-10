@@ -142,6 +142,16 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         toJson(res, 200, buyer ? { authenticated: true, buyer: publicBuyer(buyer) } : { authenticated: false });
         return;
       }
+      if (req.method === "GET" && path === "orders") {
+        const session = activeSession(req, sessions);
+        if (!session || !db.buyers.some(b => b.id === session.buyerId)) throw bad(401, "Debes iniciar sesión para consultar pedidos");
+        const orders = db.market.orders
+          .filter(o => o.buyerId === session.buyerId)
+          .map(({ id, status, eventId, ticketTypeId, quantity, pricing, createdAt }) =>
+            ({ id, status, eventId, ticketTypeId, quantity, pricing, createdAt }));
+        toJson(res, 200, { orders });
+        return;
+      }
       if (req.method !== "POST") throw bad(404, "Ruta desconocida");
       // Same-origin, custom-header requests only. Cookies alone must never authorize a form POST.
       // Only accept browser POSTs with an explicit same-origin Origin header.
@@ -208,6 +218,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
             if (existing.eventId !== payload.eventId || existing.ticketTypeId !== payload.ticketTypeId || existing.quantity !== payload.quantity) throw bad(409, "Solicitud repetida con otros datos");
             return existing;
           }
+          if (next.market.orders.length >= 2000) throw bad(429, "Límite de pedidos de demostración alcanzado");
           const created = simulateOrder(next.market, { eventId: payload.eventId, ticketTypeId: payload.ticketTypeId, quantity: payload.quantity, buyerId: session.buyerId });
           created.requestId = requestId;
           return created;
