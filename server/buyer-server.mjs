@@ -285,7 +285,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   let pool = null;
   let ordersBackend = null;
   if (process.env.PASELISTO_DEMO_DATABASE_URL) {
-    const { Pool } = await import("pg");
+    const { Pool } = (await import("pg")).default;
     pool = new Pool({ connectionString: process.env.PASELISTO_DEMO_DATABASE_URL, max: 8 });
     ordersBackend = createPostgresDemoOrders({ pool, catalog: fixture });
   }
