@@ -17,65 +17,46 @@
 <header class="site-head">
 <div class="head-inner">
 <a class="brand" href="#inicio" aria-label="PaseListo inicio"><span class="brand-icon" aria-hidden="true">✳</span><span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span></a>
-<nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a><a href="#como-funciona">Cómo comprar</a><a href="#empresas">Trabajar con PaseListo</a></nav>
-<div class="head-actions"><a href="#cartelera" class="quick-tickets">Buscar entradas</a><a class="organizer-link" href="#empresas">Trabajar con PaseListo <span aria-hidden="true">↗</span></a></div>
+<nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
+<div class="head-actions"><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
 </div>
 </header>
 <main id="contenido">
-<section class="demo-ribbon" role="note"><strong>ENTORNO DEMOSTRATIVO:</strong> Se muestran afiches de espectáculos reales solo como referencias visuales, sin contratos ni venta por PaseListo. Las compras y los datos comerciales son únicamente simulaciones.</section>
+<div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras de prueba usan eventos ficticios.</div>
 <section class="hero" id="inicio">
 <div class="hero-inner"><div class="hero-text">
-<div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span> LA ENTRADA A LO QUE VIENE</div>
-<h1>Vívelo.<br><em>Desde aquí.</em><span class="hero-asterisk" aria-hidden="true">✳</span></h1>
-<p>Encuentra tu próximo espectáculo, elige tus entradas y conoce el precio total antes de continuar. Una plataforma para conectar productores y público.</p>
-<a class="hero-cta" href="#cartelera">Explorar eventos <span aria-hidden="true">↗</span></a>
-<div class="hero-legal">Plataforma de ticketing en construcción · Compra simulada sin dinero real</div>
+<div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span> TU PRÓXIMO ESPECTÁCULO</div>
+<h1>Los mejores<br><em>momentos, en vivo.</em></h1>
+<p>Descubre conciertos, festivales y espectáculos en Chile.</p>
+<a class="hero-cta" href="#cartelera">Ver eventos <span aria-hidden="true">↗</span></a>
+
 </div>
 <div class="hero-visual"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-poster" id="hero-poster"><div class="hero-no-poster"><span>✳</span><strong>Tu próximo<br>gran evento.</strong></div></div>
-<span class="hero-sticker">ENTRADAS<br>EN UN LUGAR<span aria-hidden="true">✴</span></span>
-<div class="hero-ticket"><span class="vertical-dots">● ● ●</span><span>DESCUBRE<br>SELECCIONA<br>DISFRUTA</span><strong>PASELISTO<span>↗</span></strong></div></div></div>
-<div class="hero-footer"><span>UNA TICKETERA PARA ORGANIZADORES</span><span>DESLIZA PARA EXPLORAR ↓</span><span>DEMO · CHILE</span></div>
+
+</div></div>
+
 </section>
-<section id="destacados" class="featured section-wrap">
-<div class="section-eyebrow"><span class="eyebrow-line"></span> EXPERIENCIAS DESTACADAS / 01</div>
-<div class="section-heading"><div><h2>Tu próximo <em>evento.</em></h2><p>Afiches reales como ejemplos de diseño; el checkout se prueba aparte con eventos ficticios.</p></div><a class="text-link" href="#cartelera">Ver toda la cartelera ↗</a></div>
-<div id="featured-grid" class="featured-grid"></div>
-</section>
-<div class="ticker" aria-hidden="true"><div class="ticker-content">ENTRADAS DIGITALES <span>✳</span> PRODUCTORES <span>✳</span> RECINTOS <span>✳</span> EXPERIENCIAS EN VIVO <span>✳</span> ENTRADAS DIGITALES <span>✳</span> PRODUCTORES <span>✳</span></div></div>
 <section id="cartelera" class="catalog section-wrap">
-<div class="section-eyebrow"><span class="eyebrow-line"></span> ENTRADAS PARA TUS PRÓXIMOS PLANES / 02</div>
-<div class="section-heading"><div><h2>Todos los <em>eventos.</em></h2><p>Explora fichas reales de referencia y prueba la selección de entradas en nuestros eventos de demostración.</p></div><span class="count-pill" id="event-count">Catálogo DEMO</span></div>
+<div class="section-eyebrow"><span class="eyebrow-line"></span> ESPECTÁCULOS EN CHILE</div>
+<div class="section-heading"><div><h2>Próximos <em>eventos.</em></h2><p>Explora los espectáculos y abre su ficha tocando cualquier parte de la tarjeta.</p></div><span class="count-pill" id="event-count">Cargando…</span></div>
 <div class="filter-surface"><div class="search-row">
 <label class="search-field" for="event-search"><span aria-hidden="true">⌕</span><input type="search" id="event-search" placeholder="Buscar eventos, ciudad o recinto…"><kbd>/</kbd></label>
 <label class="select-wrap"><span>Ciudad</span><select id="city-filter"><option value="all">Todas las ciudades</option></select></label>
 <label class="select-wrap"><span>Fecha</span><select id="date-filter"><option value="all">Todas las próximas fechas</option><option value="month">Este mes</option><option value="thirty">Próximos 30 días</option><option value="later">Más adelante</option></select></label>
 </div><div class="category-list" id="category-list" role="group" aria-label="Filtrar por categoría"></div></div>
 <div class="catalog-toolbar"><span id="results-description" aria-live="polite">Buscando eventos…</span><button type="button" id="clear-filters" hidden>Limpiar filtros ↗</button></div>
-<div class="listing-head"><div><h3>Así se verían eventos reales</h3><p>Afiches promocionales originales · <strong>Sin contrato de venta con PaseListo</strong>. Las imágenes se muestran como referencias de diseño.</p></div><span class="status-example">SOLO REFERENCIA</span></div>
+<div class="listing-head"><div><h3>Espectáculos anunciados</h3><p>Afiches reales de referencia; todavía no están a la venta en PaseListo.</p></div><span class="status-example">REFERENCIAS</span></div>
 <div id="real-events-grid" class="events-grid"></div>
-<div class="listing-head demo-listing-head"><div><h3>Prueba una compra en PaseListo</h3><p>Eventos, precios, organizadores y cupos completamente ficticios. Compra simulada dentro de nuestra plataforma.</p></div><span class="status-demo">COMPRAS DEMO</span></div>
+<div class="listing-head demo-listing-head"><div><h3>Compra de demostración</h3><p>Prueba la selección de entradas y el desglose de precios.</p></div><span class="status-demo">EVENTOS FICTICIOS</span></div>
 <div id="events-grid" class="events-grid"></div>
 <div id="empty-state" class="empty-state" hidden><div aria-hidden="true">✳</div><h3>Prueba otro filtro.</h3><p>No hay eventos de prueba para esta selección.</p><button type="button" data-clear-filters>Volver a todos</button></div>
-<p class="catalog-footnote">Los afiches de eventos reales se muestran con fines de revisión de interfaz y atribución, sin autorización de venta por PaseListo ni licencia comercial de imagen acreditada. No se publicarán como entradas propias sin contrato, derechos y disponibilidad verificados.</p>
-</section>
-<section class="purchase-steps section-wrap" id="como-funciona">
-<div class="section-eyebrow"><span class="eyebrow-line"></span> COMPRA SIN SORPRESAS / 03</div>
-<div class="section-heading"><div><h2>Simple para <em>ti.</em></h2><p>La experiencia que construiremos para el público comprador.</p></div></div>
-<div class="steps-grid"><article><span>01</span><h3>Elige tu evento</h3><p>Consulta ciudad, fecha, lugar, organizador y categorías.</p></article><article><span>02</span><h3>Revisa el total</h3><p>Precio base, cargo por servicio y precio final, antes de pagar.</p></article><article><span>03</span><h3>Recibe tu entrada</h3><p>Cuando se habilite la venta real, recibirás un boleto seguro para acceder al espectáculo.</p></article></div>
-</section>
-<section id="empresas" class="organizer-spotlight">
-<div class="spotlight-inner"><div class="spotlight-burst" aria-hidden="true">✳</div><div class="spotlight-copy">
-<span class="light-eyebrow">TECNOLOGÍA PARA PRODUCTORES Y RECINTOS</span>
-<h2>Tú produces el espectáculo.<br><em>PaseListo gestiona la ticketera.</em></h2>
-<p>PaseListo celebra acuerdos con productoras y recintos; nuestro equipo central administra la publicación, ventas, entradas, comisiones y liquidaciones según lo pactado.</p>
-<span class="spotlight-button inactive-cta">Acuerdos comerciales gestionados por PaseListo</span>
-</div><div class="spotlight-art" aria-hidden="true"><div class="art-text">TU<br>EVENTO.<br>TU<br>PÚBLICO.<span>↗</span></div><div class="art-stamp">PASELISTO<br>B2B2C DEMO</div></div></div>
+<p class="catalog-footnote">Los espectáculos reales se muestran únicamente como referencias, sin contrato de venta ni permisos comerciales de afiches acreditados. No se procesan pagos reales.</p>
 </section>
 </main>
 <footer class="site-footer">
-<div class="footer-top"><a class="footer-brand" href="#inicio">paselisto<span>.</span></a><p>La plataforma para vivirlo.</p></div>
-<div class="footer-bottom"><span>© PaseListo · Prototipo comercial · 2026</span><span>Eventos y precios 100% ficticios</span><a href="./admin.html">Centro de Control · DEMO ↗</a></div>
-<div class="footer-disclaimer">La versión publicada en GitHub Pages es una simulación de ticketing; los eventos reales mostrados no se comercializan aquí. No acepta pagos, no valida identidad ni reservas reales, no emite tickets utilizables y no recoge datos bancarios. Los acuerdos comerciales, derechos de afiches y procesamiento de pagos deberán verificarse antes de iniciar operaciones.</div>
+<div class="footer-top"><a class="footer-brand" href="#inicio">paselisto<span>.</span></a><p>Eventos que se viven.</p></div>
+<div class="footer-bottom"><span>© PaseListo · 2026</span><span>Compras de prueba sin dinero real</span><a href="./admin.html">Centro de Control ↗</a></div>
+<div class="footer-disclaimer">Prototipo sin cobros ni entradas válidas. Las imágenes de terceros son referencias de diseño con derechos comerciales pendientes de verificación.</div>
 </footer>
 <div class="detail-backdrop" id="detail-backdrop" hidden>
 <section class="detail-dialog marketplace-dialog" id="event-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" tabindex="-1">
