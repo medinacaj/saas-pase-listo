@@ -144,9 +144,13 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       }
       if (req.method !== "POST") throw bad(404, "Ruta desconocida");
       // Same-origin, custom-header requests only. Cookies alone must never authorize a form POST.
-      const expectedOrigin = "http://" + req.headers.host;
-      if (req.headers["x-paselisto-request"] !== "1" ||
-          (req.headers.origin && req.headers.origin !== expectedOrigin)) throw bad(403, "Origen de solicitud no autorizado");
+      // Only accept browser POSTs with an explicit same-origin Origin header.
+      // Never trust an arbitrary Host header for CSRF validation.
+      const host = String(req.headers.host || "");
+      const localHost = /^(?:127\\.0\\.0\\.1|localhost)(?::\\d{1,5})?$/.test(host);
+      const expectedOrigin = "http://" + host;
+      if (!localHost || req.headers["x-paselisto-request"] !== "1" ||
+          req.headers.origin !== expectedOrigin) throw bad(403, "Origen de solicitud no autorizado");
       if (!String(req.headers["content-type"] || "").startsWith("application/json")) throw bad(415, "Contenido JSON requerido");
       const payload = await bodyFrom(req);
       if (path === "register") {
