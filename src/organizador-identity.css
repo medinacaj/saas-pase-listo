@@ -1,0 +1,30 @@
+/* PaseListo Backoffice — deliberately different from RutaTicket's dispatch dashboard. */
+:root{font-family:"DM Sans",ui-sans-serif,system-ui,sans-serif;color:#1E201D;background:#F6F3EC}
+.shell{display:block;min-height:100vh;background:#F6F3EC}
+.sidebar{display:flex;flex-direction:row;align-items:center;gap:22px;min-height:86px;padding:16px clamp(18px,4vw,68px);background:#171719;color:#fff;position:relative;z-index:20}
+.sidebar .brand{font-weight:800;letter-spacing:-.9px;font-size:24px;min-width:190px}
+.sidebar .brand-icon{background:#D2F178;color:#171719;border-radius:50%;font-size:22px}
+.sidebar .brand-accent{color:#D2F178}
+.sidebar .brand small{color:#BEBEBA;font-size:10px}
+.sidebar .side-label,.sidebar .side-note{display:none}
+.sidebar>label{color:#B3B6AC;font-size:11px;margin-left:auto;white-space:nowrap}
+.sidebar .field{margin:0;max-width:218px;min-width:170px;border-radius:30px;background:#30312E;border:1px solid #53554B;color:#FAFAF6;font-size:12px}
+.sidebar nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.sidebar nav a{font-size:11px;padding:11px 12px;white-space:nowrap;color:#D8D9D4;border-radius:30px}
+.sidebar nav a:hover,.sidebar nav a:focus-visible,.sidebar nav .nav-active{background:#D2F178;color:#191E19}
+.sidebar .reset-demo{background:transparent;border:1px solid #686B60;border-radius:30px;color:#EFEFEB;padding:11px 14px;font-weight:700;font-size:11px}
+.main{max-width:1430px;margin:0 auto;padding:48px clamp(18px,5vw,68px)}
+.top{padding:0 0 24px;border-bottom:1px solid #E0DDD4}.eyebrow{color:#D36547;letter-spacing:1.8px}.top h1{font-family:Georgia,"Times New Roman",serif;color:#171719;letter-spacing:-2px;font-weight:700}.subtitle{font-size:14px;color:#797970}
+.top-chip{background:#E1F4AF;color:#343D27}
+.warning{background:#FFF6DF;color:#7F6122;border:1px solid #EBDAAC;border-radius:9px}
+.metrics{gap:15px}.metrics article{border:1px solid #E7E1D8;border-radius:14px;box-shadow:none;background:#FFFEF9}.metrics strong{color:#21231E}.metrics span{font-size:12px}.metrics small{font-size:11px}
+.panel{background:#FFFEF9;border:1px solid #E7E1D8;border-radius:14px;box-shadow:none}.panel h2{font-family:Georgia,"Times New Roman",serif;font-size:23px}.panel-head p{color:#85857C}
+.btn{background:#1D2119;color:#F7F6ED;border-radius:30px;font-weight:800;font-size:12px}.btn:hover{background:#475637}.btn.secondary{background:#E1F4AF;color:#343D27}
+.event{border:1px solid #E7E1D8;border-radius:12px;background:#FAF8F3}.event.selected{background:#F0F6D9;border-color:#B1C97A;box-shadow:0 0 0 1px #C0D894 inset}.event-foot{color:#647D35}.event-title{font-family:Georgia,serif;font-size:18px}.pill{background:#E1F4AF;color:#4F6634}
+summary{color:#536B2C}.link-btn{color:#C45D44}
+input:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #B3CF7D;outline-offset:3px}
+input{border-radius:10px}.tag{background:#EFF6DC;color:#536D39}.tag.used{background:#E9EFF8;color:#345D8C}
+.activity{background:#FCFAF5}.audit li{font-size:12px}footer{font-size:11px;color:#85847C}
+@media(max-width:1200px){.sidebar{gap:10px;flex-wrap:wrap}.sidebar .brand{min-width:auto}.sidebar>label{margin-left:auto}.sidebar nav{order:3;width:100%;justify-content:center}.sidebar .field{max-width:210px}.columns{grid-template-columns:1fr 1.15fr}}
+@media(max-width:800px){.sidebar{padding:15px 20px;gap:12px}.sidebar>label{display:none}.sidebar .field{max-width:175px;min-width:135px;margin-left:auto}.sidebar nav{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;order:5;padding:4px 0}.sidebar nav a{flex-shrink:0}.main{padding:28px 18px}.columns{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.reset-demo{margin-left:auto}}
+@media(max-width:480px){.sidebar .brand{font-size:21px}.sidebar .field{max-width:145px;font-size:11px}.sidebar .reset-demo{font-size:10px}.main{padding:25px 14px}.panel{padding:18px}.form-inline{display:grid}.metrics{gap:8px}}
