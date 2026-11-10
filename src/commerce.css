@@ -77,3 +77,49 @@
 .reference-rights{display:block;font-size:10px;line-height:1.5;color:#7b7c72}
 .inactive-cta{cursor:default}
 @media(max-width:600px){.listing-head{display:block}.status-example,.status-demo{display:inline-block;margin-top:10px}.demo-listing-head{margin-top:48px}}
+
+
+/* Main page cleanup: one catalog, shorter hero, no duplicated card collections. */
+.hero-inner{min-height:455px;padding-top:38px;padding-bottom:38px}
+.hero-visual{height:410px}
+.hero h1{font-size:clamp(48px,5.8vw,86px);letter-spacing:-3px;margin:20px 0}
+.hero-text p{margin-bottom:22px}
+.catalog{padding-top:54px}
+.listing-head{margin-top:26px}
+.events-grid{row-gap:32px}
+.event-card{position:relative;cursor:pointer}
+.event-card .poster-button{display:block;position:relative;overflow:hidden;width:100%;background:transparent;border-radius:14px}
+.card-hitbox{position:absolute;inset:0;z-index:15;width:100%;height:100%;opacity:0;border:0;background:transparent;cursor:pointer;border-radius:14px;padding:0}
+.card-hitbox:focus-visible{opacity:1;outline:3px solid #507a32;outline-offset:4px;background:#CFF47A0D}
+.event-card:hover .poster-img{transform:scale(1.045)}
+.event-card:hover .poster-arrow{transform:translate(3px,-3px);background:#E2FFA2}
+.event-card:hover .card-heading{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.card-heading{font-family:var(--display);font-size:clamp(23px,2.3vw,30px);letter-spacing:-.5px;line-height:1.14;margin:8px 0 3px;font-weight:600}
+.events-grid .card-heading{font-size:25px}
+.reference-event .event-bottom{min-height:35px}
+.reference-event .event-bottom span:last-child{font-size:22px;color:#2C3228}
+.demo-listing-head{margin-top:48px}
+/* The original image opacity depended on a broken JS selector. Show actual pixels
+   immediately; the event handler removes broken images and reveals the fallback. */
+.real-poster .reference-poster,.demo-poster .owner-poster{opacity:1;visibility:visible;position:absolute;inset:0;z-index:4;display:block;width:100%;height:100%;object-fit:cover}
+.poster-frame.image-failed .demo-poster-inner{display:flex}
+.poster-frame.image-failed{border:1px solid #ddd6c6}
+.hero-poster .poster-frame{min-height:0}
+.hero-visual .hero-poster{max-width:290px;min-width:200px}
+@media(max-width:830px){
+ .hero-inner{min-height:420px}
+ .hero-visual{height:330px}
+ .hero h1{font-size:clamp(47px,6.3vw,70px)}
+ .events-grid .card-heading{font-size:23px}
+}
+@media(max-width:600px){
+ .hero-inner{padding-top:27px;padding-bottom:22px}
+ .hero h1{font-size:clamp(51px,10.5vw,72px);letter-spacing:-2px}
+ .hero-visual{height:260px}
+ .hero-visual .hero-poster{min-width:150px;max-width:180px}
+ .catalog{padding-top:39px}
+ .events-grid .card-heading{font-size:21px}
+ .event-card .event-bottom{display:flex;font-size:9px}
+ .card-hitbox{border-radius:10px}
+ .listing-head{margin-top:22px}
+}
