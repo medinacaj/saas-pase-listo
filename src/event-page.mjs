@@ -50,6 +50,16 @@ function renderVenue(event,reference) {
   "La función está anunciada para "+event.venue+" en "+event.city+
   ". Aquí puedes revisar el lugar y la ciudad sin salir de la ficha del espectáculo.");
  setText("#venue-location",event.venue+" · "+event.city+", Chile");
+ // Optional venue facts come from the event catalog, never inferred from a city.
+ // Unverified details must remain visibly pending.
+ const optional = (field, fallback="Por confirmar") =>
+  typeof field==="string" && field.trim() && field.length<=250 ? field.trim() : fallback;
+ setText("#venue-address",optional(event.venueAddress));
+ setText("#venue-doors",optional(event.doorsOpen));
+ setText("#venue-accessibility",optional(event.accessibility));
+ setText("#venue-transport",optional(event.transport));
+ setText("#venue-age",optional(event.ageRestriction));
+ setText("#venue-entry",optional(event.entryConditions));
  setText("#venue-note",reference
   ?"La dirección exacta, accesos, restricciones y horarios de apertura no están verificados por PaseListo."
   :"Este recinto es ficticio. La dirección, el estacionamiento y los accesos forman parte de una simulación.");
