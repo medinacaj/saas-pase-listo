@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "python3 -m http.server 8080",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/domain.mjs && node --check src/app.mjs && node --check src/storage.mjs && node --check src/commerce-domain.mjs && node --check src/marketplace.mjs && node --check src/control-domain.mjs && node --check src/control.mjs && node --check server/runtime.mjs && node --check server/index.mjs && node --check server/marketplace-api.mjs && node --check server/buyer-server.mjs && npm test",
+    "check": "node --check src/domain.mjs && node --check src/app.mjs && node --check src/storage.mjs && node --check src/commerce-domain.mjs && node --check src/checkout-state.mjs && node --check src/marketplace.mjs && node --check src/control-domain.mjs && node --check src/control.mjs && node --check server/runtime.mjs && node --check server/index.mjs && node --check server/marketplace-api.mjs && node --check server/buyer-server.mjs && npm test",
     "api:dev": "node server/index.mjs",
     "api:commerce": "node server/marketplace-api.mjs",
     "api:buyers": "node server/buyer-server.mjs"
