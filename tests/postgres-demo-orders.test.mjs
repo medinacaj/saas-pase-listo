@@ -165,7 +165,9 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
   await t.test("cuentas y sesiones SQL compartidas entre dos servidores locales", async t => {
     const authMigration = await readFile(new URL("../db/002_demo_buyers_sessions.sql", import.meta.url), "utf8");
     await poolA.query(authMigration);
-    await poolA.query("TRUNCATE TABLE demo_buyer_sessions, demo_buyers, demo_orders, demo_ticket_stock RESTART IDENTITY CASCADE");
+    const attemptsMigration = await readFile(new URL("../db/003_demo_shared_login_limits.sql", import.meta.url), "utf8");
+    await poolA.query(attemptsMigration);
+    await poolA.query("TRUNCATE TABLE demo_buyer_login_attempts, demo_buyer_sessions, demo_buyers, demo_orders, demo_ticket_stock RESTART IDENTITY CASCADE");
     await Promise.all([a.initialize(), b.initialize()]);
     const dir = await mkdtemp(join(tmpdir(), "paselisto-pg-shared-auth-"));
     const fileA = join(dir, "a.json"), fileB = join(dir, "b.json");
@@ -244,6 +246,27 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
     assert.equal(login.status, 200);
     assert.equal((await request(originA, "session", { cookie: login.cookie })).data.authenticated, true);
     assert.equal((await request(originA, "orders", { cookie: login.cookie })).data.orders.length, 1);
+    const wrongCredentials = { email: user.email, password: "Not-The-Actual-Password-123" };
+    for (let i = 0; i < 8; i++) {
+      const origin = i % 2 ? originA : originB;
+      const denied = await request(origin, "login", { method: "POST", body: wrongCredentials });
+      assert.equal(denied.status, 401);
+    }
+    const blocked = await request(originA, "login", { method: "POST", body: user });
+    assert.equal(blocked.status, 429);
+    // Simulate expiry of the rate-limit window without clock manipulation.
+    await poolA.query(
+      "UPDATE demo_buyer_login_attempts SET reset_at = now() - interval '1 minute' WHERE email = $1",
+      [user.email]
+    );
+    const recovered = await request(originB, "login", { method: "POST", body: user });
+    assert.equal(recovered.status, 200);
+    assert.equal((await request(originA, "session", { cookie: recovered.cookie })).data.authenticated, true);
+    const cleared = await poolB.query(
+      "SELECT count(*)::int AS n FROM demo_buyer_login_attempts WHERE email = $1",
+      [user.email]
+    );
+    assert.equal(cleared.rows[0].n, 0);
   });
 
 });
