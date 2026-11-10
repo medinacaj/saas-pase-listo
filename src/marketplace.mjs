@@ -8,8 +8,11 @@ const date=s=>new Intl.DateTimeFormat("es-CL",{timeZone:"UTC",day:"numeric",mont
 const short=s=>new Intl.DateTimeFormat("es-CL",{timeZone:"UTC",day:"numeric",month:"short"}).format(new Date(s+"T12:00:00Z")).replace(".","");
 const current=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Santiago",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 let store=null;
+let realSamples=[];
 const ui={query:"",category:"Todos",city:"all",period:"all",eventId:null,checkout:null,lastFocus:null};
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
+function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
+function allCatalogEvents(){return [...realEvents(),...allEvents()];}
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
 function quoteOrPrice(event,type){try{return quote(store,event.id,type.id,1).totalClp;}catch{return type.priceClp;}}
@@ -21,16 +24,52 @@ function poster(event){
  }
  return '<div class="poster-frame demo-poster" style="--poster-accent:'+tone+'"><div class="demo-poster-inner"><span class="demo-art-top">PASELISTO · EVENTO DEMO</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-subtitle">'+esc(event.subtitle)+'</span><span class="demo-art-bottom">'+esc(event.city)+' / '+esc(event.date)+'</span></div>'+image+'</div>';
 }
+
+function realPoster(event){
+ const tone=/^#[0-9a-f]{6}$/i.test(event.accent||"")?event.accent:"#E9D8BF";
+ let src="";
+ try{const u=new URL(event.posterUrl);if(u.protocol==="https:")src=u.href;}catch{/* fallback */}
+ return '<div class="poster-frame real-poster" style="--poster-accent:'+tone+'">'+
+  '<div class="demo-poster-inner"><span class="demo-art-top">AFICHE REAL · REFERENCIA</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-bottom">NO A LA VENTA EN PASELISTO</span></div>'+
+  (src?'<img src="'+esc(src)+'" alt="Afiche promocional de '+esc(event.title)+' publicado por un tercero" class="poster-img reference-poster" loading="lazy" decoding="async" referrerpolicy="no-referrer">':"")+'</div>';
+}
+function realCard(event){
+ return '<article class="event-card reference-event"><button class="poster-button" type="button" data-real-detail="'+esc(event.id)+'" aria-label="Ver ejemplo de ficha: '+esc(event.title)+'">'+
+  realPoster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></button>'+
+  '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
+  '<button class="event-title-button" type="button" data-real-detail="'+esc(event.id)+'"><h3>'+esc(event.title)+'</h3></button>'+
+  '<p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
+  '<div class="event-bottom real-bottom"><span>Ejemplo visual · Sin venta por PaseListo</span><button type="button" data-real-detail="'+esc(event.id)+'" aria-label="Ver ficha de referencia">↗</button></div></div></article>';
+}
+function openRealDetail(id){
+ const e=realSamples.find(x=>x.id===id);if(!e)return;
+ ui.lastFocus=document.activeElement;
+ let source="";
+ try{const u=new URL(e.sourceUrl);if(u.protocol==="https:")source=u.href;}catch{/* no external link */}
+ const end=e.endDate&&e.endDate!==e.date?" al "+date(e.endDate):"";
+ $("#detail-content").innerHTML='<div class="detail-layout"><div class="detail-cover">'+realPoster(e)+'<span class="detail-art-label">AFICHE PROMOCIONAL DE TERCERO · LICENCIA NO ACREDITADA</span></div>'+
+  '<div class="detail-info"><div class="detail-kicker">REFERENCIA VISUAL · NO A LA VENTA</div>'+
+  '<h2 id="detail-title">'+esc(e.title)+'</h2><p class="detail-subtitle">'+esc(e.subtitle)+'</p>'+
+  '<p class="detail-editorial">Este es un espectáculo real utilizado para mostrar cómo se vería una publicación de gran formato en PaseListo. <strong>El productor no ha contratado a PaseListo</strong> y aquí no existe inventario, precio ni opción de compra.</p>'+
+  '<dl class="event-facts"><div><dt>Fecha</dt><dd>'+esc(date(e.date))+esc(end)+'</dd></div>'+
+  '<div><dt>Recinto</dt><dd>'+esc(e.venue)+' · '+esc(e.city)+'</dd></div>'+
+  '<div><dt>Organiza</dt><dd>'+esc(e.organizer)+'</dd></div></dl>'+
+  '<div class="reference-disclaimer"><strong>Venta en PaseListo no habilitada.</strong><p>Para habilitar una ficha comercial, nuestro equipo debe acreditar el contrato B2B, permisos sobre el cartel, cupos y condiciones de venta.</p></div>'+
+  (source?'<p class="reference-source"><a href="'+esc(source)+'" target="_blank" rel="noopener noreferrer">Ver fuente oficial de la fecha y recinto ↗</a></p>':"")+
+  '<small class="reference-rights">'+esc(e.posterCredit||"Afiche promocional externo")+' · reproducción comercial pendiente de autorización.</small></div></div>';
+ $("#detail-backdrop").hidden=false;document.body.classList.add("dialog-open");$("#event-dialog").focus();installImages();
+}
+
 function card(event){
  return '<article class="event-card"><button class="poster-button" type="button" data-detail="'+esc(event.id)+'" aria-label="Ver entradas para '+esc(event.title)+'">'+poster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></button><div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div><button class="event-title-button" data-detail="'+esc(event.id)+'"><h3>'+esc(event.title)+'</h3></button><p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div><div class="event-bottom"><span>Desde '+clp(minPrice(event))+' · precio final DEMO</span><button type="button" data-detail="'+esc(event.id)+'" aria-label="Seleccionar entradas para '+esc(event.title)+'">↗</button></div></div></article>';
 }
 function installImages(){
- $$(".owner-poster").forEach(img=>{const done=()=>img.closest(".poster-frame")?.classList.toggle("loaded",img.naturalWidth>0);img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});if(img.complete)done();});
+ $(".owner-poster, .reference-poster").forEach(img=>{const done=()=>img.closest(".poster-frame")?.classList.toggle("loaded",img.naturalWidth>0);img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});if(img.complete)done();});
 }
 function filters(){
  const categories=["Todos","Música","Festivales","Comedia","Teatro","Familia","Experiencias"];
  $("#category-list").innerHTML=categories.map(c=>'<button type="button" class="category-chip'+(ui.category===c?" active":"")+'" data-category="'+esc(c)+'" aria-pressed="'+(ui.category===c)+'">'+esc(c)+'</button>').join("");
- const cities=[...new Set(allEvents().map(e=>e.city))].sort((a,b)=>a.localeCompare(b,"es"));
+ const cities=[...new Set(allCatalogEvents().map(e=>e.city))].sort((a,b)=>a.localeCompare(b,"es"));
  const previous=ui.city;
  $("#city-filter").innerHTML='<option value="all">Todas las ciudades</option>'+cities.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");
  if(cities.includes(previous))$("#city-filter").value=previous;else{ui.city="all";$("#city-filter").value="all";}
@@ -47,19 +86,21 @@ function matches(event){
 }
 function renderCards(){
  const events=allEvents(),filtered=events.filter(matches);
+ const real=realEvents().filter(matches);
+ $("#real-events-grid").innerHTML=real.map(realCard).join("");
  $("#events-grid").innerHTML=filtered.map(card).join("");
- $("#event-count").textContent=events.length+" eventos de prueba";
- $("#results-description").textContent=filtered.length+" resultados en la plataforma";
- $("#empty-state").hidden=filtered.length>0;
+ $("#event-count").textContent=(events.length+realEvents().length)+" fichas de ejemplo";
+ $("#results-description").textContent=real.length+" referencias reales y "+filtered.length+" eventos de compra DEMO";
+ $("#empty-state").hidden=(filtered.length+real.length)>0;
  $("#clear-filters").hidden=!ui.query&&ui.category==="Todos"&&ui.city==="all"&&ui.period==="all";
  $$("[data-category]").forEach(el=>{el.classList.toggle("active",el.dataset.category===ui.category);el.setAttribute("aria-pressed",String(el.dataset.category===ui.category));});
  installImages();
 }
 function renderFeatured(){
- const items=allEvents().filter(e=>e.featured).slice(0,3);
- $("#featured-grid").innerHTML=items.map(card).join("");
- const first=items[0]||allEvents()[0];
- if(first)$("#hero-poster").innerHTML='<button class="hero-art-button" type="button" data-detail="'+esc(first.id)+'" aria-label="Ver '+esc(first.title)+'">'+poster(first)+'<span class="hero-poster-bottom"><small>EVENTO DEMOSTRATIVO</small><strong>'+esc(first.title)+' ↗</strong></span></button>';
+ const items=realEvents().filter(e=>e.featured).slice(0,3);
+ $("#featured-grid").innerHTML=items.map(realCard).join("");
+ const first=items[0]||realEvents()[0];
+ if(first)$("#hero-poster").innerHTML='<button class="hero-art-button" type="button" data-real-detail="'+esc(first.id)+'" aria-label="Ver referencia de '+esc(first.title)+'">'+realPoster(first)+'<span class="hero-poster-bottom"><small>AFICHE REAL · SOLO EJEMPLO</small><strong>'+esc(first.title)+' ↗</strong></span></button>';
  installImages();
 }
 function selectedEvent(id){return store.events.find(e=>e.id===id&&e.status==="published");}
@@ -97,10 +138,14 @@ function orderSuccess(order){
 function resetFilters(){ui.query="";ui.category="Todos";ui.city="all";ui.period="all";$("#event-search").value="";$("#date-filter").value="all";filters();renderCards();}
 async function start(){
  try{
-  const response=await fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"});
-  if(!response.ok)throw Error("Catálogo de demostración no disponible");
-  const catalog=await response.json();
+  const [response,realResponse]=await Promise.all([
+   fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),
+   fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"})
+  ]);
+  if(!response.ok||!realResponse.ok)throw Error("Catálogos no disponibles");
+  const catalog=await response.json(),visuals=await realResponse.json();
   store=loadCommerce(catalog);
+  realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
  }catch(err){
   $("#featured-grid").innerHTML='<p class="load-error">No se pudo cargar el catálogo de prueba.</p>';
@@ -113,6 +158,8 @@ async function start(){
  $("#clear-filters").addEventListener("click",resetFilters);
  document.addEventListener("click",ev=>{
   const target=ev.target;
+  const real=target.closest("[data-real-detail]");
+  if(real){openRealDetail(real.dataset.realDetail);return;}
   const d=target.closest("[data-detail]");
   if(d){openDetail(d.dataset.detail);return;}
   const cat=target.closest("[data-category]");
