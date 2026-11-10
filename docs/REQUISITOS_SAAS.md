@@ -1,8 +1,8 @@
-# Requisitos SaaS — Venta de boletos para eventos (#22)
+# Requisitos SaaS — Venta de boletos para eventos (#21)
 
 > **Decisión de producto:** herramienta SaaS comercial independiente, aprobada el 9 de noviembre de 2026.  
-> **Estado actual:** concepto por validar; no se afirma implementación, base de datos, clientes, pagos ni producción.  
-> **Ubicación actual:** especificación provisional en MediOS; el repositorio independiente de la herramienta no se ha identificado entre los repositorios GitHub accesibles. No crear ni asociar otro sin verificar la URL.
+> **Estado actual:** MVP local de demostración v0.1 en PR (CI de reglas aprobada); aún sin autenticación, base de datos, pagos, clientes reales ni producción.  
+> **Ubicación actual:** repositorio de producto verificado `medinacaj/saas-pase-listo`; primera implementación propuesta en https://github.com/medinacaj/saas-pase-listo/pull/2.
 
 ## Principios comunes obligatorios
 1. Arquitectura SaaS multicliente: organización/operador independiente por cliente con aislamiento de datos efectivo en backend, BD, archivos, reportes y QR.
@@ -16,9 +16,9 @@
 ## Política de implementación
 - Preparar arquitectura y MVP con datos sintéticos, diseñar hitos incrementales y contrastar demanda/precios con clientes reales antes de inversión importante.
 - Toda funcionalidad es **prevista** hasta verificarla en código y tests.
-- Mantener el producto privado y no desplegarlo con datos reales, pagos activos ni usuarios externos sin evaluación legal, privacidad y autorización del propietario.
+- El repositorio es actualmente **público**: no incorporar secretos, código sensible ni datos personales. Evaluar la visibilidad con el propietario antes de código propietario. No desplegar con datos reales, pagos activos ni usuarios externos sin revisión legal, privacidad y autorización.
 - Conservar diferenciación entre estos dos negocios de boletería: pueden compartir componentes bajo licencia adecuada, pero **no** fusionarse como producto comercial.
-- Tras identificar el repositorio independiente correspondiente, trasladar allí este documento, abrir issue de ejecución y dejar en MediOS el vínculo histórico.
+- Repositorio independiente e issue de seguimiento existentes; conservar el vínculo histórico en mediOS y aplicar cambios por PR con CI, revisión y trazabilidad.
 
 ## Alcance comercial
 - Clientes que pagan por la plataforma: **organizadores, productores y promotores de eventos/espectáculos**.
@@ -42,9 +42,16 @@
 - [ ] Estado técnico, seguridad, privacidad y requisitos de comercio de eventos verificados antes de comercializar.
 
 ## Fuera de alcance
-- Venta de pasajes terrestres o marítimos: corresponde a Boletería Digital — Transporte (#23).
+- Venta de pasajes terrestres o marítimos: corresponde a Boletería Digital — Transporte (#22).
 
 
 ## Identificación del repositorio
 
 Repositorio de producto: `medinacaj/saas-pase-listo`. Fuente histórica: `medinacaj/MediOS/docs/saas/BOLETOS_EVENTOS.md`. Estas instrucciones no demuestran funcionalidades implementadas.
+
+
+## Evidencia de desarrollo inicial (2026-11-09)
+
+- **PaseListo v0.1:** interfaz local con datos sintéticos, reglas de negocio y pruebas de dominio en [PR #2](https://github.com/medinacaj/saas-pase-listo/pull/2).
+- CI Node 22 completado con resultado satisfactorio. Falta validación visual en navegador y pruebas de integración autenticada/concurrencia real.
+- El estado de negocio sigue **no operativo**; los requisitos de seguridad, pagos, backend y SaaS multicliente de este documento continúan abiertos.
