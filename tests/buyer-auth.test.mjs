@@ -56,7 +56,7 @@ test("registro con contraseña robusta, login, cookie HttpOnly y logout", async 
  assert.equal((await request("session", { cookie: login.cookie })).data.authenticated, true);
 });
 test("cada compra DEMO requiere sesión, respeta inventario e idempotencia", async t => {
- const { request } = await fixture(t);
+ const { request, filePath } = await fixture(t);
  const register = await request("register", { method: "POST", body: { email: "usuario-demo@example.test", password: "Prueba-Unica-123456789" } });
  const cookie = register.cookie;
  const order = { eventId: "demo-noches-aurora", ticketTypeId: "general", quantity: 2, requestId: "idem-order-0001" };
@@ -64,7 +64,11 @@ test("cada compra DEMO requiere sesión, respeta inventario e idempotencia", asy
  assert.equal(first.status, 201);
  assert.equal(first.data.quantity, 2);
  assert.equal(first.data.alias, undefined);
- assert.equal(first.data.buyerId, register.data.buyer.id);
+ assert.equal(first.data.buyerId, undefined);
+ assert.equal(first.data.organizerId, undefined);
+ assert.equal(first.data.requestId, undefined);
+ assert.equal(first.data.pricing.venueShareClp, undefined);
+ assert.equal(first.data.pricing.platformShareClp, undefined);
  const retry = await request("orders", { method: "POST", cookie, body: order });
  assert.equal(retry.status, 201);
  assert.equal(retry.data.id, first.data.id);
@@ -73,7 +77,11 @@ test("cada compra DEMO requiere sesión, respeta inventario e idempotencia", asy
  const second = await request("register", { method: "POST", body: { email: "otro-demo@example.test", password: "Otra-Prueba-123456789" } });
  const forged = await request("orders", { method: "POST", cookie: second.cookie, body: { ...order, requestId: "idem-order-0002", buyerId: register.data.buyer.id } });
  assert.equal(forged.status, 201);
- assert.equal(forged.data.buyerId, second.data.buyer.id);
+ assert.equal(forged.data.buyerId, undefined);
+ const persisted = JSON.parse(await readFile(filePath, "utf8"));
+ assert.equal(persisted.market.orders.find(o=>o.id===first.data.id).buyerId, register.data.buyer.id);
+ assert.equal(persisted.market.orders.find(o=>o.id===forged.data.id).buyerId, second.data.buyer.id);
+ assert.equal(persisted.market.orders.find(o=>o.id===first.data.id).pricing.platformShareClp >= 0, true);
 });
 test("protección CSRF: rechaza origen externo y ausencia del encabezado exigido", async t => {
  const { request } = await fixture(t);
@@ -153,6 +161,8 @@ test("historial de pedidos requiere sesión y no expone pedidos de otros comprad
  assert.equal(ownerHistory.data.orders[0].pricing.currency, "CLP");
  assert.equal(ownerHistory.data.orders[0].buyerId, undefined);
  assert.equal(ownerHistory.data.orders[0].requestId, undefined);
+ assert.equal(ownerHistory.data.orders[0].pricing.venueShareClp, undefined);
+ assert.equal(ownerHistory.data.orders[0].pricing.platformShareClp, undefined);
  const otherHistory = await request("orders", { cookie: second.cookie });
  assert.deepEqual(otherHistory.data.orders, []);
 });
