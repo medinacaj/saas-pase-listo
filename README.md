@@ -1,56 +1,49 @@
-# PaseListo — Ticketera B2B2C para espectáculos y recintos
+# PaseListo — Ticketera centralizada de espectáculos
 
-**Modelo de negocio:** empresas productoras, recintos y promotores contratan PaseListo para publicar espectáculos y vender entradas al público **en la propia plataforma**. PaseListo opera tecnología, distribución, cobro de cargos de servicio, emisión futura de boletos y control de acceso.
+PaseListo es **la ticketera del propietario**, no un software de autoservicio para que cada productora administre su propia cuenta. El equipo de PaseListo negocia con productores y recintos, administra el catálogo, configura tipos de entradas y comisiones, opera los pedidos y dirige la recaudación y las liquidaciones mediante proveedores autorizados.
 
-## Abrir las dos superficies web desde GitHub Pages
+## Versiones web publicadas (demostración)
 
-- **Tienda para compradores (demostración):** https://medinacaj.github.io/saas-pase-listo/
-- **Consola B2B para organizadores (demostración):** https://medinacaj.github.io/saas-pase-listo/organizador.html
-- Laboratorio técnico histórico de entradas: https://medinacaj.github.io/saas-pase-listo/laboratorio.html
+- [Portal público](https://medinacaj.github.io/saas-pase-listo/) — exploración de espectáculos, fichas, categorías y selección de entradas.
+- [Centro de Control PaseListo](https://medinacaj.github.io/saas-pase-listo/admin.html) — interfaz **única y central** de administración de todos los eventos, productores, pedidos y tarifas.
+- [Enlace antiguo de panel empresarial](https://medinacaj.github.io/saas-pase-listo/organizador.html) — redirige al Centro de Control.
+- [Laboratorio técnico antiguo](https://medinacaj.github.io/saas-pase-listo/laboratorio.html) — antigua demo aislada.
 
-**¡Importante!** Este prototipo es **100% ficticio**: ocho eventos inventados, tres organizadores sintéticos, afiches gráficos DEMO, tarifas y acuerdos ilustrativos. **No se cobran fondos, no se aceptan tarjetas, no se emiten entradas reales, no hay reservas ni autenticación segura.** Los datos se guardan en el localStorage del navegador y los cambios son visibles entre ambas páginas **solo en el mismo navegador/dispositivo**.
+**Este es un prototipo público y sin autenticación.** Cualquier persona puede abrir el «Centro de Control» y modificar su propia copia de datos de demostración en el navegador. **No hay acceso exclusivo, usuarios reales, fondos, asientos reservados ni entradas válidas.**
 
-El portal no es un diario de eventos, un agregador de noticias ni un afiliado a otros vendedores. La lista anterior de espectáculos reales de terceros fue retirada de la versión web para evitar aparentar que existe un contrato con sus productores.
+## Dos tipos de espectáculos, sin confundir permisos
 
-## Qué permite probar ahora
+1. **Referencias visuales reales:** seis espectáculos anunciados en Chile, con fechas verificadas y afiches promocionales de terceros enlazados externamente: Gorillaz, Fauna Primavera, Camila, Deep Purple, Cirque du Soleil / Alegría y 31 Minutos. Se usan únicamente para mostrar cómo lucirían fichas reales. **No hay contrato de venta con PaseListo, autorización comercial del afiche, precios o cupos nuestros.** Por eso **no tienen botón de compra**.
+2. **Eventos de ensayo comercial:** ocho espectáculos y tres productores **inventados**. Estos permiten recorrer el checkout DEMO (precio base + cargo por servicio + total), generar pedidos ficticios, modificar cupos y controlar comisiones en el mismo navegador.
 
-**Comprador:**
-- Buscar eventos y filtrar por ciudad, categoría o fecha.
-- Abrir ficha, consultar recinto, productor, fecha y tipos de entradas.
-- Seleccionar hasta seis entradas ficticias, ver cupos demo y **precio final en pesos chilenos**, separando precio base y cargo de servicio.
-- Ejecutar un **pedido de prueba** con alias ficticio, sin pagos, datos de tarjeta ni emisión válida.
+Los datos promocionales reales están en `data/eventos-reales-referencia.json` con sus `sourceUrl`, `posterSourceUrl` y `posterCredit`. No copiamos los archivos de afiches a GitHub y su uso comercial está pendiente de autorización. Si alguna imagen externa no carga, se muestra un fallback tipográfico.
 
-**Productor o recinto:**
-- Elegir una empresa **ficticia** en el panel empresarial (no es un login).
-- Publicar un evento inventado con ciudad, recinto, fecha, categoría, aforo, precio y color del afiche. Puede incorporar URL de imagen propia indicando que tiene derechos, aunque la demo **no verifica** esas autorizaciones.
-- Consultar pedidos simulados, métricas, tarifa de servicio y participación ilustrativa del recinto.
-- Anular pedidos ficticios, que liberan inventario local.
-- Probar toda la operación entre el panel y la tienda del mismo navegador.
+## Centro de Control propio de PaseListo
 
-**Tecnología:**
-- Motor independiente de negocio en `src/commerce-domain.mjs`; tests de comisiones, inventario, aislamiento lógico y operaciones DEMO.
-- **API Node.js de desarrollo** en `server/marketplace-api.mjs`: tokens separados por organizador, endpoints HTTP autenticados, archivo JSON local, idempotencia y serialización de transacciones **solo en un proceso**, con tests. No desplegada públicamente.
-- Código y evidencia de pruebas en la solicitud de cambios [PR #2](https://github.com/medinacaj/saas-pase-listo/pull/2).
+- KPIs globales y distribución simulada de ingresos por venta.
+- Catálogo de **todos los eventos** gestionados por PaseListo, con pausa/reactivación DEMO.
+- Registro central de eventos ficticios y asociación al productor correspondiente.
+- Gestión central de productores y recintos, contratos de ejemplo y participación de comisiones.
+- Pedidos simulados de todas las organizaciones y anulaciones de prueba.
+- Tarifas de servicio configurables para nuevos pedidos, con importes visibles en el checkout.
+- Registro de actividad y lista de puertas de seguridad pendientes.
+- Referencias de eventos reales con estatus **«No contratado»** y enlaces a fuentes oficiales (sin comercialización).
 
-## Ejecutar localmente
+**No se ha implementado un panel privado para productores.** La relación B2B es administrada por PaseListo; los productores podrán recibir información y reportes mediante canales contractuales autorizados que se definirán posteriormente.
 
-Para visualizar solo la tienda y panel: con Python 3 ejecuta `python3 -m http.server 8080` y abre http://localhost:8080.
+## Tecnología disponible
 
-Para verificar la aplicación, con Node 22+: `npm run check`.
+- Portal HTML/CSS/JS en `index.html`, `src/marketplace.mjs`, `src/commerce.css`, `src/portal.css`.
+- Centro de control en `admin.html`, `src/control.mjs`, `src/control-domain.mjs`, `src/control.css`.
+- Reglas de negocio DEMO en `src/commerce-domain.mjs`; los datos ficticios solo persisten en `localStorage` del mismo navegador. **No hay backend conectado al portal publicado.**
+- API Node experimental en `server/marketplace-api.mjs`, con tokens de demostración por organización, idempotencia y archivo JSON local, **sin autenticación de propietario** y no desplegada públicamente. No utilizar para operaciones reales.
+- Pruebas Node.js: `npm run check` (requiere Node 22+).
+- Código de desarrollo en [PR #2](https://github.com/medinacaj/saas-pase-listo/pull/2); la rama `gh-pages` contiene solo assets públicos de demostración.
 
-Para probar el **servidor local de comercio**, configura la variable `PASELISTO_DEMO_KEYS` como un objeto JSON con tres tokens aleatorios distintos de al menos 24 caracteres, bajo `org-aurora`, `org-escena` y `org-nexo`. Luego ejecuta `npm run api:commerce`. Escucha únicamente en `127.0.0.1:8081`; la tienda estática aún no está conectada a ese servicio.
+## Modelo de negocio y pendientes críticos
 
-El servidor anterior `npm run api:dev` conserva el laboratorio de tickets; no corresponde a ventas comerciales.
+PaseListo firma acuerdos B2B con recintos o promotores y opera una ticketera centralizada. El organizador define precio base y condiciones contractuales; PaseListo puede cobrar cargos de servicio transparentes al comprador y repartirlos según cada acuerdo. Exclusividad, anticipos, precios dinámicos, reventa y analítica de compradores son iniciativas opcionales **pendientes de evaluación legal y comercial**, no funciones activas.
 
-## Próximos hitos imprescindibles
+Para vender de verdad falta: control privado del propietario mediante autenticación y MFA, backend y PostgreSQL, inventario concurrente, reservas y expiración, pagos autorizados, conciliación/liquidaciones, QR firmado y antifraude, permisos comerciales de afiches, contratos con organizadores, derechos del consumidor y privacidad. No se venden datos personales.
 
-1. Contratos B2B reales y validación de organizadores, recintos, derechos de afiches e identidad.
-2. PostgreSQL + RLS, autenticación, MFA, permisos por empresa, inventario transaccional, reservas con expiración y multiinstancia.
-3. Procesador de pagos autorizado con webhook firmado, idempotencia, reembolsos, conciliación, liquidaciones, impuestos y contabilidad verificables.
-4. Emisión de entradas con QR firmado, transferencias/validación en puerta y prevención de reutilización.
-5. Políticas de privacidad y consentimiento, protección al comprador, condiciones de espectáculo, cumplimiento legal y despliegue seguro.
-6. Reservas, preventas, paquetes, promociones, mapas de asientos y analítica empresarial. Exclusividad, precios dinámicos y reventa solamente tras validación legal y de producto.
-
-Consulta [Modelo B2B2C](docs/MODELO_B2B2C.md) y [Requisitos SaaS](docs/REQUISITOS_SAAS.md).
-
-**GitHub Pages solo sirve frontend estático. No es hosting de backend comercial.** No introducir datos reales en esta demostración.
+Consulta también [Modelo de negocio](docs/MODELO_B2B2C.md) y [Requisitos SaaS](docs/REQUISITOS_SAAS.md).

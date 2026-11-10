@@ -69,3 +69,12 @@ El backend Node.js local sirve pruebas de aislamiento y concurrencia monoproceso
 PaseListo es la **infraestructura comercial de publicación, distribución y venta de entradas propias** de productores y recintos **contratados**, con catálogo público, checkout y control de emisión/validación. Ya no es un agregador que deriva compradores a Ticketmaster/PuntoTicket. Los organizadores establecen el precio base; PaseListo calcula y muestra cargos por servicio y acuerdos de reparto B2B de forma transparente. El régimen de exclusividades, precios variables, reventa y uso de datos exige evaluación independiente y **no se habilita por defecto**. No se venden datos personales. Ver `docs/MODELO_B2B2C.md`.
 
 La demo actual: ocho eventos 100% inventados, tres empresas ficticias, afiches tipográficos DEMO, checkout sin cobro y panel de organizadores sin autenticación. La publicación en GitHub Pages no representa un servicio comercial activo. Los carteles de terceros sin licencia acreditada y conciertos reales sin contrato fueron retirados de la web pública.
+
+
+## Aclaración definitiva del propietario · 10/11/2026: administración central y muestras de eventos reales
+
+El **Centro de Control es propiedad y uso del operador PaseListo**, y administra todos los productores, recintos, contratos, eventos, pedidos, tarifas, comisiones, control de acceso y liquidaciones. No es un panel empresarial autoservicio para cada promotor. **No crear ni presentar accesos de productores como el producto principal.** En producción el Centro de Control requerirá autenticación exclusiva, MFA, permisos granulares y auditoría. La demo de GitHub Pages es pública y no debe tratarse como un panel privado.
+
+El portal de compradores sí puede mostrar fichas de eventos anunciados con **afiches promocionales reales**, pero en esta etapa solo como **referencias de diseño no contratadas**: no tienen checkout, precio, stock, ni se atribuye venta a PaseListo. La venta real exige contrato B2B, autorización sobre el material gráfico, validación de inventario y pagos. Los eventos ficticios están separados para probar el checkout sin engaños. Referencias: `data/eventos-reales-referencia.json`; ejemplos de compra: `data/eventos-clientes-demo.json`.
+
+Panel web central de demostración: https://medinacaj.github.io/saas-pase-listo/admin.html. Tienda: https://medinacaj.github.io/saas-pase-listo/.

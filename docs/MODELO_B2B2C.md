@@ -56,3 +56,12 @@ La nueva normativa de protección de datos Ley 21.719 figura con entrada en vige
 7. Contratos B2B, derechos de propiedad intelectual, libre competencia, privacidad y protección al consumidor, luego pilotos controlados y aprobación de operación.
 
 **La demo no recauda dinero, no reserva inventario real, no autentica vendedores ni emite boletos válidos.** No colocar datos personales reales.
+
+
+## Corrección operativa: quién controla la plataforma (10/11/2026)
+
+**PaseListo es el operador central y controla toda la ticketera**. Productoras, promotores y recintos son contrapartes comerciales B2B, **no usuarios propietarios de paneles de gestión por defecto**. El equipo autorizado de PaseListo administra publicación, stock, tarifas, pedidos, validación de entradas, conciliación y liquidaciones según el contrato. El portal público es la superficie de venta al comprador (B2C).
+
+En el prototipo `admin.html` y `src/control.mjs` implementan una demostración central de operaciones de **todas las empresas a la vez**. `organizador.html` redirige a `admin.html`. Esta simulación es completamente pública y carece de login; en producción deberá exigirse backend autenticado con roles de propietario y operadores.
+
+Para poblar visualmente el portal existen **seis eventos reales con afiches promocionales originales de terceros** de muestra, verificados en fuentes primarias pero no autorizados para vender ni con permiso comercial acreditado para los afiches. No hay precio, comisión ni inventario de PaseListo para ellos. Los ocho eventos ficticios sí permiten simular el checkout. Esta separación seguirá siendo obligatoria hasta la firma de acuerdos.
