@@ -69,6 +69,7 @@ const assetTypes = new Map([
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
   ["/src/marketplace.mjs", ["src/marketplace.mjs", "text/javascript"]],
   ["/src/commerce-domain.mjs", ["src/commerce-domain.mjs", "text/javascript"]],
+  ["/src/checkout-state.mjs", ["src/checkout-state.mjs", "text/javascript"]],
   ["/src/portal.css", ["src/portal.css", "text/css"]],
   ["/src/commerce.css", ["src/commerce.css", "text/css"]],
   ["/src/control.mjs", ["src/control.mjs", "text/javascript"]],
