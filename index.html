@@ -8,9 +8,10 @@
 <meta name="robots" content="noindex,nofollow">
 <title>PaseListo — Los mejores eventos comienzan aquí</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./src/portal.css?v=20261110-weekly">
+<link rel="stylesheet" href="./src/portal.css?v=20261110-featured">
 <link rel="stylesheet" href="./src/commerce.css">
-<script type="module" src="./src/marketplace.mjs?v=20261110-verified-agenda"></script>
+<link rel="stylesheet" href="./src/hero-carousel.css?v=20261110-featured">
+<script type="module" src="./src/marketplace.mjs?v=20261110-featured"></script>
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -20,28 +21,35 @@
 <nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
 <div class="head-actions"><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
 </div>
-<div class="week-strip" id="week-strip" aria-label="Agenda de eventos de esta semana" hidden>
- <div class="week-strip-inner">
-  <div class="week-strip-label"><strong>ESTA SEMANA</strong><span id="week-strip-range"></span></div>
-  <div class="week-strip-events" id="week-strip-events" aria-live="polite"></div>
-  <a class="week-strip-all" href="./index.html#cartelera">Toda la agenda <span aria-hidden="true">→</span></a>
- </div>
-</div>
 </header>
 <main id="contenido">
 <div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras requieren una sesión validada. GitHub Pages no acepta pedidos.</div>
-<section class="hero" id="inicio">
-<div class="hero-inner"><div class="hero-text">
-<div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span> TU PRÓXIMO ESPECTÁCULO</div>
-<h1>Tu próxima<br><em>gran noche.</em></h1>
-<p>Descubre conciertos, festivales y espectáculos en Chile.</p>
-<a class="hero-cta" href="#cartelera">Ver eventos <span aria-hidden="true">↗</span></a>
-
-</div>
-<div class="hero-visual"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-poster" id="hero-poster"><div class="hero-no-poster"><span>✳</span><strong>Tu próximo<br>gran evento.</strong></div></div>
-
-</div></div>
-
+<section class="hero hero-carousel" id="inicio" aria-label="Carrusel de eventos destacados">
+ <div class="hero-inner">
+  <div class="hero-text" id="hero-feature-content">
+   <div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span><span id="hero-feature-kicker">EVENTOS DESTACADOS</span></div>
+   <h1 id="hero-feature-title"><span id="hero-title-main">Eventos</span><em id="hero-title-accent">en Chile.</em></h1>
+   <p class="hero-feature-summary" id="hero-feature-summary">Explora los principales espectáculos y descubre sus detalles.</p>
+   <div class="hero-feature-facts"><span id="hero-feature-date">Fecha por confirmar</span><span class="hero-facts-divider" aria-hidden="true">·</span><span id="hero-feature-venue">Recinto por confirmar</span></div>
+   <div class="hero-feature-actions">
+    <a class="hero-cta" id="hero-feature-link" href="#cartelera">Ver ficha del evento <span aria-hidden="true">↗</span></a>
+    <span class="hero-feature-notice" id="hero-feature-notice">REFERENCIA · SIN VENTA</span>
+   </div>
+   <div class="hero-carousel-controls" id="hero-carousel-controls" role="group" aria-label="Controles del carrusel de eventos">
+    <button type="button" class="hero-control-arrow" data-hero-step="-1" aria-label="Evento anterior">←</button>
+    <span id="hero-slide-count" class="hero-slide-count" aria-label="Número de evento destacado">01 / 06</span>
+    <button type="button" class="hero-control-arrow" data-hero-step="1" aria-label="Siguiente evento">→</button>
+    <div class="hero-carousel-dots" id="hero-carousel-dots" role="group" aria-label="Elegir evento destacado"></div>
+    <button type="button" class="hero-play-toggle" data-hero-toggle aria-label="Pausar carrusel">Pausar</button>
+   </div>
+   <span class="hero-carousel-live sr-only" id="hero-carousel-live" aria-live="polite" aria-atomic="true"></span>
+  </div>
+  <div class="hero-visual">
+   <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+   <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+   <div class="hero-poster" id="hero-poster"><div class="hero-no-poster"><span>✳</span><strong>Destacados.</strong></div></div>
+  </div>
+ </div>
 </section>
 <section id="cartelera" class="catalog section-wrap">
 <div class="section-eyebrow"><span class="eyebrow-line"></span> ESPECTÁCULOS EN CHILE</div>
