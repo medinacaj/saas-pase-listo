@@ -75,7 +75,7 @@ function renderReferences(){
  $("#references-grid").innerHTML=items.filter(e=>(e.endDate||e.date)>=now).map(e=>{
   const url=safeUrl(e.posterUrl),source=safeUrl(e.sourceUrl),credit=safeUrl(e.posterSourceUrl);
   const tone=/^#[a-f0-9]{6}$/i.test(e.accent)?e.accent:"#d7efb8";
-  const img=url?'<img src="'+esc(url)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Afiche promocional real: '+esc(e.title)+'" onerror="this.style.display='+"'none'"+'">':'';
+  const img=url?'<img src="'+esc(url)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Afiche promocional real: '+esc(e.title)+'">':'';
   return '<article class="reference-card"><div class="ref-art" style="--tone:'+tone+'"><div class="no-poster">'+esc(e.title)+'</div>'+img+'</div>'+
   '<div class="reference-info"><span class="status reference">EJEMPLO · NO A LA VENTA</span><p><strong>'+esc(e.title)+'</strong></p><p>'+esc(e.venue)+' · '+esc(e.city)+'<br>'+esc(e.date)+'</p>'+
   '<small>'+esc(e.posterCredit)+' · derechos comerciales no acreditados</small>'+
