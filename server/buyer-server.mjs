@@ -231,9 +231,12 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       }
       if (path === "login") {
         const email = safeEmail(payload.email), password = safePassword(payload.password);
-        const attempt = attempts.get(email) || { count: 0, resetAt: Date.now() + 10 * 60_000 };
-        if (attempt.resetAt < Date.now()) { attempt.count = 0; attempt.resetAt = Date.now() + 10 * 60_000; }
-        if (attempt.count >= 8) throw bad(429, "Demasiados intentos. Vuelve a probar más adelante");
+        const attempt = authBackend ? null : (attempts.get(email) || { count: 0, resetAt: Date.now() + 10 * 60_000 });
+        if (authBackend) await authBackend.reserveLoginAttempt(email);
+        else {
+          if (attempt.resetAt < Date.now()) { attempt.count = 0; attempt.resetAt = Date.now() + 10 * 60_000; }
+          if (attempt.count >= 8) throw bad(429, "Demasiados intentos. Vuelve a probar más adelante");
+        }
         if (!authBackend) await serial;
         const buyer = authBackend ? await authBackend.findByEmail(email) : db.buyers.find(b => b.email === email);
         // A dummy derivation prevents the obvious fast path for an unknown account.
@@ -241,12 +244,15 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         const computed = await calculate(password, salt);
         const stored = buyer ? asBuffer(buyer.digest) : randomBytes(64);
         if (!buyer || !timingSafeEqual(computed, stored)) {
-          attempt.count++;
-          attempts.set(email, attempt);
-          if (attempts.size > 1000) attempts.clear();
+          if (!authBackend) {
+            attempt.count++;
+            attempts.set(email, attempt);
+            if (attempts.size > 1000) attempts.clear();
+          }
           throw bad(401, "Correo o contraseña incorrectos");
         }
-        attempts.delete(email);
+        if (authBackend) await authBackend.clearLoginAttempts(email);
+        else attempts.delete(email);
         const token = randomBytes(32).toString("hex");
         const expiresAt = Date.now() + SESSION_MS;
         if (authBackend) await authBackend.createSession({ tokenHash: hashToken(token), buyerId: buyer.id, expiresAt });
