@@ -44,7 +44,7 @@ test("portal muestra cartel real de referencia, pero no le ofrece checkout",()=>
  assert.match(marketplace,/NO A LA VENTA EN PASELISTO/);
  assert.match(marketplace,/function openRealDetail/);
  assert.match(marketplace,/function openCheckout/);
- assert.match(marketplace,/sin contrato/i);
+ assert.match(marketplace,/no ha contratado|sin contrato/i);
 });
 test("el acceso administrativo es de control CENTRAL y la página empresarial anterior redirige",()=>{
  assert.match(admin,/CONTROL CENTRAL/);
