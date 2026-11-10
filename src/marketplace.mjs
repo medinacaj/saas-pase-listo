@@ -81,7 +81,7 @@ function realPoster(event,eager=false){
 }
 function realCard(event){
  return '<article class="event-card reference-event">'+
-  '<div class="poster-button">'+realPoster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></div>'+
+  '<div class="poster-button">'+realPoster(event)+'<span class="poster-arrow" aria-hidden="true">↗</span></div>'+
   '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
   '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
   '<p class="event-subtitle">'+esc(event.subtitle)+'</p>'+
@@ -112,7 +112,7 @@ function openRealDetail(id){
 
 function card(event){
  return '<article class="event-card">'+
-  '<div class="poster-button">'+poster(event)+'<span class="card-date">'+esc(short(event.date))+'</span><span class="poster-arrow" aria-hidden="true">↗</span></div>'+
+  '<div class="poster-button">'+poster(event)+'<span class="poster-arrow" aria-hidden="true">↗</span></div>'+
   '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
   '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
   '<p class="event-subtitle">'+esc(event.subtitle)+'</p><div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
