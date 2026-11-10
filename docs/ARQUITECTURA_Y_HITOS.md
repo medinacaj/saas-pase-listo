@@ -2,14 +2,14 @@
 
 ## Estado verificado de este hito (v0.1)
 - Interfaz web responsive (ES) para elegir organización sintética, ver eventos, crear evento, emitir/anular tickets de demostración, validar accesos de un solo uso y observar auditoría por organización.
-- Motor de reglas en \`src/domain.mjs\` con aislamiento básico por \`tenantId\`, aforo y doble check-in en **una única sesión de navegador**. Tests en \`tests/domain.test.mjs\`.
+- Motor de reglas en `src/domain.mjs` con aislamiento básico por `tenantId`, aforo y doble check-in en **una única sesión de navegador**. Tests en `tests/domain.test.mjs`.
 - Cero cuentas, pagos, reservas reales, base de datos, firmas QR, datos personales reales o integración externa. Los cambios viven solo en memoria; refrescar restaura el estado.
 - El selector de organizaciones permite cambiar libremente: **no es un control de autorización**.
 - Uso recomendado: revisión funcional y UX con datos sintéticos antes de diseñar flujos definitivos.
 
 ## Arquitectura futura aprobada (no implementada)
 1. Next.js/TypeScript y PostgreSQL siguiendo patrones y controles de Digi CRM, **sujeto a ADR y pruebas**. Migraciones versionadas, servicio autenticado y roles owner/admin/taquilla/lector.
-2. Multi-tenancy real con \`organization_id\` en las tablas, autorización en servidor, RLS por tenant con rol limitado, operaciones con \`SET LOCAL\` en transacciones y pruebas de acceso cruzado.
+2. Multi-tenancy real con `organization_id` en las tablas, autorización en servidor, RLS por tenant con rol limitado, operaciones con `SET LOCAL` en transacciones y pruebas de acceso cruzado.
 3. Transacción de venta/reserva con cupos bloqueados, idempotencia, expiración y liquidación consistente; asegurar aforo también bajo concurrencia y múltiples instancias.
 4. Pasarela autorizada con webhooks autenticados, conciliación, anulaciones y reembolsos. Separar claramente el pago del asistente de la **suscripción SaaS del organizador**.
 5. Entradas de código único + QR con verificación criptográfica por backend, revocación y consumo atómico. El código PL-* de demo **no tiene seguridad de acceso real**.
