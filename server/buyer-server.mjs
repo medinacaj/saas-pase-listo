@@ -8,7 +8,7 @@ import { randomBytes, randomUUID, scrypt, timingSafeEqual, createHash } from "no
 import { promisify } from "node:util";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { seedCommerce, simulateOrder, available } from "../src/commerce-domain.mjs";
+import { seedCommerce, simulateOrder, available, quote } from "../src/commerce-domain.mjs";
 
 const derive = promisify(scrypt);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -164,10 +164,15 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       if (req.method === "GET" && path === "inventory") {
         const events = db.market.events.filter(e => e.status === "published").map(e => ({
           eventId: e.id,
-          ticketTypes: e.ticketTypes.map(t => ({
-            ticketTypeId: t.id,
-            remaining: available(db.market, e.id, t.id)
-          }))
+          ticketTypes: e.ticketTypes.map(t => {
+            const preview = quote(db.market, e.id, t.id, 1, { availabilityRequired: false });
+            return {
+              ticketTypeId: t.id,
+              remaining: available(db.market, e.id, t.id),
+              unitBaseClp: preview.unitBaseClp,
+              feePerTicketClp: preview.feePerTicketClp
+            };
+          })
         }));
         toJson(res, 200, { events, updatedAt: db.market.updatedAt });
         return;
