@@ -44,7 +44,7 @@ function renderOverview(){
 function renderEvents(){
  const rows=ownerEvents(store);
  $("#events-body").innerHTML=rows.length?rows.map(e=>
- '<tr><td><strong>'+esc(e.title)+'</strong><small>'+esc(e.venue)+'</small></td>'+
+ '<tr><td><strong>'+esc(e.title)+'</strong><small>'+esc(e.venue)+'</small><small class="internal-event-id">ID interno: <code>'+esc(e.id)+'</code></small></td>'+
  '<td>'+esc(e.organizerName)+'</td>'+
  '<td>'+esc(e.city)+'<small>'+esc(e.date)+'</small></td>'+
  '<td>'+e.issuedDemo+' / '+e.ticketTypes.reduce((n,t)=>n+t.capacity,0)+'</td>'+
@@ -73,14 +73,12 @@ function renderReferences(){
  const items=ownerReferenceCatalog(refCatalog);
  const now=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Santiago",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  $("#references-grid").innerHTML=items.filter(e=>(e.endDate||e.date)>=now).map(e=>{
-  const url=safeUrl(e.posterUrl),source=safeUrl(e.sourceUrl),credit=safeUrl(e.posterSourceUrl);
+  const url=safeUrl(e.posterUrl);
   const tone=/^#[a-f0-9]{6}$/i.test(e.accent)?e.accent:"#d7efb8";
   const img=url?'<img src="'+esc(url)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Afiche promocional real: '+esc(e.title)+'">':'';
   return '<article class="reference-card"><div class="ref-art" style="--tone:'+tone+'"><div class="no-poster">'+esc(e.title)+'</div>'+img+'</div>'+
-  '<div class="reference-info"><span class="status reference">EJEMPLO · NO A LA VENTA</span><p><strong>'+esc(e.title)+'</strong></p><p>'+esc(e.venue)+' · '+esc(e.city)+'<br>'+esc(e.date)+'</p>'+
+  '<div class="reference-info"><span class="status reference">EJEMPLO · NO A LA VENTA</span><p><strong>'+esc(e.title)+'</strong></p><small class="internal-event-id">ID interno: <code>'+esc(e.id)+'</code></small><p>'+esc(e.venue)+' · '+esc(e.city)+'<br>'+esc(e.date)+'</p>'+
   '<small>'+esc(e.posterCredit)+' · derechos comerciales no acreditados</small>'+
-  (source?'<p><a href="'+esc(source)+'" target="_blank" rel="noopener noreferrer">Fuente oficial del evento ↗</a></p>':"")+
-  (credit?'<small><a href="'+esc(credit)+'" target="_blank" rel="noopener noreferrer">Procedencia del afiche ↗</a></small>':"")+
   '</div></article>';
  }).join("");
 }
