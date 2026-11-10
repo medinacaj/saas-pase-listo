@@ -1,0 +1,63 @@
+/* PaseListo — editorial standalone event page */
+.event-page-main{min-height:70vh}
+.event-page-wrap{max-width:1280px;margin:0 auto;padding:34px 5% 110px}
+.event-breadcrumb{display:flex;align-items:center;gap:12px;color:#6c7067;font-size:12px;margin:4px 0 35px}
+.event-breadcrumb a{text-decoration:underline;text-underline-offset:4px}
+.event-breadcrumb span:last-child{color:#263124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.event-page-loading{background:#fffdf9;border:1px solid #e5e3de;border-radius:18px;padding:32px;font-size:14px}
+.event-hero-layout{display:grid;grid-template-columns:minmax(240px,390px) minmax(0,1fr);gap:clamp(32px,6vw,90px);align-items:center}
+.event-page-art{overflow:hidden;border-radius:22px;box-shadow:0 20px 65px #252b1922;background:#e8ead8}
+.event-page-art .poster-frame{aspect-ratio:3/4;border-radius:22px}
+.event-page-art .poster-img{width:100%;height:100%;object-fit:cover}
+.event-page-art .demo-poster-inner{padding:9%}
+.event-page-art .demo-art-title{font-size:clamp(38px,4.5vw,65px)}
+.event-page-tag,.event-page-section-label{font-size:10px;letter-spacing:2px;font-weight:800;color:#60764b}
+.event-page-tag{display:inline-flex;align-items:center;gap:12px;color:#364b2e}
+.event-page-tag:before{content:"";width:23px;height:2px;background:#ea795c}
+.event-page-intro h1{font-family:var(--pl-display,Georgia,serif);font-size:clamp(48px,7vw,95px);letter-spacing:-3.5px;line-height:1.02;font-weight:600;margin:22px 0 14px;overflow-wrap:anywhere}
+.event-page-subtitle{font-size:clamp(17px,2vw,24px);font-weight:600;line-height:1.35;color:#40443d;margin:0 0 19px}
+.event-page-summary{color:#646d61;font-size:14px;line-height:1.85;max-width:650px;margin-bottom:29px}
+.event-page-facts{border-top:1px solid var(--pl-line,#e5e3de);padding-top:16px;display:grid;gap:0}
+.event-page-facts>div{display:flex;gap:18px;align-items:center;border-bottom:1px solid var(--pl-line,#e5e3de);padding:15px 0}
+.event-page-fact-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#e9f0d9;color:#304626;font-size:22px;flex-shrink:0}
+.event-page-facts small{font-size:9px;letter-spacing:1.6px;font-weight:800;color:#748272;display:block;margin-bottom:6px}
+.event-page-facts strong{display:block;font-size:15px;font-weight:700}
+.event-page-facts div span:not(.event-page-fact-icon){display:block;color:#657165;font-size:12px;margin-top:3px}
+.event-page-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,370px);gap:clamp(30px,5vw,75px);align-items:start;margin-top:90px}
+.event-page-primary{display:grid;gap:55px}
+.event-page-section{border-top:1px solid #dcded5;padding-top:27px}
+.event-page-section h2,.event-page-tickets h2{font-family:var(--pl-display,Georgia,serif);font-size:clamp(30px,3.8vw,45px);letter-spacing:-1.4px;line-height:1.2;font-weight:600;margin:15px 0 16px}
+.event-page-section>p{color:#636b60;line-height:1.9;font-size:14px;max-width:650px}
+.event-page-location{margin-top:22px;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:700}
+.event-page-location>span:first-child{display:grid;place-items:center;border-radius:50%;width:36px;height:36px;background:#e4f1cb;color:#426131;font-size:20px}
+.event-page-note{font-size:12px!important;color:#858b80!important}
+.event-weather-title{display:flex;align-items:center;gap:15px}
+.weather-soft-dot{width:9px;height:9px;background:#bddb80;border-radius:50%}
+.event-weather-content{padding:24px;border:1px solid #e1e6d9;border-radius:17px;background:#f0f3e9;line-height:1.6;color:#5b6858;font-size:13px;max-width:680px}
+.event-weather-result{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.event-weather-result strong{font-family:var(--pl-display,Georgia,serif);font-size:clamp(27px,4vw,39px);font-weight:600;color:#263b2d}
+.event-weather-result small{display:block;font-size:11px;color:#6f806d}
+.event-weather-temps{white-space:nowrap;text-align:right;font-size:13px}
+.event-weather-temps strong{font-family:var(--pl-sans,system-ui,sans-serif);font-size:21px}
+.event-weather-foot{border-top:1px solid #d9e1d3;margin:15px 0 0;padding-top:12px;font-size:11px;color:#6c7b69}
+.event-weather-foot a{text-decoration:underline;text-underline-offset:3px}
+.event-page-side{position:relative}
+.event-page-tickets{position:sticky;top:28px;background:#fffdf9;border:1px solid #e5e3de;border-radius:23px;padding:clamp(22px,3vw,34px);box-shadow:0 15px 50px #1717190c}
+.event-page-tickets h2{font-size:clamp(29px,3vw,39px);margin-bottom:24px}
+.event-ticket-row{padding:17px 0;border-top:1px solid #e9e9e2}
+.event-ticket-top{display:flex;align-items:start;justify-content:space-between;gap:13px}
+.event-ticket-top strong{font-size:14px;font-weight:800}
+.event-ticket-top small{display:block;margin-top:5px;font-size:11px;color:#737c6e}
+.event-ticket-total{font-size:17px!important;white-space:nowrap}
+.event-ticket-breakdown{display:grid;grid-template-columns:1fr auto;gap:8px;margin:14px 0 15px;color:#788076;font-size:11px}
+.event-ticket-breakdown strong{color:#374833;font-weight:700}
+.event-ticket-button{display:block;width:100%;text-align:center;border:0;background:var(--pl-lime,#cff47a);color:#171719;border-radius:10px;padding:14px 12px;font-weight:800;font-size:12px;cursor:pointer}
+.event-ticket-button:disabled{background:#e6e9e0;color:#747f71;cursor:not-allowed}
+.event-page-ticket-note{font-size:11px;color:#737c70;line-height:1.7;border-top:1px solid #e8e8df;margin-top:22px;padding-top:17px}
+.event-no-prices{background:#f4f1e8;border-radius:13px;padding:18px 16px;color:#53574f;line-height:1.7;font-size:13px}
+.event-no-prices strong{display:block;font-size:15px;color:#282d27;margin-bottom:6px}
+.event-header-link{font-size:12px;font-weight:800;background:#171719;color:#fff;padding:13px 16px;border-radius:8px}
+.event-header-link span{margin-left:10px}
+.event-page-footer{margin-top:35px}
+@media(max-width:900px){.event-hero-layout{grid-template-columns:minmax(200px,300px) minmax(0,1fr);gap:28px}.event-page-grid{grid-template-columns:1fr}.event-page-tickets{position:static}.event-page-grid{margin-top:55px}.event-page-primary{gap:43px}}
+@media(max-width:650px){.event-page-wrap{padding:22px 5% 65px}.event-breadcrumb{margin-bottom:22px}.event-hero-layout{grid-template-columns:1fr;gap:28px}.event-page-art{width:min(100%,330px);margin:0 auto}.event-page-intro h1{font-size:clamp(44px,12vw,65px);letter-spacing:-2px;margin-top:14px}.event-page-grid{margin-top:42px}.event-page-header-link{font-size:11px}.event-header-link{padding:10px;font-size:10px}.event-weather-result{flex-wrap:wrap}.event-weather-temps{text-align:left}}
