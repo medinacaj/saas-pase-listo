@@ -113,3 +113,12 @@ Para un uso comercial futuro debe existir una configuración de recinto aprobada
 La navegación pública muestra una franja compacta **«Esta semana»** bajo el menú principal, tanto en `index.html` como en `evento.html`. Usa las semanas de lunes a domingo y la fecha local de `America/Santiago`; muestra hasta cuatro eventos futuros o aún en curso, con enlace a su propia ficha y etiqueta explícita **Referencia** o **DEMO**.
 
 Si no hay espectáculos esta semana, indica **«Sin eventos esta semana»** y ofrece los próximos del catálogo, sin presentar sus fechas como si fueran de la semana actual. La franja se calcula desde los datos existentes (sin eventos inventados) y es desplazable horizontalmente en móviles. La cartelera y el hero de inicio no se reemplazan. Su módulo es `src/week-events.mjs`.
+
+
+#### Verificación del catálogo semanal (10/11/2026)
+
+La primera franja semanal solo leía seis referencias de diseño y ocho eventos ficticios de 2027; por eso mostraba erróneamente «Sin eventos esta semana». Se añadieron **16 eventos reales de referencia** para el 10–15 de noviembre de 2026, contrastando fecha y recinto contra la cartelera de PuntoTicket (`https://www.puntoticket.com/Landing/ListadoEventosTodos`) y la cartelera regional TodoEnConce (`https://www.todoenconce.cl/panoramas/`). La agenda incluye espectáculos en Santiago, Valparaíso, Curicó, Concepción y Talcahuano.
+
+El encabezado permite recorrer las referencias de la semana en una única fila horizontal. Los nuevos registros tienen IDs internos únicos, URL de la fuente, fecha de verificación y aviso de que **no existe contrato, inventario ni venta en PaseListo**. Para estos nuevos eventos se usan tarjetas tipográficas, sin copiar afiches promocionales ni publicar precios de terceros.
+
+**Importante:** la comprobación se hizo en la fecha indicada, no es una sincronización automática ni una verificación futura de disponibilidad. Para operación real debe existir una ingesta periódica de eventos mediante fuentes autorizadas, revisión de modificaciones/cancelaciones y contratos comerciales antes de poner entradas a la venta.
