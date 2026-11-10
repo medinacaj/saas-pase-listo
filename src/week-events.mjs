@@ -25,7 +25,7 @@ export function weekBounds(today) {
 }
 export function weeklyEventSelection(references,demos,today=chileToday(),limit=4) {
  const bounds=weekBounds(today);
- const safeLimit=Number.isSafeInteger(limit)?Math.min(8,Math.max(1,limit)):4;
+ const safeLimit=Number.isSafeInteger(limit)?Math.min(30,Math.max(1,limit)):4;
  const decorate=(events,kind)=>Array.isArray(events)?events
   .filter(e=>e && typeof e.id==="string" && e.id.length<=160 && validDate(e.date) &&
    (kind==="reference" || e.status==="published"))
@@ -51,7 +51,7 @@ export function renderWeekStrip(references,demos,root=document,today=chileToday(
  if(!strip)return;
  const target=strip.querySelector("#week-strip-events");
  const label=strip.querySelector("#week-strip-range");
- const {bounds,week,upcoming,weekCount}=weeklyEventSelection(references,demos,today,4);
+ const {bounds,week,upcoming,weekCount}=weeklyEventSelection(references,demos,today,24);
  label.textContent=readable(bounds.start)+"–"+readable(bounds.end);
  target.replaceChildren();
  const showing=weekCount?week:upcoming;
