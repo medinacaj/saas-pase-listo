@@ -97,3 +97,12 @@ Las fichas muestran fecha, hora cuando esté confirmada, recinto, ciudad, organi
 La sección de clima usa geocodificación y pronóstico por **ciudad** de Open-Meteo, con atribución. Solo consulta el pronóstico cuando la fecha está a 0–13 días en el futuro; para fechas posteriores avisa que aún no se dispone de una previsión fiable. No asume que el pronóstico municipal represente las condiciones de un recinto concreto. Las API públicas de Open-Meteo son para usos no comerciales bajo sus términos: evaluar una licencia comercial antes de lanzar el producto de pago.
 
 Las fichas de eventos ficticios creados en `localStorage` únicamente se comparten con navegadores que tengan esa misma información guardada; un URL no publica un evento en una base de datos. En producción haría falta un catálogo público en el backend central y rutas estables asociadas a los IDs.
+
+
+### Mapa cromático de zonas del recinto (DEMO)
+
+En `evento.html?id=<ID>`, las fichas de eventos ficticios presentan un esquema del escenario y las categorías de entrada diferenciadas por colores. Cada sector y su leyenda son seleccionables: resaltan la categoría correspondiente en el desglose de tarifas y muestran el precio total por entrada. Se puede utilizar la leyenda con teclado y los sectores con Enter o Espacio.
+
+**Importante:** el dibujo es **ilustrativo**, no un plano de butacas, un mapa geográfico, una garantía de ubicación ni una asignación de asientos. Ordena las categorías por precio de mayor a menor exclusivamente como referencia visual. Los eventos reales que se muestran como referencias no tienen un plano oficial verificado ni tarifas contratadas: en ellos aparece un esquema neutro de «sin plano verificado», sin fingir zonas, cupos o precios.
+
+Para un uso comercial futuro debe existir una configuración de recinto aprobada por el organizador, con geometrías de sectores y categorías asignadas, accesibilidad, aforos reales y precios respaldados por el servidor, además de una revisión previa de publicación.
