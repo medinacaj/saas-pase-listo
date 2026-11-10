@@ -4,6 +4,7 @@ import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createPostgresDemoOrders } from "../server/postgres-demo-orders.mjs";
+import { createPostgresDemoAuth } from "../server/postgres-demo-auth.mjs";
 import { buildBuyerServer } from "../server/buyer-server.mjs";
 
 const dbUrl = process.env.PASELISTO_DEMO_DATABASE_URL;
@@ -160,4 +161,89 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
     const dbOrders=await poolB.query("SELECT count(*)::int AS count FROM demo_orders");
     assert.equal(dbOrders.rows[0].count,1);
   });
+
+  await t.test("cuentas y sesiones SQL compartidas entre dos servidores locales", async t => {
+    const authMigration = await readFile(new URL("../db/002_demo_buyers_sessions.sql", import.meta.url), "utf8");
+    await poolA.query(authMigration);
+    await poolA.query("TRUNCATE TABLE demo_buyer_sessions, demo_buyers, demo_orders, demo_ticket_stock RESTART IDENTITY CASCADE");
+    await Promise.all([a.initialize(), b.initialize()]);
+    const dir = await mkdtemp(join(tmpdir(), "paselisto-pg-shared-auth-"));
+    const fileA = join(dir, "a.json"), fileB = join(dir, "b.json");
+    const authA = createPostgresDemoAuth({ pool: poolA });
+    const authB = createPostgresDemoAuth({ pool: poolB });
+    const appA = buildBuyerServer({ filePath: fileA, ordersBackend: a, authBackend: authA });
+    const appB = buildBuyerServer({ filePath: fileB, ordersBackend: b, authBackend: authB });
+    await Promise.all([appA.ready, appB.ready]);
+    for (const app of [appA, appB]) {
+      await new Promise(resolve => app.server.listen(0, "127.0.0.1", resolve));
+    }
+    t.after(async () => {
+      await Promise.all([appA, appB].map(app => new Promise(resolve => app.server.close(resolve))));
+      await rm(dir, { recursive: true, force: true });
+    });
+    const originA = "http://127.0.0.1:" + appA.server.address().port;
+    const originB = "http://127.0.0.1:" + appB.server.address().port;
+    async function request(origin, path, { method = "GET", cookie = "", body } = {}) {
+      const response = await fetch(origin + "/api/buyer/" + path, {
+        method,
+        headers: {
+          ...(cookie ? { Cookie: cookie } : {}),
+          ...(method === "POST" ? {
+            "Content-Type": "application/json", "X-PaseListo-Request": "1", Origin: origin
+          } : {})
+        },
+        ...(body ? { body: JSON.stringify(body) } : {})
+      });
+      return {
+        status: response.status, data: await response.json(),
+        cookie: response.headers.get("set-cookie")?.split(";")[0] || ""
+      };
+    }
+
+    const user = { email: "pg-shared@example.test", password: "Demo-Only-Shared-Passphrase-123" };
+    const created = await request(originA, "register", { method: "POST", body: user });
+    assert.equal(created.status, 201);
+    assert.match(created.cookie, /^pl_session=[0-9a-f]{64}$/);
+    assert.equal((await request(originB, "session", { cookie: created.cookie })).data.authenticated, true);
+    const duplicate = await request(originB, "register", { method: "POST", body: user });
+    assert.equal(duplicate.status, 409);
+
+    const orderInput = { eventId: "demo-noches-aurora", ticketTypeId: "general",
+      quantity: 1, requestId: "pg-shared-auth-0001" };
+    const ordered = await request(originB, "orders", {
+      method: "POST", cookie: created.cookie, body: orderInput
+    });
+    assert.equal(ordered.status, 201);
+    assert.equal((await request(originA, "orders", { cookie: created.cookie })).data.orders.length, 1);
+    const other = await request(originB, "register", {
+      method: "POST",
+      body: { email: "pg-shared-other@example.test", password: "Demo-Only-Other-Passphrase-123" }
+    });
+    assert.equal(other.status, 201);
+    assert.deepEqual((await request(originA, "orders", { cookie: other.cookie })).data.orders, []);
+
+    const stored = await poolA.query("SELECT id, email, salt, digest FROM demo_buyers WHERE email = $1", [user.email]);
+    assert.equal(stored.rows.length, 1);
+    assert.notEqual(stored.rows[0].digest, user.password);
+    assert.equal(stored.rows[0].digest.length, 128);
+    const sessions = await poolB.query("SELECT token_hash FROM demo_buyer_sessions");
+    assert.ok(sessions.rows.length >= 2);
+    assert.ok(sessions.rows.every(row => /^[0-9a-f]{64}$/.test(row.token_hash)));
+    assert.ok(sessions.rows.every(row => row.token_hash !== created.cookie.slice("pl_session=".length)));
+    await assert.rejects(readFile(fileA, "utf8"), { code: "ENOENT" });
+    await assert.rejects(readFile(fileB, "utf8"), { code: "ENOENT" });
+
+    const logout = await request(originB, "logout", {
+      method: "POST", cookie: created.cookie, body: {}
+    });
+    assert.equal(logout.status, 200);
+    assert.equal((await request(originA, "session", { cookie: created.cookie })).data.authenticated, false);
+    assert.equal((await request(originA, "orders", { cookie: created.cookie })).status, 401);
+
+    const login = await request(originB, "login", { method: "POST", body: user });
+    assert.equal(login.status, 200);
+    assert.equal((await request(originA, "session", { cookie: login.cookie })).data.authenticated, true);
+    assert.equal((await request(originA, "orders", { cookie: login.cookie })).data.orders.length, 1);
+  });
+
 });
