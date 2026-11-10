@@ -18,9 +18,9 @@ Interfaz web para productores/organizadores de eventos, independiente de RutaTic
 
 Requiere Python 3 y navegador actual:
 
-\`\`\`sh
+```sh
 python3 -m http.server 8080
-\`\`\`
+```
 
 Abrir **http://localhost:8080**. No abrir index.html con file:// por tratarse de módulos ES.
 
@@ -28,10 +28,10 @@ Abrir **http://localhost:8080**. No abrir index.html con file:// por tratarse de
 
 Requiere Node.js 20 o superior (sin npm install):
 
-\`\`\`sh
+```sh
 npm test
 npm run check
-\`\`\`
+```
 
 El CI ejecuta las pruebas en PR y cambios en main. La interfaz no se ha verificado en un navegador real en esta entrega.
 
