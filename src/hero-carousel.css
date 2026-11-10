@@ -29,7 +29,7 @@
 .hero-carousel .hero-poster .poster-frame{aspect-ratio:3/4;border-radius:12px;min-height:0}
 .hero-carousel .hero-poster .demo-art-title{font-size:clamp(29px,3.2vw,50px);line-height:1.06;overflow-wrap:anywhere}
 .hero-carousel .hero-poster.hero-poster-typographic .real-poster{background:linear-gradient(155deg,var(--hero-accent,#d2f58b),#f9efe0 90%);color:#263026}
-.hero-carousel .hero-poster-typographic .demo-poster-inner{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;gap:17px;overflow:hidden}
+.hero-carousel .hero-poster-typographic .demo-poster-inner{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;justify-content:space-between;gap:17px;overflow:hidden;background:linear-gradient(145deg,#ffffff6b,transparent 65%),radial-gradient(circle at 85% 20%,#ffffff58,transparent 38%),var(--hero-accent,#d2f58b)}
 .hero-carousel .hero-poster-typographic .demo-art-symbol{opacity:.22;font-size:80px}
 .hero-carousel .hero-poster-typographic .demo-art-title{font-size:clamp(29px,3.4vw,54px);line-height:1.02}
 .hero-carousel .hero-poster-bottom{padding:32px 14px 15px;gap:4px}
