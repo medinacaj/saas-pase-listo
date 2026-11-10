@@ -43,5 +43,5 @@ test("la cartelera consulta aforo del servidor DEMO y desactiva compras sin cupo
  const code = await readFile(new URL("../src/marketplace.mjs", import.meta.url), "utf8");
  assert.match(code, /buyerRequest\("inventory",undefined,"GET"\)/);
  assert.match(code, /remainingFor\(event\.id,t\.id\)/);
- assert.match(code, /insufficient\?'disabled':' '/);
+ assert.match(code, /insufficient\?'disabled':''/);
 });
