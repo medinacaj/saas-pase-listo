@@ -1,6 +1,7 @@
 import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
 import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
+import { renderWeekStrip } from "./week-events.mjs";
 
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => (
@@ -295,6 +296,7 @@ async function start() {
   if(!demoResponse.ok||!refsResponse.ok)throw Error("Catálogo no disponible");
   const catalog=await demoResponse.json(),refs=await refsResponse.json();
   const store=loadCommerce(catalog);
+  renderWeekStrip(refs.events||[],store.events);
   const real=refs.events?.find(e=>e.id===id);
   const event=real||store.events.find(e=>e.id===id&&e.status==="published");
   if(!event){
