@@ -1,35 +1,3 @@
 <!doctype html>
-<html lang="es-CL">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#202124"><meta name="robots" content="noindex,nofollow"><title>PaseListo Empresas — Gestión de eventos (DEMO)</title><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./src/gestion.css"><script type="module" src="./src/gestion.mjs"></script></head>
-<body>
-<a class="skip" href="#main">Saltar al contenido</a>
-<header class="topbar"><div class="topbar-inner"><a class="company-brand" href="./index.html"><span class="star">✳</span> pase<span>listo.</span><small>EMPRESAS</small></a><nav><a href="#eventos">Eventos</a><a href="#pedidos">Pedidos</a><a href="#acuerdos">Acuerdo comercial</a></nav><a class="public-link" href="./index.html">Ver tienda pública ↗</a></div></header>
-<div class="dev-ribbon"><strong>DEMO SIN AUTENTICACIÓN:</strong> cualquier visitante puede elegir otra empresa ficticia. No introduzcas información real, tarjetas ni imágenes sin derechos. Todo queda guardado solo en este navegador.</div>
-<main id="main" class="container">
-<div class="dashboard-head"><div><p class="micro">CENTRO COMERCIAL PARA PRODUCTORAS Y RECINTOS</p><h1>Tus eventos.<br><em>Tu negocio.</em></h1><p class="lead">Publica espectáculos, gestiona categorías de entradas y controla tus ventas desde un único lugar.</p></div><div class="org-picker"><label for="organization">Organización de demostración</label><select id="organization" aria-label="Organización de prueba"></select><span>Acceso demostrativo, no cuenta verificada</span><button id="reset" type="button">Restablecer todos los datos DEMO</button></div></div>
-<section class="metrics" aria-label="Indicadores comerciales" id="kpi"></section>
-<div class="main-grid">
-<section class="workspace" id="eventos"><div class="section-head"><div><p class="micro">TU INVENTARIO DIGITAL</p><h2>Eventos publicados</h2></div><a class="inline-link" href="#nuevo-evento">+ Publicar evento</a></div><div id="organizer-events" class="org-events"></div></section>
-<section class="workspace publish" id="nuevo-evento"><div class="section-head"><div><p class="micro">NUEVA PUBLICACIÓN</p><h2>Publicar un evento</h2></div><span class="step-label">Demo</span></div>
-<form id="new-event" class="publish-form">
-<label>Nombre del evento<input name="title" required minlength="3" maxlength="90" placeholder="Ej.: Una noche para recordar"></label>
-<label>Descripción<input name="description" required minlength="10" maxlength="750" placeholder="Describe el espectáculo de prueba"></label>
-<label>Subtítulo<input name="subtitle" minlength="3" maxlength="100" placeholder="Opcional"></label>
-<div class="form-two"><label>Ciudad<input name="city" required minlength="2" maxlength="50" placeholder="Concepción"></label><label>Recinto<input name="venue" required minlength="3" maxlength="100" placeholder="Teatro o estadio DEMO"></label></div>
-<div class="form-two"><label>Fecha<input type="date" name="date" required></label><label>Hora<input type="time" name="time" required></label></div>
-<div class="form-two"><label>Categoría<select name="category"><option>Música</option><option>Festivales</option><option>Comedia</option><option>Teatro</option><option>Familia</option><option>Experiencias</option></select></label><label>Color del afiche demo<input name="accent" type="color" value="#CFF47A"></label></div>
-<div class="form-two"><label>Precio base CLP<input name="priceClp" type="number" step="1" min="0" max="5000000" value="15000" required></label><label>Aforo de prueba<input name="capacity" type="number" step="1" min="1" max="100000" value="100" required></label></div>
-<details class="poster-option"><summary>Afiche propio (opcional)</summary><label>URL HTTPS de cartel del organizador<input type="url" name="posterUrl" placeholder="https://tu-sitio.cl/afiche.webp"></label><label class="rights"><input type="checkbox" name="posterRightsConfirmed"> Declaro que tengo autorización para usar esta imagen (no verificado por el sistema DEMO).</label></details>
-<p class="form-note">Las categorías, el aforo y el precio base se usan para simular pedidos. Los cargos de servicio del ejemplo se calculan automáticamente. No se publicarán entradas utilizables.</p>
-<button class="submit-event" type="submit">Publicar en mi tienda DEMO ↗</button>
-<p id="form-feedback" class="form-feedback" role="status" aria-live="polite"></p></form>
-</section></div>
-<section id="pedidos" class="workspace orders-panel"><div class="section-head"><div><p class="micro">REGISTROS DE PRUEBA</p><h2>Pedidos simulados</h2></div><span class="step-label">Sin pagos</span></div><div id="orders-view"></div></section>
-<section id="acuerdos" class="workspace contracts"><div class="section-head"><div><p class="micro">INFRAESTRUCTURA B2B2C</p><h2>El modelo PaseListo</h2></div></div>
-<div class="contracts-grid"><div><strong>Productor / recinto</strong><p>Publica eventos, fija el precio base y recibe el valor que corresponde a sus entradas según el contrato y la liquidación real futura.</p></div><div><strong>PaseListo</strong><p>Opera la tecnología y la distribución. El cargo de servicio es configurable y puede compartirse con el recinto mediante acuerdo B2B.</p></div><div><strong>Comprador</strong><p>Ve el costo total antes de pagar: precio de la entrada más cargo por servicio, sin tarifas obligatorias ocultas.</p></div></div>
-<div id="fee-example" class="fee-example"></div>
-<p class="contract-note">Acuerdo, valores, comisiones y distribución de este prototipo son ejemplos, no contratos ni ingresos reales. Precios dinámicos, exclusividades, reventa y campañas de marketing requieren evaluación legal, comercial y autorización específica. Los datos personales no se venden.</p>
-</section>
-</main>
-<footer class="footer"><span>PaseListo Empresas · Versión demostrativa 2026</span><a href="./index.html">Portal público ↗</a><a href="./laboratorio.html">Laboratorio anterior ↗</a></footer>
-</body></html>
+<html lang="es-CL"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=./admin.html"><meta name="robots" content="noindex,nofollow"><title>Centro de Control PaseListo</title></head>
+<body><main style="max-width:680px;margin:70px auto;padding:20px;font-family:system-ui"><h1>Centro de Control PaseListo</h1><p>El antiguo panel empresarial fue sustituido por un único centro de administración de la ticketera.</p><p><a href="./admin.html">Abrir Centro de Control (demostración pública)</a></p><small>La demostración aún no dispone de autenticación real.</small></main></body></html>
