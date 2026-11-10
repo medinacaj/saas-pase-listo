@@ -156,3 +156,22 @@ test("historial de pedidos requiere sesión y no expone pedidos de otros comprad
  const otherHistory = await request("orders", { cookie: second.cookie });
  assert.deepEqual(otherHistory.data.orders, []);
 });
+
+test("inventario público DEMO refleja pedidos sin descontar dos veces por reintento", async t => {
+ const { request } = await fixture(t);
+ const count = response => response.data.events
+  .find(event => event.eventId === "demo-noches-aurora")
+  .ticketTypes.find(ticket => ticket.ticketTypeId === "general").remaining;
+ const initial = await request("inventory");
+ assert.equal(initial.status, 200);
+ const before = count(initial);
+ assert.ok(Number.isInteger(before) && before >= 2);
+ const registered = await request("register", { method: "POST",
+  body: { email: "inventario@example.test", password: "Inventario-Prueba-123456" } });
+ assert.equal(registered.status, 201);
+ const order = { eventId: "demo-noches-aurora", ticketTypeId: "general", quantity: 2, requestId: "inventory-demo-0001" };
+ assert.equal((await request("orders", { method: "POST", cookie: registered.cookie, body: order })).status, 201);
+ assert.equal(count(await request("inventory")), before - 2);
+ assert.equal((await request("orders", { method: "POST", cookie: registered.cookie, body: order })).status, 201);
+ assert.equal(count(await request("inventory")), before - 2);
+});
