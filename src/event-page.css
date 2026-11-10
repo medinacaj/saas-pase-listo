@@ -61,3 +61,10 @@
 .event-page-footer{margin-top:35px}
 @media(max-width:900px){.event-hero-layout{grid-template-columns:minmax(200px,300px) minmax(0,1fr);gap:28px}.event-page-grid{grid-template-columns:1fr}.event-page-tickets{position:static}.event-page-grid{margin-top:55px}.event-page-primary{gap:43px}}
 @media(max-width:650px){.event-page-wrap{padding:22px 5% 65px}.event-breadcrumb{margin-bottom:22px}.event-hero-layout{grid-template-columns:1fr;gap:28px}.event-page-art{width:min(100%,330px);margin:0 auto}.event-page-intro h1{font-size:clamp(44px,12vw,65px);letter-spacing:-2px;margin-top:14px}.event-page-grid{margin-top:42px}.event-page-header-link{font-size:11px}.event-header-link{padding:10px;font-size:10px}.event-weather-result{flex-wrap:wrap}.event-weather-temps{text-align:left}}
+
+
+.venue-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0 15px}
+.venue-details-grid>div{background:#fffdf9;border:1px solid #e6e5dc;border-radius:12px;padding:16px}
+.venue-details-grid small{display:block;color:#70806d;letter-spacing:1.15px;font-weight:800;font-size:9px;margin-bottom:9px}
+.venue-details-grid strong{display:block;font-size:13px;line-height:1.55;font-weight:700;color:#343c32;overflow-wrap:anywhere}
+@media(max-width:530px){.venue-details-grid{grid-template-columns:1fr;gap:10px}}
