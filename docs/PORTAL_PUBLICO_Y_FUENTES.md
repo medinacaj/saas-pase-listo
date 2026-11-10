@@ -13,7 +13,7 @@ PaseListo es un portal cultural editorial: tipografía expresiva, papel cálido,
 
 ## Datos y procedencia
 
-El archivo data/eventos-editoriales.json guarda diez espectáculos publicados en Chile y consultados en noviembre de 2026. Cada registro conserva:
+El archivo data/eventos-editoriales.json guarda catorce espectáculos publicados en Chile y consultados en noviembre de 2026. Cada registro conserva:
 
 - Título, subtítulo, ciudad, recinto, género, categoría y fechas confirmadas.
 - URL de fuente primaria (organizador, artista, espectáculo o ticketera).
@@ -34,8 +34,12 @@ Fuentes utilizadas:
 | Creamfields 14–15 nov. 2026 | https://www.puntoticket.com/todos |
 | Edo Caroe 27–29 nov. 2026 | https://www.puntoticket.com/especiales |
 | 31 Minutos 20 dic. 2026 | https://www.puntoticket.com/todos |
-| Mägo de Oz 19–20 mar. 2027 | https://www.puntoticket.com/especiales |
-| Karol G 28–31 ene. 2027 | https://www.puntoticket.com/todos |
+| Mägo de Oz 19–20 mar. 2027 | https://www.puntoticket.com/evento/mago-de-oz-teatro-caupolican-mar-2027 |
+| Karol G 28–31 ene. 2027 | https://www.puntoticket.com/karol-g |
+| Inti-Illimani 28 nov. 2026 · Valparaíso | https://www.puntoticket.com/inti-illimani-valparaiso-2026 |
+| Surfestival 13 feb. 2027 · Pichilemu | https://ticketplus.cl/events/surfestival2027 |
+| Festival Nacional de Big Bands Juveniles 17 nov. 2026 · Concepción | https://ticketplus.cl/events/festival-nacional-de-big-band-juveniles |
+| Kidd Voodoo 28 feb. 2027 · Antofagasta | https://www.ticketmaster.cl/event/kidd-voodoo-explanada-enjoy-antofagasta |
 
 ## Uso responsable de afiches
 
