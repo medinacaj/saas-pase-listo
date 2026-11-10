@@ -92,6 +92,7 @@ const assetTypes = new Map([
   ["/src/marketplace.mjs", ["src/marketplace.mjs", "text/javascript"]],
   ["/src/event-page.mjs", ["src/event-page.mjs", "text/javascript"]],
   ["/src/event-page-domain.mjs", ["src/event-page-domain.mjs", "text/javascript"]],
+  ["/src/venue-zones.mjs", ["src/venue-zones.mjs", "text/javascript"]],
   ["/src/event-page.css", ["src/event-page.css", "text/css"]],
   ["/src/commerce-domain.mjs", ["src/commerce-domain.mjs", "text/javascript"]],
   ["/src/checkout-state.mjs", ["src/checkout-state.mjs", "text/javascript"]],
