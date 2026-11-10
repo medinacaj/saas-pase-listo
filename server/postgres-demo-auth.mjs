@@ -13,6 +13,7 @@ export function createPostgresDemoAuth({ pool }) {
   async function initialize() {
     await pool.query("SELECT 1 FROM demo_buyers LIMIT 1");
     await pool.query("SELECT 1 FROM demo_buyer_sessions LIMIT 1");
+    await pool.query("SELECT 1 FROM demo_buyer_login_attempts LIMIT 1");
   }
   async function register({ id, email, salt, digest }) {
     const client = await pool.connect();
@@ -76,5 +77,47 @@ export function createPostgresDemoAuth({ pool }) {
   async function deleteSession(tokenHash) {
     await pool.query("DELETE FROM demo_buyer_sessions WHERE token_hash = $1", [tokenHash]);
   }
-  return { initialize, register, findByEmail, createSession, sessionForToken, deleteSession };
+  async function reserveLoginAttempt(email) {
+    // Lock by email so parallel workers do not each grant their own eight tries.
+    const client = await pool.connect();
+    let open = false;
+    try {
+      await client.query("BEGIN");
+      open = true;
+      await client.query(
+        `INSERT INTO demo_buyer_login_attempts(email, attempts, reset_at)
+         VALUES ($1, 0, now() + interval '10 minutes')
+         ON CONFLICT (email) DO NOTHING`,
+        [email]
+      );
+      const { rows } = await client.query(
+        `SELECT attempts, reset_at <= now() AS expired
+         FROM demo_buyer_login_attempts WHERE email = $1 FOR UPDATE`,
+        [email]
+      );
+      const expired = rows[0].expired;
+      if (!expired && rows[0].attempts >= 8) {
+        throw bad(429, "Demasiados intentos. Vuelve a probar más adelante");
+      }
+      await client.query(
+        `UPDATE demo_buyer_login_attempts
+         SET attempts = $2,
+             reset_at = CASE WHEN $3 THEN now() + interval '10 minutes' ELSE reset_at END
+         WHERE email = $1`,
+        [email, expired ? 1 : rows[0].attempts + 1, expired]
+      );
+      await client.query("COMMIT");
+      open = false;
+    } catch (error) {
+      if (open) await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+  async function clearLoginAttempts(email) {
+    await pool.query("DELETE FROM demo_buyer_login_attempts WHERE email = $1", [email]);
+  }
+  return { initialize, register, findByEmail, createSession, sessionForToken,
+    deleteSession, reserveLoginAttempt, clearLoginAttempts };
 }
