@@ -68,7 +68,7 @@ test("todas las tarjetas se abren pulsando cualquier área y no contienen botone
 test("los afiches visibles usan querySelectorAll y tienen fallback de error",async()=>{
  const style=await read("../src/commerce.css");
  assert.match(marketplace,/\$\$\("\.owner-poster, \.reference-poster"\)\.forEach/);
- assert.doesNotMatch(marketplace,/\$\("\.owner-poster, \.reference-poster"\)\.forEach/);
+ assert.doesNotMatch(marketplace,/(?<!\$)\$\("\.owner-poster, \.reference-poster"\)\.forEach/);
  assert.match(marketplace,/img\.addEventListener\("error",failed\)/);
  assert.match(marketplace,/img\.dataset\.fallback/);
  assert.match(style,/\.real-poster \.reference-poster,\.demo-poster \.owner-poster\{opacity:1/);
