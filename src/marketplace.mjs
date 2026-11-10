@@ -16,7 +16,7 @@ let buyerApiReady=false;
 let serverInventory=null;
 function remainingFor(eventId,typeId){
  // The local demo server owns stock. Never offer browser-only events as purchasable.
- if(serverInventory!==null)return serverInventory.get(eventId+"|"+typeId)??0;
+ if(serverInventory!==null)return serverInventory.get(eventId+"|"+typeId)?.remaining??0;
  return available(store,eventId,typeId);
 }
 async function refreshInventory(){
@@ -28,20 +28,38 @@ async function refreshInventory(){
   for(const event of data.events){
    if(typeof event.eventId!=="string"||!Array.isArray(event.ticketTypes))continue;
    for(const ticket of event.ticketTypes){
-    if(typeof ticket.ticketTypeId==="string"&&Number.isSafeInteger(ticket.remaining)&&ticket.remaining>=0)
-     next.set(event.eventId+"|"+ticket.ticketTypeId,ticket.remaining);
+    if(typeof ticket.ticketTypeId==="string"&&Number.isSafeInteger(ticket.remaining)&&ticket.remaining>=0&&
+       Number.isSafeInteger(ticket.unitBaseClp)&&ticket.unitBaseClp>=0&&
+       Number.isSafeInteger(ticket.feePerTicketClp)&&ticket.feePerTicketClp>=0)
+     next.set(event.eventId+"|"+ticket.ticketTypeId,{
+      remaining:ticket.remaining,unitBaseClp:ticket.unitBaseClp,feePerTicketClp:ticket.feePerTicketClp
+     });
    }
   }
   serverInventory=next;
   if(store){renderCards();syncDetailAvailability();}
- }catch{serverInventory=null;}
+ }catch{
+  // Fail closed when the buyer API is reachable but its inventory cannot be verified.
+  serverInventory=buyerApiReady?new Map():null;
+  if(store){renderCards();syncDetailAvailability();}
+ }
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
 function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return [...realEvents(),...allEvents()];}
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
-function quoteOrPrice(event,type){try{return quote(store,event.id,type.id,1).totalClp;}catch{return type.priceClp;}}
+function pricePreview(eventId,typeId,qty){
+ if(serverInventory!==null){
+  const ticket=serverInventory.get(eventId+"|"+typeId);
+  if(!ticket)throw Error("Esta entrada no está disponible en el servidor DEMO");
+  const faceValueClp=ticket.unitBaseClp*qty;
+  const serviceFeeClp=ticket.feePerTicketClp*qty;
+  return {faceValueClp,serviceFeeClp,totalClp:faceValueClp+serviceFeeClp};
+ }
+ return quote(store,eventId,typeId,qty,{availabilityRequired:false});
+}
+function quoteOrPrice(event,type){try{return pricePreview(event.id,type.id,1).totalClp;}catch{return type.priceClp;}}
 function poster(event){
  const tone=/^#[0-9a-f]{6}$/i.test(event.accent||"")?event.accent:"#CFF47A";
  let image="";
@@ -242,7 +260,7 @@ function renderCheckout(eventId,typeId,qty=1){
  const ticket=e.ticketTypes.find(t=>t.id===typeId);if(!ticket)return;
  const remaining=remainingFor(eventId,typeId),insufficient=!canSubmitCheckout(ui.checkout,remaining);
  let summary;
- try{summary=quote(store,eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
+ try{summary=pricePreview(eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
  $("#checkout-content").innerHTML='<div class="checkout-head"><div class="detail-kicker">CUENTA VERIFICADA · COMPRA DE PRUEBA</div><h2 id="checkout-title">Tus entradas.</h2><p>'+esc(e.title)+' · '+esc(date(e.date))+' · '+esc(e.venue)+'</p><p class="signed-buyer">Sesión iniciada: '+esc(buyer.email)+'</p></div><form id="demo-checkout" class="checkout-form"><div class="checkout-controls"><label>Tipo de entrada<select name="ticketType">'+e.ticketTypes.map(t=>'<option value="'+esc(t.id)+'" '+(t.id===typeId?"selected":"")+'>'+esc(t.name)+'</option>').join("")+'</select></label><label>Cantidad<select name="quantity">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'" '+(n===qty?"selected":"")+'>'+n+'</option>').join("")+'</select></label></div><div class="fee-summary"><div><span>Entrada base × '+qty+'</span><strong>'+clp(summary.faceValueClp)+'</strong></div><div><span>Cargo por servicio × '+qty+'</span><strong>'+clp(summary.serviceFeeClp)+'</strong></div><div class="fee-total"><span>Total del comprador</span><strong>'+clp(summary.totalClp)+'</strong></div><small>Los cargos de esta simulación están incluidos. No se efectuará ningún cobro.</small></div>'+(insufficient?'<p class="load-error" role="alert">Solo quedan '+remaining+' cupos de prueba para esta selección.</p>':'')+'<label class="ack"><input type="checkbox" required name="acceptDemo"> Entiendo que es una simulación sin pago, reserva ni boleto válido.</label><button type="submit" class="checkout-submit" '+(insufficient?'disabled':'')+'>Continuar pedido de prueba · '+clp(summary.totalClp)+' ↗</button></form>';
 }
 async function openCheckout(eventId,typeId){
