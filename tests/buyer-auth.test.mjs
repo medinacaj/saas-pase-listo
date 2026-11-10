@@ -98,3 +98,35 @@ test("protección CSRF: rechaza POST sin Origin aunque tenga encabezado personal
  });
  assert.equal(response.status, 403);
 });
+
+test("pedidos concurrentes DEMO con la misma clave se consolidan en uno", async t => {
+ const { request, filePath } = await fixture(t);
+ const registered = await request("register", { method: "POST", body: { email: "paralelo@example.test", password: "Clave-Paralela-12345678" } });
+ assert.equal(registered.status, 201);
+ const order = { eventId: "demo-noches-aurora", ticketTypeId: "general", quantity: 2, requestId: "parallel-request-001" };
+ const attempts = await Promise.all(Array.from({ length: 8 }, () => request("orders", { method: "POST", cookie: registered.cookie, body: order })));
+ assert.ok(attempts.every(x => x.status === 201));
+ assert.equal(new Set(attempts.map(x => x.data.id)).size, 1);
+ const saved = JSON.parse(await readFile(filePath, "utf8"));
+ assert.equal(saved.market.orders.length, 1);
+ assert.equal(saved.market.orders[0].quantity, 2);
+});
+test("solicitudes concurrentes de compradores distintos no comparten idempotencia", async t => {
+ const { request, filePath } = await fixture(t);
+ const [a, b] = await Promise.all([
+  request("register", { method: "POST", body: { email: "uno-concurrente@example.test", password: "Clave-Concurrente-111111" } }),
+  request("register", { method: "POST", body: { email: "dos-concurrente@example.test", password: "Clave-Concurrente-222222" } })
+ ]);
+ assert.equal(a.status, 201);
+ assert.equal(b.status, 201);
+ const body = { eventId: "demo-noches-aurora", ticketTypeId: "general", quantity: 1, requestId: "same-id-different-buyer" };
+ const [first, second] = await Promise.all([
+  request("orders", { method: "POST", cookie: a.cookie, body }),
+  request("orders", { method: "POST", cookie: b.cookie, body })
+ ]);
+ assert.equal(first.status, 201);
+ assert.equal(second.status, 201);
+ assert.notEqual(first.data.id, second.data.id);
+ const saved = JSON.parse(await readFile(filePath, "utf8"));
+ assert.equal(saved.market.orders.length, 2);
+});
