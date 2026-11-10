@@ -38,3 +38,10 @@ test("Mi cuenta presenta el historial privado y permite cerrar sesión", async (
  assert.match(code, /buyerRequest\("orders",undefined,"GET"\)/);
  assert.match(code, /buyerRequest\("logout",\{\}\)/);
 });
+
+test("la cartelera consulta aforo del servidor DEMO y desactiva compras sin cupos", async () => {
+ const code = await readFile(new URL("../src/marketplace.mjs", import.meta.url), "utf8");
+ assert.match(code, /buyerRequest\("inventory",undefined,"GET"\)/);
+ assert.match(code, /remainingFor\(event\.id,t\.id\)/);
+ assert.match(code, /insufficient\?'disabled':' '/);
+});
