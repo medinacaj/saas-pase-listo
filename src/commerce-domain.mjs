@@ -86,7 +86,19 @@ export function quote(store, eventId, ticketTypeId, quantityInput) {
   const venueShareClp = Math.round(serviceFeeClp * venueShareBps / 10000);
   return { eventId, ticketTypeId, quantity, currency:"CLP", unitBaseClp:baseClp, faceValueClp, feePerTicketClp, serviceFeeClp, totalClp, venueShareClp, platformShareClp: serviceFeeClp - venueShareClp, note:"Simulación de cobro; sin procesamiento de pagos, impuestos ni recaudación" };
 }
-export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId }) {
+export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId, idempotencyKey }) {
+  // The optional key makes local DEMO retries deterministic; production needs DB uniqueness.
+  if (idempotencyKey !== undefined) {
+    const key = text(idempotencyKey, 8, 128, "Clave de idempotencia");
+    const existing = store.orders.find(o => o.idempotencyKey === key);
+    if (existing) {
+      if (existing.eventId !== eventId || existing.ticketTypeId !== ticketTypeId ||
+          existing.quantity !== Number(quantity) || existing.buyerId !== buyerId) {
+        fail("Clave de idempotencia reutilizada con datos diferentes");
+      }
+      return existing;
+    }
+  }
   const pricing = quote(store, eventId, ticketTypeId, quantity);
   const event = eventOrFail(store, eventId);
   const order = {
@@ -96,6 +108,7 @@ export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId 
     eventId, ticketTypeId,
     quantity:pricing.quantity,
     buyerId:text(buyerId,8,100,"Identificador de comprador autenticado"),
+    ...(idempotencyKey !== undefined ? {idempotencyKey} : {}),
     pricing,
     createdAt:iso()
   };
@@ -119,7 +132,7 @@ export function createOrganizerEvent(store, organizationId, input) {
   const venue = text(input.venue,3,100,"Recinto");
   const city = text(input.city,2,50,"Ciudad");
   const date = String(input.date ?? "");
-  if (!/^\d{4}-\d\d-\d\d$/.test(date) || Number.isNaN(Date.parse(date + "T12:00:00Z"))) fail("Fecha inválida");
+  if (!/^\d{4}-\d\d-\d\d$/.test(date) || Number.isNaN(Date.parse(date + "T12:00:00Z")) || new Date(date + "T12:00:00Z").toISOString().slice(0,10) !== date) fail("Fecha inválida");
   const time = String(input.time ?? "");
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) fail("Hora inválida");
   const category = String(input.category ?? "");
