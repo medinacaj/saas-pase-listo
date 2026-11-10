@@ -68,13 +68,15 @@ export function available(store, eventId, ticketTypeId) {
   const simulatedQty = store.orders.filter((o) => o.eventId === eventId && o.ticketTypeId === ticketTypeId && o.status === "demo_confirmed").reduce((sum, o) => sum + o.quantity, 0);
   return Math.max(0, type.capacity - simulatedQty);
 }
-export function quote(store, eventId, ticketTypeId, quantityInput) {
+export function quote(store, eventId, ticketTypeId, quantityInput, { availabilityRequired = true } = {}) {
+  // Preview-only callers may show price for sold-out DEMO entries; orders always
+  // use the default availability check inside simulateOrder.
   const event = eventOrFail(store, eventId);
   if (event.status !== "published") fail("Este evento no está publicado");
   const type = typeOrFail(event, ticketTypeId);
   const quantity = bounded(quantityInput, 1, 6, "Cantidad");
   if (!Number.isSafeInteger(type.capacity) || type.capacity < 0) fail("Aforo DEMO inválido");
-  if (available(store, eventId, ticketTypeId) < quantity) fail("Entradas DEMO insuficientes");
+  if (availabilityRequired && available(store, eventId, ticketTypeId) < quantity) fail("Entradas DEMO insuficientes");
   const bps = bounded(store.contract.buyerFeeBps, 0, 4000, "Porcentaje de servicio");
   const fixed = bounded(store.contract.buyerFeeFixedClp, 0, 20000, "Cargo fijo");
   const baseClp = bounded(type.priceClp, 0, 5000000, "Precio base");
