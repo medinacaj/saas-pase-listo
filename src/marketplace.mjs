@@ -206,7 +206,8 @@ function renderFeatured(){
  if(!heroSlides.length){
   $("#hero-feature-kicker").textContent="PRÓXIMOS EVENTOS EN CHILE";
   $("#hero-feature-summary").textContent="Explora la cartelera disponible.";
-  $("#hero-feature-title").textContent="Tu próxima gran noche.";
+  $("#hero-title-main").textContent="Tu próxima";
+  $("#hero-title-accent").textContent="gran noche.";
   $("#hero-feature-link").href="#cartelera";
   $("#hero-poster").innerHTML='<div class="hero-no-poster"><span>✳</span><strong>Eventos en vivo.</strong></div>';
   $("#hero-carousel-controls").hidden=true;
