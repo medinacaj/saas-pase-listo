@@ -1,0 +1,39 @@
+/* PaseListo shared visual system — portal, event detail, checkout and control. */
+:root{--pl-ink:#171719;--pl-cream:#F6F3EC;--pl-paper:#FFFDF9;--pl-lime:#CFF47A;--pl-orange:#F9785B;--pl-line:#E5E3DE;--pl-muted:#6F706B;--pl-radius:18px;--pl-shadow:0 12px 36px rgba(23,23,25,.065);--pl-sans:"DM Sans",ui-sans-serif,system-ui,sans-serif;--pl-display:"Fraunces",Georgia,serif}
+body{font-family:var(--pl-sans);background:var(--pl-cream);color:var(--pl-ink)}
+button,a,input,select,textarea{font-family:var(--pl-sans)}
+:where(a,button,input,select,textarea):focus-visible{outline:3px solid #5d9132;outline-offset:3px}
+:where(button,a){-webkit-tap-highlight-color:transparent}
+:where(.site-head,.head-inner,.main,.checkout-dialog,.marketplace-dialog,.detail-info){color:var(--pl-ink)}
+:where(.checkout-dialog,.fee-summary,.steps-grid article,.metrics article){background:var(--pl-paper)}
+:where(.checkout-dialog,.fee-summary,.steps-grid article,.metrics article){border-radius:var(--pl-radius)}
+:where(.hero h1,.checkout-head h2,.demo-success h2,.type-list h3,.top h1,.section-head h2){font-family:var(--pl-display)}
+:where(.hero-cta,.type-row button,.organizer-link){transition:transform .18s ease,background-color .18s ease,box-shadow .18s ease}
+:where(.hero-cta,.type-row button,.organizer-link):hover{transform:translateY(-2px)}
+:where(.hero-cta,.type-row button,.organizer-link):active{transform:translateY(0)}
+/* Control center is a workspace within the same brand, not a separate product. */
+.admin-layout{background:var(--pl-cream)}
+.sidebar{background:var(--pl-ink);color:var(--pl-paper)}
+.sidebar .brand{color:var(--pl-paper);letter-spacing:-1.5px}
+.sidebar .brand-icon{background:var(--pl-ink);color:var(--pl-lime);border:1px solid rgba(207,244,122,.45);border-radius:50%}
+.sidebar .brand strong{color:var(--pl-lime)}
+.sidebar nav a.nav-current,.sidebar nav a:hover,.sidebar nav a:focus-visible{background:#343535;color:var(--pl-lime)}
+.sidebar-foot{border-color:#41413e}
+.owner-dot{background:var(--pl-lime);color:var(--pl-ink)}
+.main{background:var(--pl-cream)}
+.top h1,.section-head h2{color:var(--pl-ink)}
+.eyebrow,.micro{color:#5c6855}
+.top-tools a{background:var(--pl-ink);color:var(--pl-paper)}
+.admin-pill,.note-chip{background:var(--pl-lime);color:var(--pl-ink)}
+.metrics article{border:1px solid var(--pl-line);box-shadow:var(--pl-shadow)}
+.metrics span{color:var(--pl-muted)}
+.inline-link{color:#395e26;border-color:#9bbd6c}
+.ghost-btn{background:var(--pl-paper);border-color:var(--pl-line)}
+/* Align the event detail and purchase overlay with the same surfaces and tokens. */
+.checkout-dialog{background:var(--pl-cream);border:1px solid var(--pl-line);box-shadow:0 25px 90px #0005}
+.fee-summary{border-color:var(--pl-line)}
+.type-row button{background:var(--pl-lime);color:var(--pl-ink)}
+.steps-grid article{border-top-color:var(--pl-ink)}
+.steps-grid span{color:var(--pl-orange)}
+@media(max-width:700px){.checkout-dialog{border-radius:18px;padding:clamp(18px,5vw,32px)}.main{padding-left:18px;padding-right:18px}}
+@media(prefers-reduced-motion:reduce){:where(.hero-cta,.type-row button,.organizer-link){transition:none;transform:none!important}}
