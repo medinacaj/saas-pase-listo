@@ -108,17 +108,18 @@ En `evento.html?id=<ID>`, las fichas de eventos ficticios presentan un esquema d
 Para un uso comercial futuro debe existir una configuración de recinto aprobada por el organizador, con geometrías de sectores y categorías asignadas, accesibilidad, aforos reales y precios respaldados por el servidor, además de una revisión previa de publicación.
 
 
-### Encabezado: eventos de la semana
+### Carrusel de eventos destacados en la portada
 
-La navegación pública muestra una franja compacta **«Esta semana»** bajo el menú principal, tanto en `index.html` como en `evento.html`. Usa las semanas de lunes a domingo y la fecha local de `America/Santiago`; muestra hasta cuatro eventos futuros o aún en curso, con enlace a su propia ficha y etiqueta explícita **Referencia** o **DEMO**.
+El bloque principal oscuro de `index.html` contiene un **carrusel editorial de eventos destacados** (ya no una franja debajo del menú). Muestra cuatro eventos de esta semana y hasta dos próximos destacados, seleccionados automáticamente a partir del catálogo con prioridad editorial `heroPriority`; los eventos vencidos desaparecen al cambiar de fecha. Cada diapositiva actualiza título, subtítulo, fecha, ciudad, recinto, composición de afiche y enlaces a `evento.html?id=<ID>`.
 
-Si no hay espectáculos esta semana, indica **«Sin eventos esta semana»** y ofrece los próximos del catálogo, sin presentar sus fechas como si fueran de la semana actual. La franja se calcula desde los datos existentes (sin eventos inventados) y es desplazable horizontalmente en móviles. La cartelera y el hero de inicio no se reemplazan. Su módulo es `src/week-events.mjs`.
+La rotación ocurre cada 6,5 segundos; hay flechas anterior/siguiente, indicadores de posición y control de pausa. Se detiene al pasar el mouse, al enfocar controles o enlaces, al ocultar la pestaña y cuando el navegador prefiere movimiento reducido. El diseño se adapta a móviles. Se preservan las tarjetas de la cartelera y la estructura de navegación sin añadir encabezados altos ni una segunda barra de eventos.
 
+Los afiches existentes se muestran solo como referencias con derechos de explotación comercial **no acreditados**. Las referencias recientes sin permisos de reproducción usan composiciones tipográficas, no imágenes copiadas. Todos los destacados externos indican **«Referencia · sin venta»**. Las páginas públicas siguen sin pagos ni entradas válidas.
 
 #### Verificación del catálogo semanal (10/11/2026)
 
 La primera franja semanal solo leía seis referencias de diseño y ocho eventos ficticios de 2027; por eso mostraba erróneamente «Sin eventos esta semana». Se añadieron **16 eventos reales de referencia** para el 10–15 de noviembre de 2026, contrastando fecha y recinto contra la cartelera de PuntoTicket (`https://www.puntoticket.com/Landing/ListadoEventosTodos`) y la cartelera regional TodoEnConce (`https://www.todoenconce.cl/panoramas/`). La agenda incluye espectáculos en Santiago, Valparaíso, Curicó, Concepción y Talcahuano.
 
-El encabezado permite recorrer las referencias de la semana en una única fila horizontal. Los nuevos registros tienen IDs internos únicos, URL de la fuente, fecha de verificación y aviso de que **no existe contrato, inventario ni venta en PaseListo**. Para estos nuevos eventos se usan tarjetas tipográficas, sin copiar afiches promocionales ni publicar precios de terceros.
+El carrusel de la portada destaca algunos de los eventos relevantes de esa semana y dos próximos espectáculos; el resto continúa disponible en la cartelera. Los nuevos registros tienen IDs internos únicos, URL de la fuente, fecha de verificación y aviso de que **no existe contrato, inventario ni venta en PaseListo**. Para estos nuevos eventos se usan tarjetas tipográficas, sin copiar afiches promocionales ni publicar precios de terceros.
 
 **Importante:** la comprobación se hizo en la fecha indicada, no es una sincronización automática ni una verificación futura de disponibilidad. Para operación real debe existir una ingesta periódica de eventos mediante fuentes autorizadas, revisión de modificaciones/cancelaciones y contratos comerciales antes de poner entradas a la venta.
