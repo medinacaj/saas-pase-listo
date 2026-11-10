@@ -1,0 +1,13 @@
+{
+  "name": "saas-pase-listo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PaseListo: MVP local de boletería de eventos (datos sintéticos)",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/domain.mjs && node --check src/app.mjs && npm test"
+  },
+  "engines": { "node": ">=20" }
+}
