@@ -86,3 +86,14 @@ La modalidad PostgreSQL utiliza las tablas `demo_ticket_stock`, `demo_orders`, `
 Para correr las pruebas de integración con PostgreSQL se necesita la variable `PASELISTO_DEMO_DATABASE_URL`. Las pruebas **vacían las tablas DEMO** antes de ejecutarse; jamás usar una base con información que deba conservarse. GitHub Actions levanta un contenedor PostgreSQL descartable para esas pruebas.
 
 **Limitaciones pendientes:** protección avanzada contra abuso (el límite por correo está compartido en SQL, pero no hay límites por IP/dispositivo ni servicio de gestión antifraude), verificación de correo, MFA, recuperación de cuenta, gestión autenticada de propietarios, pagos y conciliación, reservas con expiración, claves/QR firmados, controles tributarios y protección de datos. Esta etapa prepara operaciones SQL transaccionales pero no habilita ventas reales.
+
+
+## Fichas individuales de eventos (cartelera pública)
+
+Seleccionar cualquier tarjeta o el afiche destacado lleva a `evento.html?id=<ID>`. Cada ID único identifica una ficha que puede abrirse y compartirse directamente. Esto es una **ruta/página individual**, no un subdominio DNS. Para implementar `evento.paselisto.cl` (o subdominios por evento) sería necesario disponer de un dominio propio, DNS y un hosting compatible con wildcard hosts y certificados TLS; GitHub Pages no ofrece por sí solo ese comportamiento dinámico.
+
+Las fichas muestran fecha, hora cuando esté confirmada, recinto, ciudad, organizador, descripción y condiciones de venta. Para eventos DEMO indican precios por categoría, cargo por servicio y total, y solo muestran un enlace a checkout si funciona el servidor local; en GitHub Pages los pedidos siguen bloqueados. Para espectáculos reales de referencia no se publican precios, aforos ni venta no autorizados, y se retiró el enlace externo «Ver fuente oficial de la fecha y recinto».
+
+La sección de clima usa geocodificación y pronóstico por **ciudad** de Open-Meteo, con atribución. Solo consulta el pronóstico cuando la fecha está a 0–13 días en el futuro; para fechas posteriores avisa que aún no se dispone de una previsión fiable. No asume que el pronóstico municipal represente las condiciones de un recinto concreto. Las API públicas de Open-Meteo son para usos no comerciales bajo sus términos: evaluar una licencia comercial antes de lanzar el producto de pago.
+
+Las fichas de eventos ficticios creados en `localStorage` únicamente se comparten con navegadores que tengan esa misma información guardada; un URL no publica un evento en una base de datos. En producción haría falta un catálogo público en el backend central y rutas estables asociadas a los IDs.
