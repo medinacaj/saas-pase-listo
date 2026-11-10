@@ -78,7 +78,7 @@ function realPoster(event,eager=false){
  try{const u=new URL(event.posterUrl);if(u.protocol==="https:")src=u.href;}catch{/* Visible fallback */}
  try{const u=new URL(event.posterFallbackUrl);if(u.protocol==="https:")backup=u.href;}catch{/* No secondary source */}
  return '<div class="poster-frame real-poster" style="--poster-accent:'+tone+'">'+
-  '<div class="demo-poster-inner"><span class="demo-art-top">CARTEL NO DISPONIBLE</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-bottom">AFICHE DE TERCERO · REFERENCIA</span></div>'+
+  '<div class="demo-poster-inner"><span class="demo-art-top">AGENDA VERIFICADA · REFERENCIA</span><span class="demo-art-symbol">✳</span><span class="demo-art-title">'+esc(event.title)+'</span><span class="demo-art-bottom">FICHA INFORMATIVA · SIN VENTA</span></div>'+
   (src?'<img src="'+esc(src)+'"'+(backup?' data-fallback="'+esc(backup)+'"':"")+' alt="Afiche promocional de '+esc(event.title)+'" class="poster-img reference-poster" loading="'+(eager?"eager":"lazy")+'" decoding="async" referrerpolicy="no-referrer">':"")+'</div>';
 }
 function realCard(event){
