@@ -75,3 +75,16 @@ test("no permite publicar eventos DEMO con fecha pasada",()=>{
  const input={title:"Evento pasado",venue:"Teatro de prueba",city:"Concepción",date:"2020-01-01",time:"20:00",category:"Teatro",priceClp:1000,capacity:10};
  assert.throws(()=>createOrganizerEvent(s,"org-aurora",input),/pasado/);
 });
+
+test("precio visible mantiene desglose al agotarse un evento, sin permitir órdenes nuevas",()=>{
+ const s=seedCommerce(catalog);
+ const event=s.events.find(e=>e.id==="demo-noches-aurora");
+ event.ticketTypes.find(t=>t.id==="general").capacity=0;
+ assert.throws(()=>quote(s,event.id,"general",1),/insuficientes/);
+ const preview=quote(s,event.id,"general",1,{availabilityRequired:false});
+ assert.equal(preview.unitBaseClp,15000);
+ assert.equal(preview.feePerTicketClp,2000);
+ assert.equal(preview.totalClp,17000);
+ assert.throws(()=>simulateOrder(s,{eventId:event.id,ticketTypeId:"general",quantity:1,buyerId:"buyer-demo-001"}),/insuficientes/);
+ assert.equal(s.orders.length,0);
+});
