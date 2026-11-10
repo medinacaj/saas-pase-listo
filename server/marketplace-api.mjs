@@ -33,6 +33,12 @@ export function buildMarketplaceServer({tokens,filePath=resolve(staticRoot,".loc
   staticRoot,
   handlers:{
    product:"PaseListo B2B2C DEMO",
+   publicEvents:(store)=>store.events.filter(e=>e.status==="published").map(e=>({
+    id:e.id,title:e.title,subtitle:e.subtitle,date:e.date,time:e.time,
+    city:e.city,venue:e.venue,category:e.category,organizerId:e.organizerId,
+    ticketTypes:e.ticketTypes.map(t=>({id:t.id,name:t.name,priceClp:t.priceClp})),
+    notice:"EVENTO DEMOSTRATIVO; sin venta real"
+   })),
    view,
    actions:{
     "/api/v1/market/events":(s,tenant,p)=>createOrganizerEvent(s,tenant,p),
