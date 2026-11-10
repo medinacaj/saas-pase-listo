@@ -20,7 +20,8 @@
       "featured": false,
       "accent": "#a87558",
       "verifiedOn": "2026-11-10",
-      "verificationScope": "fecha y recinto"
+      "verificationScope": "fecha y recinto",
+      "heroPriority": 79
     },
     {
       "id": "ref-cypress-hill-2026-11-11",
@@ -39,7 +40,8 @@
       "featured": false,
       "accent": "#54776b",
       "verifiedOn": "2026-11-10",
-      "verificationScope": "fecha y recinto"
+      "verificationScope": "fecha y recinto",
+      "heroPriority": 95
     },
     {
       "id": "ref-edo-caroe-valpo-2026-11-11",
@@ -77,7 +79,8 @@
       "featured": false,
       "accent": "#7b8cb0",
       "verifiedOn": "2026-11-10",
-      "verificationScope": "fecha y recinto"
+      "verificationScope": "fecha y recinto",
+      "heroPriority": 78
     },
     {
       "id": "ref-alejo-igoa-2026-11-12",
@@ -115,7 +118,8 @@
       "featured": false,
       "accent": "#dbaa78",
       "verifiedOn": "2026-11-10",
-      "verificationScope": "fecha y recinto"
+      "verificationScope": "fecha y recinto",
+      "heroPriority": 91
     },
     {
       "id": "ref-luar-la-l-2026-11-13",
@@ -172,7 +176,8 @@
       "featured": false,
       "accent": "#8f83b3",
       "verifiedOn": "2026-11-10",
-      "verificationScope": "fecha y recinto"
+      "verificationScope": "fecha y recinto",
+      "heroPriority": 98
     },
     {
       "id": "ref-los-tres-unplugged-2026",
@@ -267,7 +272,8 @@
       "featured": false,
       "accent": "#7a937f",
       "verifiedOn": "2026-11-10",
-      "verificationScope": "fecha y recinto"
+      "verificationScope": "fecha y recinto",
+      "heroPriority": 88
     },
     {
       "id": "ref-alanys-lagos-2026",
@@ -325,7 +331,8 @@
       "posterCredit": "Afiche promocional difundido por DG Medios (publicación oficial)",
       "featured": true,
       "accent": "#f8af41",
-      "posterFallbackUrl": "https://www.rockaxis.com/rxidashboard/wisi_photos/1772206047_Gorillaz%202.png"
+      "posterFallbackUrl": "https://www.rockaxis.com/rxidashboard/wisi_photos/1772206047_Gorillaz%202.png",
+      "heroPriority": 86
     },
     {
       "id": "ref-fauna-primavera-2026",
@@ -345,7 +352,8 @@
       "posterCredit": "Afiche del festival difundido por Rockaxis",
       "featured": true,
       "accent": "#e7bb9b",
-      "posterFallbackUrl": "https://uchile-media-storage.nyc3.cdn.digitaloceanspaces.com/2026/06/cartel-fauna-primavera-1-678x847.jpg"
+      "posterFallbackUrl": "https://uchile-media-storage.nyc3.cdn.digitaloceanspaces.com/2026/06/cartel-fauna-primavera-1-678x847.jpg",
+      "heroPriority": 90
     },
     {
       "id": "ref-camila-2026",
@@ -364,7 +372,8 @@
       "posterSourceUrl": "https://www.puntoticket.com/camila",
       "posterCredit": "Afiche promocional alojado en PuntoTicket",
       "featured": true,
-      "accent": "#6b3f64"
+      "accent": "#6b3f64",
+      "heroPriority": 93
     },
     {
       "id": "ref-deep-purple-2026",
