@@ -18,7 +18,7 @@ async function fixture(t) {
  const origin = "http://127.0.0.1:" + server.address().port;
  const request = async (path, { cookie = "", method = "GET", body, originHeader = origin, header = "1" } = {}) => {
   const resp = await fetch(origin + "/api/buyer/" + path, {
-   method, headers: { ...(cookie ? { Cookie: cookie } : {}), ...(method === "POST" ? { "Content-Type": "application/json", "X-PaseListo-Request": header, Origin: originHeader } : {}) },
+   method, headers: { ...(cookie ? { Cookie: cookie } : {}), ...(method === "POST" ? { "Content-Type": "application/json", "X-PaseListo-Request": header, ...(originHeader === null ? {} : { Origin: originHeader }) } : {}) },
    ...(body ? { body: JSON.stringify(body) } : {})
   });
   return { status: resp.status, data: await resp.json(), cookie: resp.headers.get("set-cookie")?.split(";")[0] || "" };
@@ -88,4 +88,13 @@ test("servidor de compradores entrega el sistema visual compartido", async t => 
  assert.equal(response.status, 200);
  assert.match(response.headers.get("content-type"), /text\/css/);
  assert.match(await response.text(), /--pl-lime/);
+});
+
+test("protección CSRF: rechaza POST sin Origin aunque tenga encabezado personalizado", async t => {
+ const { request } = await fixture(t);
+ const response = await request("register", {
+  method: "POST", originHeader: null,
+  body: { email: "sin-origen@example.test", password: "Contrasena-Larga-123456" }
+ });
+ assert.equal(response.status, 403);
 });
