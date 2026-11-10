@@ -41,15 +41,23 @@ test("un evento de varios días figura mientras transcurre la semana",()=>{
  assert.equal(ended.weekCount,0);
 });
 
-test("si no hay eventos esta semana, muestra los próximos sin inventar fechas",async()=>{
+test("la semana real del 9 al 15 de noviembre tiene eventos contrastados",async()=>{
  const [demo,refs]=await Promise.all([
   read("../data/eventos-clientes-demo.json").then(JSON.parse),
   read("../data/eventos-reales-referencia.json").then(JSON.parse)
  ]);
- const selection=weeklyEventSelection(refs.events,demo.events,"2026-11-10");
- assert.equal(selection.weekCount,0);
+ const selection=weeklyEventSelection(refs.events,demo.events,"2026-11-10",24);
+ assert.ok(selection.weekCount>=15);
+ assert.equal(selection.week.length,selection.weekCount);
+ assert.equal(selection.week[0].id,"ref-ronnie-wood-2026-11-10");
+ assert.ok(selection.week.some(e=>e.title==="Creamfields Chile"));
+ assert.ok(selection.week.some(e=>e.title==="León Gieco"&&e.city==="Concepción"));
+ assert.ok(selection.week.every(e=>e.date<="2026-11-15"&&e.endDate>="2026-11-10"));
  assert.equal(selection.upcoming[0].id,"ref-camila-2026");
  assert.ok(selection.upcoming.every(e=>e.date>"2026-11-15"));
+ const sources=refs.events.filter(e=>e.date>="2026-11-10"&&e.date<="2026-11-15");
+ assert.ok(sources.every(e=>e.sourceUrl.startsWith("https://")&&e.verifiedOn==="2026-11-10"));
+ assert.ok(sources.every(e=>!e.ticketTypes&&!e.priceClp&&!e.posterUrl));
 });
 
 test("el encabezado público y la ficha cargan la misma agenda semanal compacta",async()=>{
