@@ -73,6 +73,7 @@ export function quote(store, eventId, ticketTypeId, quantityInput) {
   if (event.status !== "published") fail("Este evento no está publicado");
   const type = typeOrFail(event, ticketTypeId);
   const quantity = bounded(quantityInput, 1, 6, "Cantidad");
+  if (!Number.isSafeInteger(type.capacity) || type.capacity < 0) fail("Aforo DEMO inválido");
   if (available(store, eventId, ticketTypeId) < quantity) fail("Entradas DEMO insuficientes");
   const bps = bounded(store.contract.buyerFeeBps, 0, 4000, "Porcentaje de servicio");
   const fixed = bounded(store.contract.buyerFeeFixedClp, 0, 20000, "Cargo fijo");
@@ -146,6 +147,8 @@ export function createOrganizerEvent(store, organizationId, input) {
     if (u.protocol !== "https:" || ![".jpg",".jpeg",".png",".webp"].some((ext) => u.pathname.toLowerCase().endsWith(ext))) fail("El cartel debe usar HTTPS y terminar en .jpg, .png o .webp");
     if (input.posterRightsConfirmed !== true) fail("Debes declarar que tienes autorización para publicar el cartel");
   }
+  const normalizedDate = new Date(date + "T12:00:00Z");
+  if (normalizedDate.getTime() < Date.now() - 24 * 60 * 60 * 1000) fail("No se puede publicar un evento DEMO en el pasado");
   const result={
     id:"demo-creado-"+id().slice(0,12),organizerId:organizationId,title,
     subtitle:text(input.subtitle||"Evento publicado por organizador DEMO",3,100,"Subtítulo"),
