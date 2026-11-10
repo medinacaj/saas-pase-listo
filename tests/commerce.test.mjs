@@ -52,3 +52,20 @@ test("almacenamiento local persiste únicamente una demo por navegador",()=>{
  assert.equal(saveCommerce(state,memory),true);
  assert.equal(loadCommerce(catalog,memory).orders.length,1);
 });
+
+test("reintento de compra DEMO con misma clave no duplica cupos",()=>{
+ const s=seedCommerce(catalog);
+ const input={eventId:"demo-noches-aurora",ticketTypeId:"general",quantity:2,buyerId:"buyer-demo-001",idempotencyKey:"retry-demo-order-001"};
+ const before=available(s,input.eventId,input.ticketTypeId);
+ const first=simulateOrder(s,input);
+ const second=simulateOrder(s,input);
+ assert.equal(first.id,second.id);
+ assert.equal(s.orders.length,1);
+ assert.equal(available(s,input.eventId,input.ticketTypeId),before-2);
+ assert.throws(()=>simulateOrder(s,{...input,quantity:3}),/idempotencia reutilizada/);
+});
+test("rechaza fechas imposibles al crear un evento",()=>{
+ const s=seedCommerce(catalog);
+ const input={title:"Evento ficticio",venue:"Teatro de prueba",city:"Concepción",date:"2027-02-30",time:"20:00",category:"Teatro",priceClp:1000,capacity:10};
+ assert.throws(()=>createOrganizerEvent(s,"org-aurora",input),/Fecha inválida/);
+});
