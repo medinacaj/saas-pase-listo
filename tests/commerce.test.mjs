@@ -69,3 +69,9 @@ test("rechaza fechas imposibles al crear un evento",()=>{
  const input={title:"Evento ficticio",venue:"Teatro de prueba",city:"Concepción",date:"2027-02-30",time:"20:00",category:"Teatro",priceClp:1000,capacity:10};
  assert.throws(()=>createOrganizerEvent(s,"org-aurora",input),/Fecha inválida/);
 });
+
+test("no permite publicar eventos DEMO con fecha pasada",()=>{
+ const s=seedCommerce(catalog);
+ const input={title:"Evento pasado",venue:"Teatro de prueba",city:"Concepción",date:"2020-01-01",time:"20:00",category:"Teatro",priceClp:1000,capacity:10};
+ assert.throws(()=>createOrganizerEvent(s,"org-aurora",input),/pasado/);
+});
