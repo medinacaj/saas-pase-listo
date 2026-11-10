@@ -16,8 +16,12 @@ const iso = () => new Date().toISOString();
 const known = (store, organizationId) => store.organizers.find((o) => o.id === organizationId) || fail("Organización DEMO desconocida");
 const eventOrFail = (store, eventId) => store.events.find((e) => e.id === eventId) || fail("Evento no encontrado");
 const typeOrFail = (event, ticketTypeId) => event.ticketTypes.find((t) => t.id === ticketTypeId) || fail("Tipo de entrada inexistente");
+const hasUniqueEventIds = (events) => Array.isArray(events) &&
+  events.every((event) => typeof event?.id === "string" && event.id.length > 0) &&
+  new Set(events.map((event) => event.id)).size === events.length;
 export function seedCommerce(catalog) {
   if (!catalog || !Array.isArray(catalog.organizers) || !Array.isArray(catalog.events) || !catalog.contractExample) fail("Catálogo DEMO inválido");
+  if (!hasUniqueEventIds(catalog.events)) fail("Identificadores de evento DEMO duplicados o inválidos");
   return {
     version: 1,
     organizers: structuredClone(catalog.organizers),
@@ -35,7 +39,7 @@ export function loadCommerce(catalog, storage = typeof localStorage === "undefin
     const raw = storage.getItem("paselisto:commerce:demo:v1");
     if (!raw || raw.length > 350000) return seed();
     const value = JSON.parse(raw);
-    if (value.version !== 1 || !Array.isArray(value.orders) || !Array.isArray(value.events) || !Array.isArray(value.organizers) || !Array.isArray(value.audit)) return seed();
+    if (value.version !== 1 || !Array.isArray(value.orders) || !hasUniqueEventIds(value.events) || !Array.isArray(value.organizers) || !Array.isArray(value.audit)) return seed();
     return value;
   } catch { return seed(); }
 }
@@ -68,12 +72,15 @@ export function available(store, eventId, ticketTypeId) {
   const simulatedQty = store.orders.filter((o) => o.eventId === eventId && o.ticketTypeId === ticketTypeId && o.status === "demo_confirmed").reduce((sum, o) => sum + o.quantity, 0);
   return Math.max(0, type.capacity - simulatedQty);
 }
-export function quote(store, eventId, ticketTypeId, quantityInput) {
+export function quote(store, eventId, ticketTypeId, quantityInput, { availabilityRequired = true } = {}) {
+  // Preview-only callers may show price for sold-out DEMO entries; orders always
+  // use the default availability check inside simulateOrder.
   const event = eventOrFail(store, eventId);
   if (event.status !== "published") fail("Este evento no está publicado");
   const type = typeOrFail(event, ticketTypeId);
   const quantity = bounded(quantityInput, 1, 6, "Cantidad");
-  if (available(store, eventId, ticketTypeId) < quantity) fail("Entradas DEMO insuficientes");
+  if (!Number.isSafeInteger(type.capacity) || type.capacity < 0) fail("Aforo DEMO inválido");
+  if (availabilityRequired && available(store, eventId, ticketTypeId) < quantity) fail("Entradas DEMO insuficientes");
   const bps = bounded(store.contract.buyerFeeBps, 0, 4000, "Porcentaje de servicio");
   const fixed = bounded(store.contract.buyerFeeFixedClp, 0, 20000, "Cargo fijo");
   const baseClp = bounded(type.priceClp, 0, 5000000, "Precio base");
@@ -86,7 +93,19 @@ export function quote(store, eventId, ticketTypeId, quantityInput) {
   const venueShareClp = Math.round(serviceFeeClp * venueShareBps / 10000);
   return { eventId, ticketTypeId, quantity, currency:"CLP", unitBaseClp:baseClp, faceValueClp, feePerTicketClp, serviceFeeClp, totalClp, venueShareClp, platformShareClp: serviceFeeClp - venueShareClp, note:"Simulación de cobro; sin procesamiento de pagos, impuestos ni recaudación" };
 }
-export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId }) {
+export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId, idempotencyKey }) {
+  // The optional key makes local DEMO retries deterministic; production needs DB uniqueness.
+  if (idempotencyKey !== undefined) {
+    const key = text(idempotencyKey, 8, 128, "Clave de idempotencia");
+    const existing = store.orders.find(o => o.idempotencyKey === key);
+    if (existing) {
+      if (existing.eventId !== eventId || existing.ticketTypeId !== ticketTypeId ||
+          existing.quantity !== Number(quantity) || existing.buyerId !== buyerId) {
+        fail("Clave de idempotencia reutilizada con datos diferentes");
+      }
+      return existing;
+    }
+  }
   const pricing = quote(store, eventId, ticketTypeId, quantity);
   const event = eventOrFail(store, eventId);
   const order = {
@@ -96,6 +115,7 @@ export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId 
     eventId, ticketTypeId,
     quantity:pricing.quantity,
     buyerId:text(buyerId,8,100,"Identificador de comprador autenticado"),
+    ...(idempotencyKey !== undefined ? {idempotencyKey} : {}),
     pricing,
     createdAt:iso()
   };
@@ -119,7 +139,8 @@ export function createOrganizerEvent(store, organizationId, input) {
   const venue = text(input.venue,3,100,"Recinto");
   const city = text(input.city,2,50,"Ciudad");
   const date = String(input.date ?? "");
-  if (!/^\d{4}-\d\d-\d\d$/.test(date) || Number.isNaN(Date.parse(date + "T12:00:00Z"))) fail("Fecha inválida");
+  const parsedDate = /^\d{4}-\d\d-\d\d$/.test(date) ? Date.parse(date + "T12:00:00Z") : NaN;
+  if (!Number.isFinite(parsedDate) || new Date(parsedDate).toISOString().slice(0,10) !== date) fail("Fecha inválida");
   const time = String(input.time ?? "");
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) fail("Hora inválida");
   const category = String(input.category ?? "");
@@ -133,8 +154,18 @@ export function createOrganizerEvent(store, organizationId, input) {
     if (u.protocol !== "https:" || ![".jpg",".jpeg",".png",".webp"].some((ext) => u.pathname.toLowerCase().endsWith(ext))) fail("El cartel debe usar HTTPS y terminar en .jpg, .png o .webp");
     if (input.posterRightsConfirmed !== true) fail("Debes declarar que tienes autorización para publicar el cartel");
   }
+  const todayUtc = new Date().toISOString().slice(0,10);
+  if (date < todayUtc) fail("No se puede publicar un evento DEMO en el pasado");
+  // Full UUID + collision check: event IDs are immutable internal references
+  // for catalog, audit records, orders and the Central Control panel.
+  let eventId;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const candidate = "demo-creado-" + id();
+    if (!store.events.some(e => e.id === candidate)) { eventId = candidate; break; }
+  }
+  if (!eventId) fail("No fue posible asignar un ID único al evento DEMO");
   const result={
-    id:"demo-creado-"+id().slice(0,12),organizerId:organizationId,title,
+    id:eventId,organizerId:organizationId,title,
     subtitle:text(input.subtitle||"Evento publicado por organizador DEMO",3,100,"Subtítulo"),
     category,genre:category,city,venue,date,time,
     description:text(input.description||"Evento de prueba publicado desde el panel de organizador",10,750,"Descripción"),
