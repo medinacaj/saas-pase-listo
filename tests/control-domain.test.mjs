@@ -52,5 +52,6 @@ test("espectáculos reales son referencias sin autorización ni precio PaseListo
  const items=ownerReferenceCatalog(refs);
  assert.ok(items.length>=5);
  assert.ok(items.every(x=>x.saleEnabled===false&&x.authorization==="not_authorized"&&x.price===null));
- assert.ok(items.every(x=>x.posterUrl.startsWith("https://")&&x.sourceUrl.startsWith("https://")&&x.posterCredit));
+ assert.ok(items.every(x=>(!x.posterUrl||x.posterUrl.startsWith("https://"))&&x.sourceUrl.startsWith("https://")&&x.posterCredit));
+ assert.ok(items.some(x=>!x.posterUrl),"Las nuevas referencias verificadas no requieren copiar afiches de terceros");
 });
