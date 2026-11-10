@@ -58,3 +58,22 @@
 .organizer-spotlight .spotlight-art{background:#26352B}
 @media(max-width:830px){.quick-tickets{display:none}.steps-grid{gap:10px}.steps-grid article{padding:18px}}
 @media(max-width:600px){.demo-ribbon{font-size:10px}.steps-grid{grid-template-columns:1fr}.steps-grid article{min-height:0}.checkout-dialog{padding:35px 18px 20px;border-radius:14px}.checkout-controls{grid-template-columns:1fr 95px}.marketplace-dialog .detail-cover{height:270px}.marketplace-dialog .detail-cover .poster-frame{min-height:0;height:100%}.demo-art-title{font-size:clamp(24px,6vw,40px)}.hero-poster .demo-art-title{font-size:30px}.hero-no-poster{height:300px}.type-row strong{font-size:12px}.type-row small{font-size:10px}.type-row button{padding:8px}}
+
+/* Real promotional artwork: reference-only. Checkout remains available only for synthetic test events. */
+.listing-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:32px 0 18px;padding-top:20px;border-top:1px solid #dfddd6}
+.listing-head h3{font:600 clamp(21px,2.6vw,32px)/1.15 var(--display);letter-spacing:-.6px;margin:0 0 6px}
+.listing-head p{margin:0;color:#77796e;font-size:12px;line-height:1.6;max-width:670px}
+.status-example,.status-demo{font-size:9px;letter-spacing:1px;font-weight:800;padding:9px 10px;border-radius:30px;background:#fff0d6;color:#8d622a;white-space:nowrap}
+.status-demo{background:#ddedb8;color:#47652f}
+.demo-listing-head{margin-top:65px}
+.real-poster{position:relative;background:var(--poster-accent);overflow:hidden}
+.real-poster.loaded .reference-poster{opacity:1}
+.reference-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:4;transition:opacity .2s ease}
+.real-bottom{color:#89683b}
+.reference-event .event-subtitle{color:#806f5e}
+.reference-disclaimer{padding:16px;margin:22px 0 10px;background:#fff1dc;border:1px solid #efd8af;border-radius:10px;font-size:12px;color:#735329}
+.reference-disclaimer p{line-height:1.6;margin:8px 0 0}
+.reference-source a{font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px;color:#496949}
+.reference-rights{display:block;font-size:10px;line-height:1.5;color:#7b7c72}
+.inactive-cta{cursor:default}
+@media(max-width:600px){.listing-head{display:block}.status-example,.status-demo{display:inline-block;margin-top:10px}.demo-listing-head{margin-top:48px}}
