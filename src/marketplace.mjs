@@ -2,6 +2,7 @@ import { loadCommerce, publishedEvents, available, quote } from "./commerce-doma
 import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
 import { selectHeroEvents, splitHeroTitle } from "./hero-carousel.mjs";
+import { weekBounds } from "./week-events.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -190,7 +191,7 @@ function showHeroSlide(manual=false){
  $("#hero-title-accent").textContent=accent;
  $("#hero-feature-kicker").textContent=event.date<=current()
    ?"EN CARTELERA · EVENTO DESTACADO"
-   :event.date<=new Date(Date.now()+7*86400000).toISOString().slice(0,10)
+   :event.date<=weekBounds(current()).end
     ?"ESTA SEMANA · DESTACADOS":"PRÓXIMAMENTE · DESTACADOS";
  $("#hero-feature-summary").textContent=event.subtitle||event.genre||"Descubre los detalles del evento.";
  $("#hero-feature-date").textContent=date(event.date)+
@@ -257,6 +258,8 @@ function renderFeatured(){
   return;
  }
  $("#hero-carousel-controls").hidden=heroSlides.length<2;
+ const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches===true;
+ $("#hero-carousel-controls").querySelector("[data-hero-toggle]").hidden=reduceMotion;
  showHeroSlide();
  scheduleHero();
 }
