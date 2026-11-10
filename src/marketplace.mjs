@@ -141,6 +141,7 @@ function openDetail(id){
 }
 function closeModal(which,restore=true){
  const node=$(which);node.hidden=true;
+ if(which==="#checkout-backdrop")ui.checkout=null;
  if($("#detail-backdrop").hidden&&$("#checkout-backdrop").hidden)document.body.classList.remove("dialog-open");
  if(restore&&ui.lastFocus?.isConnected)ui.lastFocus.focus();
 }
@@ -182,6 +183,7 @@ function renderLoginForm(mode="login",message=""){
 async function showLogin(eventId=null,typeId=null){
  ui.authPending=eventId&&typeId?{eventId,typeId}:null;
  closeModal("#detail-backdrop",false);
+ if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop",false);
  await refreshBuyer();
  $("#login-backdrop").hidden=false;document.body.classList.add("dialog-open");
  renderLoginForm();
@@ -193,7 +195,13 @@ function closeLogin(){
 function renderCheckout(eventId,typeId,qty=1){
  if(!buyer||!buyerApiReady){showLogin(eventId,typeId);return;}
  const e=selectedEvent(eventId);if(!e)return;
- ui.checkout={eventId,typeId,qty};
+ const previous=ui.checkout;
+ ui.checkout={
+  eventId,typeId,qty,
+  requestId:previous?.eventId===eventId&&previous.typeId===typeId&&previous.qty===qty
+   ?previous.requestId:crypto.randomUUID(),
+  submitting:false
+ };
  const ticket=e.ticketTypes.find(t=>t.id===typeId);if(!ticket)return;
  let summary;
  try{summary=quote(store,eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
@@ -205,9 +213,11 @@ async function openCheckout(eventId,typeId){
  if(!buyer){await showLogin(eventId,typeId);return;}
  ui.lastFocus=document.activeElement;
  $("#checkout-backdrop").hidden=false;document.body.classList.add("dialog-open");
+ ui.checkout=null;
  renderCheckout(eventId,typeId,1);$("#checkout-dialog").focus();
 }
 function orderSuccess(order){
+ ui.checkout=null;
  const event=selectedEvent(order.eventId);
  $("#checkout-content").innerHTML='<div class="demo-success"><div class="success-symbol" aria-hidden="true">✓</div><div class="detail-kicker">PEDIDO DE PRUEBA REGISTRADO</div><h2 id="checkout-title">¡Simulación completada!</h2><p>Este registro de prueba está asociado a tu cuenta de desarrollo. No hay pago, reserva real ni entrada válida.</p><div class="demo-receipt"><span>N.º de simulación</span><strong>'+esc(order.id)+'</strong><span>Evento</span><strong>'+esc(event?.title||"Evento DEMO")+'</strong><span>Total teórico</span><strong>'+clp(order.pricing.totalClp)+'</strong></div><button type="button" data-close-checkout class="checkout-submit">Volver a la cartelera ↗</button></div>';
 }
@@ -284,20 +294,36 @@ async function start(){
  $("#checkout-content").addEventListener("submit",async ev=>{
   if(ev.target.id!=="demo-checkout")return;
   ev.preventDefault();
-  const f=new FormData(ev.target);
+  const checkout=ui.checkout,form=ev.target;
+  if(!checkout||checkout.submitting)return;
+  if(form.elements.ticketType.value!==checkout.typeId||Number(form.elements.quantity.value)!==checkout.qty)return;
+  checkout.submitting=true;
+  const button=form.querySelector('[type="submit"]'),buttonText=button?.textContent;
+  const controls=[...form.querySelectorAll("select")];
+  if(button){button.disabled=true;button.textContent="Registrando pedido de prueba…";}
+  controls.forEach(control=>{control.disabled=true;});
   try{
    await refreshBuyer();
-   if(!buyer){await showLogin(ui.checkout.eventId,ui.checkout.typeId);return;}
+   if(!buyer){await showLogin(checkout.eventId,checkout.typeId);return;}
    const order=await buyerRequest("orders",{
-    eventId:ui.checkout.eventId,
-    ticketTypeId:f.get("ticketType"),
-    quantity:Number(f.get("quantity")),
-    requestId:crypto.randomUUID()
+    eventId:checkout.eventId,
+    ticketTypeId:checkout.typeId,
+    quantity:checkout.qty,
+    requestId:checkout.requestId
    });
-   orderSuccess(order);
+   if(ui.checkout===checkout)orderSuccess(order);
   }catch(err){
-   const error=document.createElement("p");
-   error.className="load-error";error.setAttribute("role","alert");error.textContent=err.message;ev.target.prepend(error);
+   if(ui.checkout===checkout&&form.isConnected){
+    form.querySelector('[role="alert"]')?.remove();
+    const error=document.createElement("p");
+    error.className="load-error";error.setAttribute("role","alert");error.textContent=err.message;form.prepend(error);
+   }
+  }finally{
+   checkout.submitting=false;
+   if(form.isConnected){
+    controls.forEach(control=>{control.disabled=false;});
+    if(button){button.disabled=false;button.textContent=buttonText;}
+   }
   }
  });
  document.addEventListener("keydown",ev=>{
