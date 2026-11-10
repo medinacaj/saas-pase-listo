@@ -41,7 +41,7 @@ test("portal muestra cartel real de referencia, pero no le ofrece checkout",()=>
  assert.match(portal,/checkout-backdrop/);
  assert.match(marketplace,/Cargo por servicio/i);
  assert.match(marketplace,/function realPoster/);
- assert.match(marketplace,/NO A LA VENTA EN PASELISTO/);
+ assert.match(marketplace,/Solo referencia · Sin venta/);
  assert.match(marketplace,/function openRealDetail/);
  assert.match(marketplace,/function openCheckout/);
  assert.match(marketplace,/no ha contratado|sin contrato/i);
