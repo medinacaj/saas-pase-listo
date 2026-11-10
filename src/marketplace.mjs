@@ -76,6 +76,8 @@ function card(event){
 }
 function installImages(){
  $$(".owner-poster, .reference-poster").forEach(img=>{
+  if(img.dataset.imageBound==="1")return;
+  img.dataset.imageBound="1";
   const frame=img.closest(".poster-frame");
   const loaded=()=>{if(img.naturalWidth>0)frame?.classList.add("loaded");};
   const failed=()=>{
@@ -171,7 +173,7 @@ async function start(){
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
  }catch(err){
-  $("#featured-grid").innerHTML='<p class="load-error">No se pudo cargar el catálogo de prueba.</p>';
+  $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
   $("#events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
   console.error("PaseListo",err.message);return;
  }
