@@ -78,3 +78,51 @@ test("recinto permite datos prácticos sin inventar los no confirmados",async()=
  assert.ok(code.includes('fallback="Por confirmar"'));
  assert.ok(css.includes(".venue-details-grid"));
 });
+
+
+test("clasificación DEMO recibe colores estables, zonas únicas y orden de precio",async()=>{
+ const { buildVenueZones, ZONE_COLORS, zoneBandPath, zoneBandLabelY }=
+  await import("../src/venue-zones.mjs");
+ const tickets=[{id:"general",name:"General",priceClp:15000},
+  {id:"premium",name:"Experiencia",priceClp:28000}];
+ const zones=buildVenueZones(tickets);
+ assert.deepEqual(zones.map(z=>z.id),["premium","general"]);
+ assert.equal(zones[0].color,ZONE_COLORS[0]);
+ assert.notEqual(zones[0].color,zones[1].color);
+ assert.equal(zones[0].name,"Experiencia");
+ assert.equal(zones[1].name,"General");
+ assert.match(zoneBandPath(0,2),/^M /);
+ assert.notEqual(zoneBandPath(0,2),zoneBandPath(1,2));
+ assert.ok(zoneBandLabelY(0,2)<zoneBandLabelY(1,2));
+ assert.throws(()=>zoneBandPath(-1,2),/inválida/);
+ assert.throws(()=>zoneBandPath(0,0),/inválida/);
+ assert.deepEqual(buildVenueZones([]),[]);
+ assert.deepEqual(buildVenueZones(null),[]);
+ const colorSafety=new Set(ZONE_COLORS);
+ assert.equal(colorSafety.size,ZONE_COLORS.length);
+ assert.ok(ZONE_COLORS.every(color=>/^#[0-9a-f]{6}$/i.test(color)));
+});
+
+test("plano de zonas y leyenda interactiva conectan con desglose de entradas",async()=>{
+ const html=await read("../evento.html");
+ const js=await read("../src/event-page.mjs");
+ const css=await read("../src/event-page.css");
+ const localServer=await read("../server/buyer-server.mjs");
+ for(const id of ["venue-map-heading","venue-zone-map","venue-zone-legend","venue-zone-selection","venue-map-accuracy"]){
+  assert.ok(html.includes('id="'+id+'"'),id);
+ }
+ assert.ok(js.includes('buildVenueZones(event.ticketTypes)'));
+ assert.ok(js.includes('zoneBandPath(index,zones.length)'));
+ assert.ok(js.includes('ticketSummary(event,type,store,inventory)'));
+ assert.ok(js.includes('data-zone-select'));
+ assert.ok(js.includes('data-ticket-zone'));
+ assert.ok(js.includes('renderVenueMap(event,store,reference,inventory)'));
+ assert.ok(js.includes('setAttribute("aria-pressed",String(active))'));
+ assert.ok(js.includes('if(reference){'));
+ assert.ok(js.includes('SIN PLANO VERIFICADO'));
+ assert.ok(js.includes('Plano ilustrativo DEMO'));
+ assert.ok(css.includes(".venue-map-zone.is-selected"));
+ assert.ok(css.includes(".venue-zone-key.is-selected"));
+ assert.ok(css.includes(".event-ticket-row.is-zone-selected"));
+ assert.ok(localServer.includes('["/src/venue-zones.mjs", ["src/venue-zones.mjs", "text/javascript"]]'));
+});
