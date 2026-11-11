@@ -59,6 +59,18 @@ jobs:
           assert.ok(page.includes('id="hero-carousel-dots"'), 'Hero slide indicators missing');
           assert.ok(page.includes('id="hero-feature-link"'), 'Hero CTA missing');
           assert.ok(page.includes('id="hero-poster"'), 'Hero poster missing');
+          assert.ok(!page.includes('id="hero-slide-count"'), 'Old numeric hero counter must be removed');
+          assert.ok(!page.includes('data-hero-step'), 'Old hero arrow buttons must be removed');
+          assert.ok(!page.includes('data-hero-toggle'), 'Old hero pause button must be removed');
+          assert.ok(carouselCss.includes('height:clamp(310px,44svh,345px)'), 'Half-height mobile hero missing');
+          assert.ok(carouselCss.includes('object-fit:cover'), 'Hero background must fill the entire banner');
+          assert.ok(carouselCss.includes('.hero-carousel .hero-poster-bottom{display:none}'), 'Poster caption overlay should be hidden');
+          assert.ok(script.includes('"touchstart"')&&script.includes('"touchend"'), 'Mobile swipe navigation missing');
+          assert.ok(script.includes('"pointerdown"')&&script.includes('"pointerup"'), 'Desktop drag missing');
+          assert.ok(script.includes('Math.abs(dy)*1.3'), 'Swipe must not intercept vertical scroll');
+          assert.ok(script.includes('stopImmediatePropagation'), 'Swipe must not trigger a link click');
+          assert.ok(!script.includes('#hero-slide-count'), 'Old counter still updated from JavaScript');
+          assert.ok(!script.includes('[data-hero-toggle]'), 'Old pause UI still wired');
           assert.ok(page.includes('id="real-events-grid"') && page.includes('id="events-grid"'), 'Catalog grids missing');
           assert.ok(!page.includes('id="week-strip"'), 'Incorrect weekly header strip still present');
           assert.ok(!eventPage.includes('id="week-strip"'), 'Incorrect event-page header strip still present');
