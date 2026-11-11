@@ -2,6 +2,7 @@ import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
 import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
 import { DEMO_REFERENCE_TIERS, referenceQuote, referenceOrderReceipt, referenceTicketLimit } from "./reference-checkout.mjs";
+import { eventRequiresWaitingRoom } from "./waiting-room.mjs";
 import { locateVenue, googleMapsEmbedUrl, googleMapsLocationUrl, googleMapsVenueSearchUrl } from "./venue-geolocation.mjs";
 
 
@@ -263,7 +264,7 @@ function renderTickets(event,store,reference,inventory) {
   const {base,fee,total,remaining,canOrder}=ticketSummary(event,type,store,inventory);
   const url="./index.html?checkout="+encodeURIComponent(event.id)+"&type="+encodeURIComponent(type.id);
   const action=canOrder
-   ?'<a class="event-ticket-button" href="'+esc(url)+'">Continuar pedido de prueba ↗</a>'
+   ?'<a class="event-ticket-button" href="'+esc(url)+'">'+(eventRequiresWaitingRoom(event)?"Ingresar a lista de espera DEMO ↗":"Continuar pedido de prueba ↗")+'</a>'
    :'<button class="event-ticket-button" type="button" disabled>'+
      (inventory.enabled ? "No hay cupos de prueba" : "Compra demo solo en servidor local")+'</button>';
   return '<div class="event-ticket-row" data-ticket-zone="'+esc(type.id)+'"><div class="event-ticket-top"><div><strong>'+
@@ -278,6 +279,7 @@ function renderTickets(event,store,reference,inventory) {
  }).join("");
  setText("#ticket-disclaimer",
   "Todos los valores son ficticios, en CLP y por entrada. No se realizan pagos reales. "+
+  (eventRequiresWaitingRoom(event)?"Evento masivo: acceso con lista de espera y turno autorizado por el servidor de prueba. ":"")+
   (inventory.enabled?"Los cupos se verifican otra vez antes de registrar un pedido.":"GitHub Pages no dispone de servidor de compras."));
 }
 
