@@ -51,7 +51,7 @@ test("ficha individual contiene recinto, precios por categoría, estado y clima 
  assert.ok(code.includes("geocoding-api.open-meteo.com"));
  assert.ok(code.includes("api.open-meteo.com/v1/forecast"));
  assert.ok(code.includes("precipitation_probability_max"));
- assert.ok(code.includes("Precios no disponibles en PaseListo"));
+ assert.ok(code.includes("SIMULADOR: sectores, precios, cupos y cargos son ficticios"));
  assert.ok(code.includes("event.posterRights"));
  assert.ok(code.includes('const real=refs.events?.find(e=>e.id===id)'));
  assert.equal(html.includes("Ver fuente oficial de la fecha y recinto"),false);
@@ -119,10 +119,31 @@ test("plano de zonas y leyenda interactiva conectan con desglose de entradas",as
  assert.ok(js.includes('renderVenueMap(event,store,reference,inventory)'));
  assert.ok(js.includes('setAttribute("aria-pressed",String(active))'));
  assert.ok(js.includes('if(reference){'));
- assert.ok(js.includes('SIN PLANO VERIFICADO'));
+ assert.ok(js.includes('PLANO 100 % FICTICIO'));
+ assert.ok(js.includes('changeDemoTier?.(target.dataset.zoneSelect)'));
  assert.ok(js.includes('Plano ilustrativo DEMO'));
  assert.ok(css.includes(".venue-map-zone.is-selected"));
  assert.ok(css.includes(".venue-zone-key.is-selected"));
  assert.ok(css.includes(".event-ticket-row.is-zone-selected"));
  assert.ok(localServer.includes('["/src/venue-zones.mjs", ["src/venue-zones.mjs", "text/javascript"]]'));
+});
+
+test("la ficha de referencia permite probar entradas, resumen y confirmación sin cobros",async()=>{
+ const [html,code,css,server]=await Promise.all([
+  read("../evento.html"),read("../src/event-page.mjs"),read("../src/event-page.css"),
+  read("../server/buyer-server.mjs")
+ ]);
+ for(const id of ["reference-checkout","reference-ticket-quantity","reference-checkout-next",
+  "reference-checkout-review","reference-checkout-summary","reference-checkout-confirm",
+  "reference-checkout-complete"]){
+  assert.ok(html.includes('id="'+id+'"'),id);
+ }
+ assert.ok(code.includes("renderReferenceCheckout(event)"));
+ assert.ok(code.includes("referenceQuote(event,selectedId,quantity.value)"));
+ assert.ok(code.includes("referenceOrderReceipt(quote,crypto.randomUUID())"));
+ assert.ok(code.includes("No se cobró dinero, no se hizo reserva"));
+ assert.ok(code.includes('event.description||"Evento ficticio de demostración."'));
+ assert.ok(css.includes(".reference-checkout-action"));
+ assert.ok(server.includes('["/src/reference-checkout.mjs", ["src/reference-checkout.mjs", "text/javascript"]]'));
+ assert.ok(html.includes("No se realizan pagos, reservas ni se emiten entradas válidas."));
 });
