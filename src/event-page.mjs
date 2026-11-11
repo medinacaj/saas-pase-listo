@@ -1,6 +1,7 @@
 import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
 import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
+import { DEMO_REFERENCE_TIERS, referenceQuote, referenceOrderReceipt } from "./reference-checkout.mjs";
 import { locateVenue, googleMapsEmbedUrl, googleMapsLocationUrl, googleMapsVenueSearchUrl } from "./venue-geolocation.mjs";
 
 
@@ -156,12 +157,98 @@ function ticketSummary(event,type,store,inventory) {
  return {base,fee,remaining,total,canOrder};
 }
 
+let changeDemoTier=null;
+function renderReferenceCheckout(event){
+ const list=$("#event-ticket-list");
+ const chooser=$("#reference-checkout");
+ chooser.hidden=false;
+ const tiers=DEMO_REFERENCE_TIERS;
+ let selectedId=tiers[0].id;
+ const quantity=$("#reference-ticket-quantity");
+ const step=$("#reference-checkout-step");
+ const choose=$("#reference-checkout-select");
+ const review=$("#reference-checkout-review");
+ const complete=$("#reference-checkout-complete");
+ const preview=$("#reference-checkout-preview");
+ const summary=$("#reference-checkout-summary");
+ const renderChoice=()=>{
+  const quote=referenceQuote(event,selectedId,quantity.value);
+  list.querySelectorAll("[data-reference-tier]").forEach(button=>{
+   const active=button.dataset.referenceTier===selectedId;
+   button.classList.toggle("is-selected",active);
+   button.setAttribute("aria-pressed",String(active));
+  });
+  document.querySelectorAll("[data-zone-select]").forEach(button=>{
+   const active=button.dataset.zoneSelect===selectedId;
+   button.classList.toggle("is-selected",active);
+   button.setAttribute("aria-pressed",String(active));
+  });
+  const selection=$("#venue-zone-selection");
+  if(selection){selection.hidden=false;selection.textContent=quote.tierName+" · "+clp(quote.unitClp)+" por entrada · precio ficticio para ensayo";}
+  preview.textContent="Subtotal ficticio: "+clp(quote.subtotalClp)+" · Cargo ficticio: "+clp(quote.serviceFeeClp)+" · Total DEMO: "+clp(quote.totalClp);
+  return quote;
+ };
+ changeDemoTier=id=>{
+  if(!tiers.some(tier=>tier.id===id))return;
+  selectedId=id;
+  renderChoice();
+ };
+ list.innerHTML=tiers.map((tier,index)=>
+  '<button type="button" class="event-ticket-row reference-tier-option" data-reference-tier="'+
+  esc(tier.id)+'" aria-pressed="'+(index===0)+'"><span class="event-ticket-top"><strong>'+esc(tier.name)+
+  '</strong><strong>'+clp(tier.priceClp)+'</strong></span><small>Precio inventado para probar la compra; no es tarifa oficial</small></button>'
+ ).join("");
+ list.addEventListener("click",ev=>{
+  const button=ev.target.closest("[data-reference-tier]");
+  if(button)changeDemoTier(button.dataset.referenceTier);
+ });
+ quantity.addEventListener("change",renderChoice);
+ $("#reference-checkout-next").addEventListener("click",()=>{
+  const quote=renderChoice();
+  step.textContent="PASO 2 DE 3 · RESUMEN";
+  choose.hidden=true;review.hidden=false;complete.hidden=true;
+  const rows=[
+   ["Evento de referencia",event.title],["Categoría DEMO",quote.tierName],
+   ["Cantidad",String(quote.quantity)],["Precio ficticio por entrada",clp(quote.unitClp)],
+   ["Subtotal ficticio",clp(quote.subtotalClp)],["Cargo de servicio ficticio",clp(quote.serviceFeeClp)],
+   ["Total de demostración",clp(quote.totalClp)]
+  ];
+  summary.replaceChildren();
+  for(const [name,value] of rows){
+   const row=document.createElement("div"),label=document.createElement("span"),amount=document.createElement("strong");
+   label.textContent=name;amount.textContent=value;row.append(label,amount);summary.append(row);
+  }
+ });
+ $("#reference-checkout-back").addEventListener("click",()=>{
+  step.textContent="PASO 1 DE 3 · SELECCIÓN";
+  choose.hidden=false;review.hidden=true;complete.hidden=true;
+ });
+ $("#reference-checkout-confirm").addEventListener("click",()=>{
+  const quote=referenceQuote(event,selectedId,quantity.value);
+  const receipt=referenceOrderReceipt(quote,crypto.randomUUID());
+  review.hidden=true;choose.hidden=true;complete.hidden=false;
+  step.textContent="PASO 3 DE 3 · FINALIZADO";
+  complete.replaceChildren();
+  const h=document.createElement("h3"),notice=document.createElement("p"),details=document.createElement("p"),restart=document.createElement("button");
+  h.textContent="Simulación completada";
+  notice.textContent="No se cobró dinero, no se hizo reserva y no se emitió entrada válida.";
+  details.textContent="N.º de prueba: "+receipt.id+" · "+receipt.tierName+" · "+receipt.quantity+" entrada(s) · Total ficticio "+clp(receipt.totalClp);
+  restart.type="button";restart.className="reference-checkout-secondary";restart.textContent="Realizar otra simulación";
+  restart.addEventListener("click",()=>{
+   choose.hidden=false;review.hidden=true;complete.hidden=true;
+   step.textContent="PASO 1 DE 3 · SELECCIÓN";renderChoice();
+  });
+  complete.append(h,notice,details,restart);
+ });
+ renderChoice();
+ setText("#ticket-disclaimer",
+  "SIMULADOR: sectores, precios, cupos y cargos son ficticios. El organizador de este evento no vende entradas a través de PaseListo. No solicitamos datos bancarios ni personales.");
+}
+
 function renderTickets(event,store,reference,inventory) {
  const list=$("#event-ticket-list");
  if(reference){
-  list.innerHTML='<div class="event-no-prices"><strong>Precios no disponibles en PaseListo.</strong>'+
-   'No publicamos valores de terceros sin acuerdo comercial ni inventario verificado. Este espectáculo es solo una referencia.</div>';
-  setText("#ticket-disclaimer","Sin botones de compra, tarifas supuestas ni enlaces de venta de terceros.");
+  renderReferenceCheckout(event);
   return;
  }
  list.innerHTML=event.ticketTypes.map(type=>{
