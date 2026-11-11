@@ -1,4 +1,5 @@
 // PaseListo B2B2C demo: pricing and simulated orders only. No real payments, fiscal documents or valid entries.
+import { validateWaitingRoomSetting, useWaitingRoomAdmission } from "./waiting-room.mjs";
 const fail = (message) => { throw new Error(message); };
 const bounded = (value, min, max, label) => {
   const n = Number(value);
@@ -28,6 +29,7 @@ export function seedCommerce(catalog) {
     events: structuredClone(catalog.events),
     contract: structuredClone(catalog.contractExample),
     orders: [],
+    waitlist: [],
     audit: [],
     updatedAt: iso()
   };
@@ -40,6 +42,8 @@ export function loadCommerce(catalog, storage = typeof localStorage === "undefin
     if (!raw || raw.length > 350000) return seed();
     const value = JSON.parse(raw);
     if (value.version !== 1 || !Array.isArray(value.orders) || !hasUniqueEventIds(value.events) || !Array.isArray(value.organizers) || !Array.isArray(value.audit)) return seed();
+    if(value.waitlist!==undefined&&!Array.isArray(value.waitlist))return seed();
+    value.waitlist??=[];
     return value;
   } catch { return seed(); }
 }
@@ -117,17 +121,19 @@ export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId,
       return existing;
     }
   }
+  const validBuyer=text(buyerId,8,100,"Identificador de comprador autenticado");
   const pricing = quote(store, eventId, ticketTypeId, quantity);
   const event = eventOrFail(store, eventId);
   if(purchasedByBuyer(store,eventId,buyerId)+pricing.quantity>eventTicketLimit(event))
     fail("Límite máximo de boletos por persona para este evento excedido");
+  useWaitingRoomAdmission(store,eventId,validBuyer);
   const order = {
     id: "SIM-" + id().slice(0, 8).toUpperCase(),
     status:"demo_confirmed",
     organizerId:event.organizerId,
     eventId, ticketTypeId,
     quantity:pricing.quantity,
-    buyerId:text(buyerId,8,100,"Identificador de comprador autenticado"),
+    buyerId:validBuyer,
     ...(idempotencyKey !== undefined ? {idempotencyKey} : {}),
     pricing,
     createdAt:iso()
@@ -161,6 +167,7 @@ export function createOrganizerEvent(store, organizationId, input) {
   const priceClp=bounded(input.priceClp,0,5000000,"Precio base");
   const capacity=bounded(input.capacity,1,100000,"Aforo");
   const maxTicketsPerPerson=bounded(input.maxTicketsPerPerson??DEFAULT_MAX_TICKETS_PER_PERSON,1,MAX_CONFIGURABLE_TICKETS_PER_PERSON,"Máximo de boletos por persona");
+  const waitlistEnabled=validateWaitingRoomSetting(capacity,input.waitlistEnabled??false);
   const posterUrl=String(input.posterUrl ?? "").trim();
   if (posterUrl) {
     let u;
@@ -184,7 +191,7 @@ export function createOrganizerEvent(store, organizationId, input) {
     category,genre:category,city,venue,date,time,
     description:text(input.description||"Evento de prueba publicado desde el panel de organizador",10,750,"Descripción"),
     accent:/^#[0-9A-Fa-f]{6}$/.test(input.accent||"")?input.accent:"#D2F178",
-    visual:"✳",featured:false,status:"published",maxTicketsPerPerson,
+    visual:"✳",featured:false,status:"published",maxTicketsPerPerson,waitlistEnabled,
     posterUrl:posterUrl||null,posterRights:posterUrl?"declarados_por_usuario_sin_verificar":"demo",
     ticketTypes:[{id:"general",name:"General",priceClp,capacity}]
   };
