@@ -432,44 +432,6 @@ async function showAccount(){
  }
 }
 function resetFilters(){ui.query="";ui.category="Todos";ui.city="all";ui.period="all";$("#event-search").value="";$("#date-filter").value="all";filters();renderCards();}
-const isLocalPreview=["localhost","127.0.0.1","[::1]"].includes(location.hostname);
-const isInternalLab=isLocalPreview && new URLSearchParams(location.search).get("modo")==="pruebas";
-function setupPurchaseLab(){
- const link=$("#lab-trigger"),panel=$("#lab-testing");
- if(link)link.hidden=!isLocalPreview;
- if(!panel || !isInternalLab)return;
- panel.hidden=false;
- const eventSelect=$("#lab-event"),ticketSelect=$("#lab-ticket");
- const events=allEvents();
- eventSelect.replaceChildren();
- for(const event of events){
-  const option=document.createElement("option");
-  option.value=event.id;option.textContent=event.title+" · "+event.city;
-  eventSelect.append(option);
- }
- function updateTickets(){
-  const event=events.find(item=>item.id===eventSelect.value);
-  ticketSelect.replaceChildren();
-  if(!event)return;
-  for(const type of event.ticketTypes||[]){
-   const option=document.createElement("option");
-   option.value=type.id;
-   option.textContent=type.name+" · "+clp(type.priceClp)+" base";
-   ticketSelect.append(option);
-  }
-  $("#lab-event-description").textContent=event.description||"Evento ficticio de prueba";
- }
- eventSelect.addEventListener("change",updateTickets);
- updateTickets();
- $("#lab-feedback").textContent="Solo funciona con el servidor local de compradores (npm run api:buyers). No genera entradas ni pagos reales.";
- $("#lab-checkout-form").addEventListener("submit",async ev=>{
-  ev.preventDefault();
-  const eventId=eventSelect.value,ticketTypeId=ticketSelect.value;
-  if(!events.some(item=>item.id===eventId && item.ticketTypes.some(t=>t.id===ticketTypeId)))return;
-  try{await openCheckout(eventId,ticketTypeId);}
-  catch(error){$("#lab-feedback").textContent=error.message;}
- });
-}
 
 async function start(){
  try{
@@ -482,7 +444,6 @@ async function start(){
   store=loadCommerce(catalog);
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
-  setupPurchaseLab();
 
   refreshBuyer().then(refreshInventory).catch(()=>{});
  }catch(err){
