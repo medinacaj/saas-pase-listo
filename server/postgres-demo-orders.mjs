@@ -142,7 +142,7 @@ export function createPostgresDemoOrders({ pool, catalog }) {
       const sandbox = seedCommerce(catalog);
       let order;
       try {
-        order = simulateOrder(sandbox, { eventId, ticketTypeId, quantity, buyerId });
+        order = simulateOrder(sandbox, { eventId, ticketTypeId, quantity, buyerId }, {admissionValidatedByDatabase:true});
       } catch (error) {
         throw bad(422, error.message);
       }
