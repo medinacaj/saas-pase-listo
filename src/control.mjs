@@ -47,7 +47,7 @@ function renderEvents(){
  '<tr><td><strong>'+esc(e.title)+'</strong><small>'+esc(e.venue)+'</small><small class="internal-event-id">ID interno: <code>'+esc(e.id)+'</code></small></td>'+
  '<td>'+esc(e.organizerName)+'</td>'+
  '<td>'+esc(e.city)+'<small>'+esc(e.date)+'</small></td>'+
- '<td>'+e.issuedDemo+' / '+e.ticketTypes.reduce((n,t)=>n+t.capacity,0)+'</td>'+
+ '<td>'+e.issuedDemo+' / '+e.ticketTypes.reduce((n,t)=>n+t.capacity,0)+'<small>Máx. '+(e.maxTicketsPerPerson??10)+' por persona</small></td>'+
  '<td><span class="status '+(e.status==="paused"?"paused":"")+'">'+(e.status==="published"?"Publicación DEMO":"Pausado DEMO")+'</span></td>'+
  '<td><button type="button" class="action-btn '+(e.status==="published"?"danger":"")+'" data-toggle-event="'+esc(e.id)+'">'+(e.status==="published"?"Pausar":"Reactivar")+'</button></td></tr>').join(""):'<tr><td colspan="6" class="empty">No existen eventos ficticios.</td></tr>';
 }
@@ -105,7 +105,7 @@ async function initialize(){
   const form=ev.target;
   const data=Object.fromEntries(new FormData(form).entries());
   const organizerId=data.organizerId;delete data.organizerId;
-  data.capacity=Number(data.capacity);data.priceClp=Number(data.priceClp);
+  data.capacity=Number(data.capacity);data.priceClp=Number(data.priceClp);data.maxTicketsPerPerson=Number(data.maxTicketsPerPerson);
   try{
    const e=ownerPublishEvent(store,organizerId,data);remember();form.reset();success("#event-feedback","Evento "+e.title+" creado. Visible en la tienda de demostración de este navegador.");
   }catch(err){error("#event-feedback",err.message);}
