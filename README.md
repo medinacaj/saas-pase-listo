@@ -13,7 +13,7 @@ PaseListo es **la ticketera del propietario**, no un software de autoservicio pa
 
 ## Dos tipos de espectáculos, sin confundir permisos
 
-1. **Referencias visuales reales:** seis espectáculos anunciados en Chile, con fechas verificadas y afiches promocionales de terceros enlazados externamente: Gorillaz, Fauna Primavera, Camila, Deep Purple, Cirque du Soleil / Alegría y 31 Minutos. Se usan únicamente para mostrar cómo lucirían fichas reales. **No hay contrato de venta con PaseListo, autorización comercial del afiche, precios o cupos nuestros.** Por eso **no tienen botón de compra**.
+1. **Referencias visuales reales:** seis espectáculos anunciados en Chile, con fechas verificadas y afiches promocionales de terceros enlazados externamente: Gorillaz, Fauna Primavera, Camila, Deep Purple, Cirque du Soleil / Alegría y 31 Minutos. Se usan únicamente para mostrar cómo lucirían fichas reales. **No hay contrato de venta con PaseListo, autorización comercial del afiche, precios o cupos nuestros.** Por eso no ofrecen venta real, pero sus fichas ahora incluyen un **recorrido de compra ficticia sin pago ni reserva** para evaluar la experiencia.
 2. **Eventos de ensayo comercial:** ocho espectáculos y tres productores **inventados**. Estos muestran tipos de entradas y tarifas. El checkout solo se habilita con inicio de sesión verificado por servidor; GitHub Pages bloquea el pedido al no disponer de backend.
 
 Los datos promocionales reales están en `data/eventos-reales-referencia.json` con sus `sourceUrl`, `posterSourceUrl` y `posterCredit`. No copiamos los archivos de afiches a GitHub y su uso comercial está pendiente de autorización. Si alguna imagen externa no carga, se muestra un fallback tipográfico.
@@ -103,7 +103,7 @@ Las fichas de eventos ficticios creados en `localStorage` únicamente se compart
 
 En `evento.html?id=<ID>`, las fichas de eventos ficticios presentan un esquema del escenario y las categorías de entrada diferenciadas por colores. Cada sector y su leyenda son seleccionables: resaltan la categoría correspondiente en el desglose de tarifas y muestran el precio total por entrada. Se puede utilizar la leyenda con teclado y los sectores con Enter o Espacio.
 
-**Importante:** el dibujo es **ilustrativo**, no un plano de butacas, un mapa geográfico, una garantía de ubicación ni una asignación de asientos. Ordena las categorías por precio de mayor a menor exclusivamente como referencia visual. Los eventos reales que se muestran como referencias no tienen un plano oficial verificado ni tarifas contratadas: en ellos aparece un esquema neutro de «sin plano verificado», sin fingir zonas, cupos o precios.
+**Importante:** el dibujo es **ilustrativo**, no un plano de butacas, un mapa geográfico, una garantía de ubicación ni una asignación de asientos. Ordena las categorías por precio de mayor a menor exclusivamente como referencia visual. Los eventos reales no tienen plano oficial ni tarifas contratadas: en ellos aparece un esquema **expresamente ficticio** con categorías y precios inventados para ensayar la selección visual, sin aparentar que son zonas, cupos ni valores oficiales.
 
 Para un uso comercial futuro debe existir una configuración de recinto aprobada por el organizador, con geometrías de sectores y categorías asignadas, accesibilidad, aforos reales y precios respaldados por el servidor, además de una revisión previa de publicación.
 
@@ -140,4 +140,13 @@ Las coordenadas existentes se mantienen en `data/recintos-openstreetmap.json` po
 
 La página pública `index.html` presenta únicamente **eventos reales como referencias visuales**. Se eliminó de la vista la sección «Compra de demostración» y sus tarjetas de eventos ficticios. Los filtros de ciudad, categoría, fecha y búsqueda, los contadores y el carrusel trabajan exclusivamente con referencias reales (y se conservan únicamente las que tienen afiche HTTPS, conforme a la opción visual A).
 
-El catálogo `data/eventos-clientes-demo.json`, el servidor y los tests de pedidos simulados permanecen en el repositorio **exclusivamente para desarrollo y pruebas internas**; no se borran ni se confunden con ventas autorizadas. Se mantiene un contenedor oculto y vacío en la portada por compatibilidad técnica, sin generar tarjetas ficticias. Los eventos reales no tienen compra habilitada en PaseListo, pues no existen contratos comerciales ni inventario verificado.
+El catálogo `data/eventos-clientes-demo.json`, el servidor y los tests de pedidos simulados permanecen en el repositorio **exclusivamente para desarrollo y pruebas internas**; no se borran ni se confunden con ventas autorizadas. Se mantiene un contenedor oculto y vacío en la portada por compatibilidad técnica, sin generar tarjetas ficticias. Los eventos reales no tienen venta auténtica habilitada. Sí permiten ensayar categorías, cantidades, subtotal, comisión ficticia y confirmación sin pago en la **misma ficha individual**; no existe inventario real ni contrato comercial.
+
+
+### Un solo recorrido de comprador: catálogo → ficha → compra ficticia (11/11/2026)
+
+El comprador **no tiene que entrar a un laboratorio separado**. La página `index.html` presenta únicamente las referencias con **afiche HTTPS y descripción editorial de al menos 40 caracteres**. Al tocar una tarjeta o un destacado abre su propia `evento.html?id=<ID>`; en el panel «Elige tus entradas DEMO» puede seleccionar uno de tres sectores inventados (General, Preferente o VIP), explorar el esquema de zonas, cambiar la cantidad (1–6), revisar subtotal, cargo ficticio y total, y confirmar una **simulación sin pago, reserva ni emisión de tickets**. El resultado muestra un número de prueba `SIM-...`, no un pedido válido.
+
+Los eventos de terceros no tienen inventario, condiciones comerciales ni precios autorizados para venta. Se indica claramente en la ficha que **todos los valores y zonas de la prueba son ficticios**; no se recopilan datos bancarios ni personales, no se genera un cobro y no se presenta la prueba como una compra de ese espectáculo. Esta simulación de interfaz funciona también en GitHub Pages, sin backend, pero **no prueba la persistencia, la autenticación ni la disponibilidad real**.
+
+Las pruebas de integración técnica de autenticación, aforos y pedidos DEMO siguen operativas en `npm run api:buyers` y `npm test` utilizando el catálogo ficticio, sin obligar al visitante público a cambiar de experiencia. La implementación del flujo visual está en `src/reference-checkout.mjs` y `src/event-page.mjs`.
