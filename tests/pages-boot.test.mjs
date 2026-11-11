@@ -64,3 +64,12 @@ test("public visual gallery keeps a single explicit no-payment buyer journey",()
  assert.ok(html.includes('id="real-events-grid"'));
  assert.ok(read("src/reference-checkout.mjs").includes("ticketIssued:false"));
 });
+
+test("a failed catalog request cannot erase the pre-rendered gallery",()=>{
+ const source=read("src/marketplace.mjs");
+ assert.ok(source.includes("Mostrando cartelera precargada"));
+ assert.ok(source.includes("No se cargaron referencias visuales completas"));
+ assert.ok(!source.includes('$("#real-events-grid").innerHTML=\'<p class="load-error"'));
+ assert.ok(!source.includes('$("#hero-poster").innerHTML=\'<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible'));
+ assert.ok(html.includes('src="./assets/event-art/creamfields-2026.svg"'));
+});
