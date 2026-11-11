@@ -1,10 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { selectHeroEvents, splitHeroTitle, hasHeroPoster } from "../src/hero-carousel.mjs";
+import { selectHeroEvents, splitHeroTitle, hasHeroPoster, hasEventDescription } from "../src/hero-carousel.mjs";
 
 const read=async path=>readFile(new URL(path,import.meta.url),"utf8");
 const poster="https://example.test/valid-event-poster.jpg";
+const described=items=>items.map(e=>({...e,description:e.description??"Ficha de concierto de prueba con información relevante, recinto y fecha del evento."}));
 
 test("opción A: solo eventos con afiche pueden entrar al carrusel",()=>{
  const now="2026-11-10";
@@ -19,11 +20,11 @@ test("opción A: solo eventos con afiche pueden entrar al carrusel",()=>{
   {id:"camila",title:"Camila",date:"2026-11-20",featured:true,heroPriority:93,posterUrl:poster},
   {id:"fauna",title:"Fauna Primavera",date:"2026-11-26",featured:true,heroPriority:90,posterUrl:poster}
  ];
- const selected=selectHeroEvents([...week,...future],[],now);
+ const selected=selectHeroEvents(described([...week,...future]),[],now);
  assert.deepEqual(selected.map(e=>e.id),["poster-1","camila","fauna"]);
- assert.ok(selected.every(e=>hasHeroPoster(e,e.kind)));
- assert.equal(selectHeroEvents(week,[],now,2).length,1);
- assert.equal(selectHeroEvents([{id:"old",title:"Old",date:"2026-11-01",posterUrl:poster}],[],now).length,0);
+ assert.ok(selected.every(e=>hasHeroPoster(e,e.kind)&&hasEventDescription(e)));
+ assert.equal(selectHeroEvents(described(week),[],now,2).length,1);
+ assert.equal(selectHeroEvents(described([{id:"old",title:"Old",date:"2026-11-01",posterUrl:poster}]),[],now).length,0);
 });
 
 test("filtro de imágenes exige HTTPS y respeta derechos declarados de DEMO",()=>{
@@ -46,7 +47,7 @@ test("deduplica ID y excluye eventos DEMO sin afiche o no publicados",()=>{
   {id:"no-image",title:"No visual",date:"2026-11-12",status:"published"},
   {id:"good",title:"Con imagen",date:"2026-11-13",posterUrl:poster,posterRights:"declarados_por_usuario_sin_verificar",status:"published"}
  ];
- const items=selectHeroEvents(refs,demos,"2026-11-10");
+ const items=selectHeroEvents(described(refs),described(demos),"2026-11-10");
  assert.deepEqual(items.map(x=>x.id),["dup","good"]);
  assert.equal(items[1].kind,"demo");
 });
@@ -114,4 +115,13 @@ test("portada conserva navegación visual y descarta afiches fallidos",async()=>
  assert.ok(!index.includes('id="week-strip"'));
  assert.ok(index.includes('id="real-events-grid"'));
  assert.ok(index.includes('id="events-grid"'));
+});
+
+test("la portada rechaza afiches sin una descripción editorial completa",()=>{
+ assert.equal(hasEventDescription({description:""}),false);
+ assert.equal(hasEventDescription({subtitle:"Gira internacional"}),false);
+ assert.equal(hasEventDescription({description:"Ficha sin detalles"}),false);
+ assert.equal(hasEventDescription({description:"Concierto anunciado en Santiago con fecha, nombre de gira y ubicación del recinto."}),true);
+ const missing=[{id:"incompleto",title:"No publicar",date:"2026-11-20",posterUrl:poster}];
+ assert.deepEqual(selectHeroEvents(missing,[],"2026-11-11"),[]);
 });
