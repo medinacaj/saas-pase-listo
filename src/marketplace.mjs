@@ -421,12 +421,15 @@ async function start(){
   const catalog=await response.json(),visuals=await realResponse.json();
   store=loadCommerce(catalog);
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
+  if(!realSamples.some(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)))
+   throw Error("No se cargaron referencias visuales completas");
   filters();renderCards();renderFeatured();
 
   refreshBuyer().then(refreshInventory).catch(()=>{});
  }catch(err){
-  $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
-  $("#real-events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
+  // Keep the ten pre-rendered linked cards and featured cover visible if
+  // a browser module, remote request or catalog initialization fails.
+  $("#results-description").textContent="Mostrando cartelera precargada; algunas funciones interactivas no están disponibles.";
   console.error("PaseListo",err.message);return;
  }
  const heroControls=$("#hero-carousel-controls");
