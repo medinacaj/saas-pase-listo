@@ -1,7 +1,7 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
 import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
-import { selectHeroEvents, splitHeroTitle } from "./hero-carousel.mjs";
+import { selectHeroEvents, splitHeroTitle, hasHeroPoster } from "./hero-carousel.mjs";
 import { weekBounds } from "./week-events.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
@@ -48,7 +48,7 @@ async function refreshInventory(){
  }
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
-function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
+function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return [...realEvents(),...allEvents()];}
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
@@ -170,6 +170,7 @@ function renderCards(){
 
 
 let heroSlides=[];
+const heroBrokenIds=new Set();
 let heroIndex=0;
 let heroTimer=null;
 let heroPaused=false;
@@ -225,7 +226,23 @@ function showHeroSlide(manual=false){
   void node.offsetWidth;
   node.classList.add("is-changing");
  }
- installImages();
+ const heroImage=card.querySelector("img.poster-img");
+ if(heroImage){
+  const skipBrokenImage=()=>{
+   queueMicrotask(()=>{
+    // Let installImages try a configured backup before excluding this slide.
+    if(heroSlides[heroIndex]?.id!==event.id || heroImage.isConnected)return;
+    heroBrokenIds.add(event.id);
+    renderFeatured();
+   });
+  };
+  heroImage.addEventListener("error",skipBrokenImage);
+  installImages();
+  if(!heroImage.isConnected)skipBrokenImage();
+ }else{
+  heroBrokenIds.add(event.id);
+  queueMicrotask(renderFeatured);
+ }
 }
 function chooseHero(index,manual=true){
  if(heroSlides.length===0)return;
@@ -234,7 +251,8 @@ function chooseHero(index,manual=true){
  scheduleHero();
 }
 function renderFeatured(){
- heroSlides=selectHeroEvents(realSamples,publishedEvents(store),current(),6);
+ heroSlides=selectHeroEvents(realSamples,publishedEvents(store),current(),6)
+  .filter(event=>!heroBrokenIds.has(event.id));
  heroIndex=0;
  const dots=$("#hero-carousel-dots");
  dots.replaceChildren();
