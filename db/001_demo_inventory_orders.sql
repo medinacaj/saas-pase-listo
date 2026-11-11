@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS demo_orders (
   event_id TEXT NOT NULL,
   ticket_type_id TEXT NOT NULL,
   organizer_id TEXT NOT NULL,
-  quantity SMALLINT NOT NULL CHECK (quantity BETWEEN 1 AND 6),
+  quantity SMALLINT NOT NULL CHECK (quantity BETWEEN 1 AND 100),
   status TEXT NOT NULL DEFAULT 'demo_confirmed'
     CHECK (status IN ('demo_confirmed', 'demo_cancelled')),
   pricing JSONB NOT NULL,
