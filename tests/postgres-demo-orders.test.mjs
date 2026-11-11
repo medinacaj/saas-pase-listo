@@ -58,6 +58,46 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
     assert.equal(parallel.filter(Boolean).length,1,"Solo un pedido puede pasar el límite acumulado");
   });
 
+  await t.test("cola masiva FIFO entre dos pools no se puede saltar con pedidos HTTP directos",async()=>{
+    await reset();
+    await Promise.all([a.initialize(),b.initialize()]);
+    const massive="demo-festival-masivo-2027";
+    const buyerAt=n=>"buyer-"+String(n).padStart(8,"0")+"-2222-4222-8222-"+String(n).padStart(12,"0");
+    const first=buyerAt(1);
+    await assert.rejects(a.create({buyerId:first,eventId:massive,ticketTypeId:"general",
+      quantity:1,requestId:"queue-bypass-attempt-0001"}),e=>e.status===409&&/turno/.test(e.message));
+    const entrants=await Promise.all(Array.from({length:27},(_,i)=>
+      (i%2?a:b).joinWaitingRoom({eventId:massive,buyerId:buyerAt(i+1)})));
+    assert.equal(entrants.filter(x=>x.status==="admitted").length,25);
+    const pos26=await a.waitlistStatus({eventId:massive,buyerId:buyerAt(26)});
+    const pos27=await b.waitlistStatus({eventId:massive,buyerId:buyerAt(27)});
+    assert.equal(pos26.status,"waiting");
+    assert.equal(pos26.position,1);
+    assert.equal(pos27.position,2);
+    const repeat=await b.joinWaitingRoom({eventId:massive,buyerId:buyerAt(27)});
+    assert.equal(repeat.position,2);
+    await assert.rejects(b.create({buyerId:buyerAt(27),eventId:massive,ticketTypeId:"general",
+      quantity:1,requestId:"queue-bypass-waiting-0002"}),e=>e.status===409);
+    const order=await a.create({buyerId:first,eventId:massive,ticketTypeId:"general",
+      quantity:4,requestId:"queue-admitted-order-0001"});
+    assert.equal(order.quantity,4);
+    assert.equal((await a.waitlistStatus({eventId:massive,buyerId:first})).status,"used");
+    assert.equal((await b.waitlistStatus({eventId:massive,buyerId:buyerAt(26)})).status,"admitted");
+    const retry=await b.create({buyerId:first,eventId:massive,ticketTypeId:"general",
+      quantity:4,requestId:"queue-admitted-order-0001"});
+    assert.equal(retry.id,order.id);
+    await assert.rejects(b.create({buyerId:first,eventId:massive,ticketTypeId:"general",
+      quantity:1,requestId:"queue-no-second-turn-0003"}),e=>e.status===409);
+    await b.joinWaitingRoom({eventId:massive,buyerId:first});
+    const second=await b.create({buyerId:first,eventId:massive,ticketTypeId:"general",
+      quantity:3,requestId:"queue-second-admission-0004"});
+    assert.equal(second.quantity,3);
+    await assert.rejects(a.joinWaitingRoom({eventId:massive,buyerId:first}),
+      e=>e.status===409 && /máximo/.test(e.message));
+    const sold=await poolA.query("SELECT sold FROM demo_ticket_stock WHERE event_id=$1 AND ticket_type_id='general'",[massive]);
+    assert.equal(Number(sold.rows[0].sold),7);
+  });
+
   await t.test("ocho pedidos paralelos no superan dos entradas, aun entre pools", async () => {
     await poolA.query(
       "UPDATE demo_ticket_stock SET capacity = 2 WHERE event_id = $1 AND ticket_type_id = $2",
