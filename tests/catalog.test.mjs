@@ -157,3 +157,29 @@ test("la portada solo muestra eventos reales y conserva DEMO fuera del catálogo
  // Preserve internal purchase simulations and their test coverage, not public sales.
  assert.ok(demo.events.length>=8);
 });
+
+
+test("la portada presenta únicamente fichas completas y conserva un laboratorio local para compras",async()=>{
+ const {hasHeroPoster,hasEventDescription}=await import("../src/hero-carousel.mjs");
+ const visuals=refs.events.filter(e=>hasHeroPoster(e,"reference")&&hasEventDescription(e));
+ assert.equal(visuals.length,6);
+ assert.ok(visuals.every(e=>e.description.trim().length>=40));
+ assert.ok(visuals.every(e=>e.posterUrl.startsWith("https://")));
+ assert.match(marketplace,/hasHeroPoster\(e,"reference"\)&&hasEventDescription\(e\)/);
+ assert.ok(marketplace.includes('esc(event.description)'));
+ assert.ok(portal.includes('id="lab-trigger"'));
+ assert.ok(portal.includes('id="lab-testing"'));
+ assert.ok(portal.includes('id="lab-checkout-form"'));
+ assert.ok(portal.includes('id="lab-event"'));
+ assert.ok(portal.includes('id="lab-ticket"'));
+ assert.ok(marketplace.includes('new URLSearchParams(location.search).get("modo")==="pruebas"'));
+ assert.ok(marketplace.includes('isLocalPreview &&'));
+ assert.ok(marketplace.includes('link.hidden=!isLocalPreview'));
+ assert.ok(marketplace.includes('panel.hidden=false'));
+ assert.ok(marketplace.includes('await openCheckout(eventId,ticketTypeId)'));
+ assert.ok(marketplace.includes('setupPurchaseLab()'));
+ assert.ok(!portal.includes('Compra de demostración'));
+ // The fixture remains intact for local authentication, inventory and purchase tests.
+ assert.ok(demo.events.length>=8);
+ assert.ok(demo.events.every(e=>e.ticketTypes.length>=1));
+});
