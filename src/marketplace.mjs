@@ -1,4 +1,5 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
+import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
 import { selectHeroEvents, splitHeroTitle, hasHeroPoster, hasEventDescription } from "./hero-carousel.mjs";
 import { weekBounds } from "./week-events.mjs";
@@ -15,13 +16,54 @@ let realSamples=[];
 const ui={query:"",category:"Todos",city:"all",period:"all",eventId:null,checkout:null,lastFocus:null,authPending:null};
 let buyer=null;
 let buyerApiReady=false;
+let serverInventory=null;
+function remainingFor(eventId,typeId){
+ // The local demo server owns stock. Never offer browser-only events as purchasable.
+ if(serverInventory!==null)return serverInventory.get(eventId+"|"+typeId)?.remaining??0;
+ return available(store,eventId,typeId);
+}
+async function refreshInventory(){
+ if(!buyerApiReady){serverInventory=null;return;}
+ try{
+  const data=await buyerRequest("inventory",undefined,"GET");
+  if(!Array.isArray(data.events))throw Error("Inventario inválido");
+  const next=new Map();
+  for(const event of data.events){
+   if(typeof event.eventId!=="string"||!Array.isArray(event.ticketTypes))continue;
+   for(const ticket of event.ticketTypes){
+    if(typeof ticket.ticketTypeId==="string"&&Number.isSafeInteger(ticket.remaining)&&ticket.remaining>=0&&
+       Number.isSafeInteger(ticket.unitBaseClp)&&ticket.unitBaseClp>=0&&
+       Number.isSafeInteger(ticket.feePerTicketClp)&&ticket.feePerTicketClp>=0)
+     next.set(event.eventId+"|"+ticket.ticketTypeId,{
+      remaining:ticket.remaining,unitBaseClp:ticket.unitBaseClp,feePerTicketClp:ticket.feePerTicketClp
+     });
+   }
+  }
+  serverInventory=next;
+  if(store){renderCards();syncDetailAvailability();}
+ }catch{
+  // Fail closed when the buyer API is reachable but its inventory cannot be verified.
+  serverInventory=buyerApiReady?new Map():null;
+  if(store){renderCards();syncDetailAvailability();}
+ }
+}
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
 const brokenReferenceImages=new Set();
 function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return realEvents();} // Home: real references only; DEMO sales remain in internal tests.
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
-function quoteOrPrice(event,type){try{return quote(store,event.id,type.id,1).totalClp;}catch{return type.priceClp;}}
+function pricePreview(eventId,typeId,qty){
+ if(serverInventory!==null){
+  const ticket=serverInventory.get(eventId+"|"+typeId);
+  if(!ticket)throw Error("Esta entrada no está disponible en el servidor DEMO");
+  const faceValueClp=ticket.unitBaseClp*qty;
+  const serviceFeeClp=ticket.feePerTicketClp*qty;
+  return {faceValueClp,serviceFeeClp,totalClp:faceValueClp+serviceFeeClp};
+ }
+ return quote(store,eventId,typeId,qty,{availabilityRequired:false});
+}
+function quoteOrPrice(event,type){try{return pricePreview(event.id,type.id,1).totalClp;}catch{return type.priceClp;}}
 function poster(event){
  const tone=/^#[0-9a-f]{6}$/i.test(event.accent||"")?event.accent:"#CFF47A";
  let image="";
@@ -54,6 +96,7 @@ function realCard(event){
 }
 function openRealDetail(id){
  const e=realSamples.find(x=>x.id===id);if(!e)return;
+ ui.eventId=null;
  ui.lastFocus=document.activeElement;
  const end=e.endDate&&e.endDate!==e.date?" al "+date(e.endDate):"";
  $("#detail-content").innerHTML='<div class="detail-layout"><div class="detail-cover">'+realPoster(e)+'<span class="detail-art-label">AFICHE PROMOCIONAL DE TERCERO · LICENCIA NO ACREDITADA</span></div>'+
@@ -248,17 +291,31 @@ function renderFeatured(){
 }
 
 function selectedEvent(id){return store.events.find(e=>e.id===id&&e.status==="published");}
+function syncDetailAvailability(){
+ if($("#detail-backdrop").hidden||!ui.eventId)return;
+ const event=selectedEvent(ui.eventId);
+ if(!event)return;
+ $("[data-remaining-type]",$("#detail-content")).forEach(node=>{
+  const type=event.ticketTypes.find(t=>t.id===node.dataset.remainingType);
+  if(type)node.textContent=remainingFor(event.id,type.id)+" cupos de prueba · valor base "+clp(type.priceClp);
+ });
+ $("[data-select-ticket]",$("#detail-content")).forEach(button=>{
+  button.disabled=remainingFor(event.id,button.dataset.selectTicket)<1;
+ });
+}
 function openDetail(id){
  const event=selectedEvent(id);if(!event)return;
  ui.lastFocus=document.activeElement;ui.eventId=id;
  const organizer=org(event.organizerId);
- const rows=event.ticketTypes.map(t=>'<div class="type-row"><div><strong>'+esc(t.name)+'</strong><small>'+available(store,event.id,t.id)+' cupos de prueba · valor base '+clp(t.priceClp)+'</small></div><div><strong>'+clp(quoteOrPrice(event,t))+'</strong><button type="button" data-select-ticket="'+esc(t.id)+'" data-event="'+esc(event.id)+'" '+(available(store,event.id,t.id)<1?"disabled":"")+'>Iniciar sesión para comprar ↗</button></div></div>').join("");
+ const rows=event.ticketTypes.map(t=>'<div class="type-row"><div><strong>'+esc(t.name)+'</strong><small data-remaining-type="'+esc(t.id)+'">'+remainingFor(event.id,t.id)+' cupos de prueba · valor base '+clp(t.priceClp)+'</small></div><div><strong>'+clp(quoteOrPrice(event,t))+'</strong><button type="button" data-select-ticket="'+esc(t.id)+'" data-event="'+esc(event.id)+'" '+(remainingFor(event.id,t.id)<1?"disabled":"")+'>Iniciar sesión para comprar ↗</button></div></div>').join("");
  $("#detail-content").innerHTML='<div class="detail-layout"><div class="detail-cover">'+poster(event)+'<span class="detail-art-label">ARTE FICTICIO · NO OFICIAL</span></div><div class="detail-info"><div class="detail-kicker">'+esc(event.category)+' <span>✳</span> '+esc(event.city)+'</div><h2 id="detail-title">'+esc(event.title)+'</h2><p class="detail-subtitle">'+esc(event.subtitle)+'</p><p class="detail-editorial">'+esc(event.description)+'</p><dl class="event-facts"><div><dt>Fecha</dt><dd>'+esc(date(event.date))+' · '+esc(event.time)+' h</dd></div><div><dt>Recinto</dt><dd>'+esc(event.venue)+'</dd></div><div><dt>Organiza</dt><dd>'+esc(organizer?.name||"Organizador")+'</dd></div></dl><div class="type-list"><h3>Elige una entrada</h3>'+rows+'</div><p class="detail-important">Precios finales de demostración en CLP, incluidos los cargos de servicio simulados. No hay venta ni emisión de tickets utilizables.</p></div></div>';
  $("#detail-backdrop").hidden=false;document.body.classList.add("dialog-open");$("#event-dialog").focus();
 }
 function closeModal(which,restore=true){
  const node=$(which);node.hidden=true;
- if($("#detail-backdrop").hidden&&$("#checkout-backdrop").hidden)document.body.classList.remove("dialog-open");
+ if(which==="#checkout-backdrop")ui.checkout=null;
+ if(which==="#detail-backdrop")ui.eventId=null;
+ if(["#detail-backdrop","#checkout-backdrop","#login-backdrop","#orders-backdrop"].every(selector=>$(selector).hidden))document.body.classList.remove("dialog-open");
  if(restore&&ui.lastFocus?.isConnected)ui.lastFocus.focus();
 }
 
@@ -267,19 +324,23 @@ async function buyerRequest(path,payload,method="POST"){
  if(payload!==undefined)headers["Content-Type"]="application/json";
  const response=await fetch("/api/buyer/"+path,{method,credentials:"same-origin",headers,...(payload!==undefined?{body:JSON.stringify(payload)}:{})});
  const data=await response.json().catch(()=>({}));
- if(!response.ok)throw Error(data.error||"No fue posible completar la solicitud");
+ if(!response.ok){
+  const error=Error(data.error||"No fue posible completar la solicitud");
+  error.status=response.status;
+  throw error;
+ }
  return data;
 }
 async function refreshBuyer(){
  try {
   const status=await buyerRequest("status",undefined,"GET");
   buyerApiReady=status.ready===true&&status.mode==="local-demo";
-  if(!buyerApiReady){buyer=null;return false;}
+  if(!buyerApiReady){buyer=null;serverInventory=null;return false;}
   const response=await buyerRequest("session",undefined,"GET");
   buyer=response.authenticated===true?response.buyer:null;
- }catch{buyerApiReady=false;buyer=null;}
+ }catch{buyerApiReady=false;buyer=null;serverInventory=null;}
  const trigger=$("#buyer-account-trigger");
- if(trigger)trigger.textContent=buyer?"Mi cuenta · Salir":"Iniciar sesión";
+ if(trigger)trigger.textContent=buyer?"Mi cuenta":"Iniciar sesión";
  return buyerApiReady;
 }
 function renderLoginForm(mode="login",message=""){
@@ -299,6 +360,8 @@ function renderLoginForm(mode="login",message=""){
 async function showLogin(eventId=null,typeId=null){
  ui.authPending=eventId&&typeId?{eventId,typeId}:null;
  closeModal("#detail-backdrop",false);
+ if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop",false);
+ if(!$("#orders-backdrop").hidden)closeModal("#orders-backdrop",false);
  await refreshBuyer();
  $("#login-backdrop").hidden=false;document.body.classList.add("dialog-open");
  renderLoginForm();
@@ -310,23 +373,63 @@ function closeLogin(){
 function renderCheckout(eventId,typeId,qty=1){
  if(!buyer||!buyerApiReady){showLogin(eventId,typeId);return;}
  const e=selectedEvent(eventId);if(!e)return;
- ui.checkout={eventId,typeId,qty};
+ ui.checkout=createCheckoutState(ui.checkout,eventId,typeId,qty);
  const ticket=e.ticketTypes.find(t=>t.id===typeId);if(!ticket)return;
+ const remaining=remainingFor(eventId,typeId),insufficient=!canSubmitCheckout(ui.checkout,remaining);
  let summary;
- try{summary=quote(store,eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
- $("#checkout-content").innerHTML='<div class="checkout-head"><div class="detail-kicker">CUENTA VERIFICADA · COMPRA DE PRUEBA</div><h2 id="checkout-title">Tus entradas.</h2><p>'+esc(e.title)+' · '+esc(date(e.date))+' · '+esc(e.venue)+'</p><p class="signed-buyer">Sesión iniciada: '+esc(buyer.email)+'</p></div><form id="demo-checkout" class="checkout-form"><div class="checkout-controls"><label>Tipo de entrada<select name="ticketType">'+e.ticketTypes.map(t=>'<option value="'+esc(t.id)+'" '+(t.id===typeId?"selected":"")+'>'+esc(t.name)+'</option>').join("")+'</select></label><label>Cantidad<select name="quantity">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'" '+(n===qty?"selected":"")+'>'+n+'</option>').join("")+'</select></label></div><div class="fee-summary"><div><span>Entrada base × '+qty+'</span><strong>'+clp(summary.faceValueClp)+'</strong></div><div><span>Cargo por servicio × '+qty+'</span><strong>'+clp(summary.serviceFeeClp)+'</strong></div><div class="fee-total"><span>Total del comprador</span><strong>'+clp(summary.totalClp)+'</strong></div><small>Los cargos de esta simulación están incluidos. No se efectuará ningún cobro.</small></div><label class="ack"><input type="checkbox" required name="acceptDemo"> Entiendo que es una simulación sin pago, reserva ni boleto válido.</label><button type="submit" class="checkout-submit">Continuar pedido de prueba · '+clp(summary.totalClp)+' ↗</button></form>';
+ try{summary=pricePreview(eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
+ $("#checkout-content").innerHTML='<div class="checkout-head"><div class="detail-kicker">CUENTA VERIFICADA · COMPRA DE PRUEBA</div><h2 id="checkout-title">Tus entradas.</h2><p>'+esc(e.title)+' · '+esc(date(e.date))+' · '+esc(e.venue)+'</p><p class="signed-buyer">Sesión iniciada: '+esc(buyer.email)+'</p></div><form id="demo-checkout" class="checkout-form"><div class="checkout-controls"><label>Tipo de entrada<select name="ticketType">'+e.ticketTypes.map(t=>'<option value="'+esc(t.id)+'" '+(t.id===typeId?"selected":"")+'>'+esc(t.name)+'</option>').join("")+'</select></label><label>Cantidad<select name="quantity">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'" '+(n===qty?"selected":"")+'>'+n+'</option>').join("")+'</select></label></div><div class="fee-summary"><div><span>Entrada base × '+qty+'</span><strong>'+clp(summary.faceValueClp)+'</strong></div><div><span>Cargo por servicio × '+qty+'</span><strong>'+clp(summary.serviceFeeClp)+'</strong></div><div class="fee-total"><span>Total del comprador</span><strong>'+clp(summary.totalClp)+'</strong></div><small>Los cargos de esta simulación están incluidos. No se efectuará ningún cobro.</small></div>'+(insufficient?'<p class="load-error" role="alert">Solo quedan '+remaining+' cupos de prueba para esta selección.</p>':'')+'<label class="ack"><input type="checkbox" required name="acceptDemo"> Entiendo que es una simulación sin pago, reserva ni boleto válido.</label><button type="submit" class="checkout-submit" '+(insufficient?'disabled':'')+'>Continuar pedido de prueba · '+clp(summary.totalClp)+' ↗</button></form>';
 }
 async function openCheckout(eventId,typeId){
  closeModal("#detail-backdrop",false);
  await refreshBuyer();
  if(!buyer){await showLogin(eventId,typeId);return;}
+ await refreshInventory();
+ if(remainingFor(eventId,typeId)<1){openDetail(eventId);return;}
  ui.lastFocus=document.activeElement;
  $("#checkout-backdrop").hidden=false;document.body.classList.add("dialog-open");
+ ui.checkout=null;
  renderCheckout(eventId,typeId,1);$("#checkout-dialog").focus();
 }
 function orderSuccess(order){
+ ui.checkout=null;
+ refreshInventory().catch(()=>{});
  const event=selectedEvent(order.eventId);
  $("#checkout-content").innerHTML='<div class="demo-success"><div class="success-symbol" aria-hidden="true">✓</div><div class="detail-kicker">PEDIDO DE PRUEBA REGISTRADO</div><h2 id="checkout-title">¡Simulación completada!</h2><p>Este registro de prueba está asociado a tu cuenta de desarrollo. No hay pago, reserva real ni entrada válida.</p><div class="demo-receipt"><span>N.º de simulación</span><strong>'+esc(order.id)+'</strong><span>Evento</span><strong>'+esc(event?.title||"Evento DEMO")+'</strong><span>Total teórico</span><strong>'+clp(order.pricing.totalClp)+'</strong></div><button type="button" data-close-checkout class="checkout-submit">Volver a la cartelera ↗</button></div>';
+}
+function orderDate(value){
+ const d=new Date(value);
+ return Number.isFinite(d.getTime())
+  ?new Intl.DateTimeFormat("es-CL",{dateStyle:"medium",timeZone:"America/Santiago"}).format(d)
+  :"Fecha no disponible";
+}
+async function showAccount(){
+ await refreshBuyer();
+ if(!buyer){await showLogin();return;}
+ ui.lastFocus=document.activeElement;
+ $("#orders-backdrop").hidden=false;
+ document.body.classList.add("dialog-open");
+ $("#orders-dialog").focus();
+ const content=$("#buyer-orders-content");
+ content.textContent="Cargando pedidos de prueba…";
+ try{
+  const response=await buyerRequest("orders",undefined,"GET");
+  if($("#orders-backdrop").hidden)return;
+  const orders=Array.isArray(response.orders)?response.orders:[];
+  const cards=orders.slice(0,50).map(order=>{
+   const event=store?.events.find(e=>e.id===order.eventId);
+   const status=order.status==="demo_confirmed"?"Registrado · DEMO":"Anulado · DEMO";
+   const amount=Number.isFinite(order.pricing?.totalClp)?order.pricing.totalClp:0;
+   return '<article class="buyer-order-card"><div class="buyer-order-top"><strong>'+esc(event?.title||"Evento de prueba")+'</strong><span>'+esc(status)+'</span></div>'+
+    '<p>'+esc(order.id)+' · '+esc(order.quantity)+' entrada(s) · '+esc(orderDate(order.createdAt))+'</p>'+
+    '<div class="buyer-order-total"><span>Valor simulado</span><strong>'+clp(amount)+'</strong></div></article>';
+  }).join("");
+  content.innerHTML=orders.length
+   ?'<p class="orders-count">'+orders.length+' pedido(s) de prueba · se muestran hasta 50 recientes</p><div class="buyer-orders-list">'+cards+'</div>'
+   :'<p class="orders-empty">Todavía no tienes pedidos de prueba.</p>';
+ }catch(err){
+  if(!$("#orders-backdrop").hidden)content.textContent=err.message;
+ }
 }
 function resetFilters(){ui.query="";ui.category="Todos";ui.city="all";ui.period="all";$("#event-search").value="";$("#date-filter").value="all";filters();renderCards();}
 
@@ -342,7 +445,7 @@ async function start(){
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
 
-  refreshBuyer();
+  refreshBuyer().then(refreshInventory).catch(()=>{});
  }catch(err){
   $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
   $("#real-events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
@@ -418,6 +521,7 @@ async function start(){
   const type=target.closest("[data-select-ticket]");
   if(type){openCheckout(type.dataset.event,type.dataset.selectTicket).catch(e=>alert(e.message));return;}
   if(target.closest("[data-close-login]")||target.id==="login-backdrop"){closeLogin();return;}
+  if(target.closest("[data-close-orders]")||target.id==="orders-backdrop"){closeModal("#orders-backdrop");return;}
   const switchAuth=target.closest("[data-switch-auth]");
   if(switchAuth){renderLoginForm(switchAuth.dataset.switchAuth);return;}
   if(target.closest("[data-close-detail]")||target.id==="detail-backdrop"){closeModal("#detail-backdrop");return;}
@@ -432,13 +536,20 @@ async function start(){
   renderCheckout(ui.checkout.eventId,type,qty);
  });
 
- $("#buyer-account-trigger").addEventListener("click",async()=>{
-  await refreshBuyer();
-  if(!buyer){showLogin();return;}
-  if(confirm("¿Cerrar sesión del comprador en este navegador?")){
-   try{await buyerRequest("logout",{});}catch{}
-   buyer=null;await refreshBuyer();
-  }
+ $("#buyer-account-trigger").addEventListener("click",()=>{
+  showAccount().catch(err=>console.error("PaseListo",err.message));
+ });
+ $("#buyer-logout").addEventListener("click",async()=>{
+  const button=$("#buyer-logout");
+  button.disabled=true;
+  try{
+   await buyerRequest("logout",{});
+   buyer=null;
+   closeModal("#orders-backdrop");
+   await refreshBuyer();
+  }catch(err){
+   $("#buyer-orders-content").textContent=err.message;
+  }finally{button.disabled=false;}
  });
  $("#buyer-auth-content").addEventListener("submit",async ev=>{
   if(ev.target.id!=="buyer-auth-form")return;
@@ -458,27 +569,50 @@ async function start(){
  $("#checkout-content").addEventListener("submit",async ev=>{
   if(ev.target.id!=="demo-checkout")return;
   ev.preventDefault();
-  const f=new FormData(ev.target);
+  const checkout=ui.checkout,form=ev.target;
+  if(!checkout||checkout.submitting)return;
+  if(form.elements.ticketType.value!==checkout.typeId||Number(form.elements.quantity.value)!==checkout.qty)return;
+  checkout.submitting=true;
+  const button=form.querySelector('[type="submit"]'),buttonText=button?.textContent;
+  const controls=[...form.querySelectorAll("select")];
+  if(button){button.disabled=true;button.textContent="Registrando pedido de prueba…";}
+  controls.forEach(control=>{control.disabled=true;});
   try{
    await refreshBuyer();
-   if(!buyer){await showLogin(ui.checkout.eventId,ui.checkout.typeId);return;}
+   if(!buyer){await showLogin(checkout.eventId,checkout.typeId);return;}
+   checkout.attempted=true;
    const order=await buyerRequest("orders",{
-    eventId:ui.checkout.eventId,
-    ticketTypeId:f.get("ticketType"),
-    quantity:Number(f.get("quantity")),
-    requestId:crypto.randomUUID()
+    eventId:checkout.eventId,
+    ticketTypeId:checkout.typeId,
+    quantity:checkout.qty,
+    requestId:checkout.requestId
    });
-   orderSuccess(order);
+   if(ui.checkout===checkout)orderSuccess(order);
   }catch(err){
-   const error=document.createElement("p");
-   error.className="load-error";error.setAttribute("role","alert");error.textContent=err.message;ev.target.prepend(error);
+   if(err.status===409)checkout.attempted=false;
+   await refreshInventory();
+   if(ui.checkout===checkout&&form.isConnected){
+    if(!canSubmitCheckout(checkout,remainingFor(checkout.eventId,checkout.typeId))){
+     renderCheckout(checkout.eventId,checkout.typeId,checkout.qty);
+     return;
+    }
+    form.querySelector('[role="alert"]')?.remove();
+    const error=document.createElement("p");
+    error.className="load-error";error.setAttribute("role","alert");error.textContent=err.message;form.prepend(error);
+   }
+  }finally{
+   checkout.submitting=false;
+   if(form.isConnected){
+    controls.forEach(control=>{control.disabled=false;});
+    if(button){button.disabled=false;button.textContent=buttonText;}
+   }
   }
  });
  document.addEventListener("keydown",ev=>{
-  if(ev.key==="Escape"){if(!$("#login-backdrop").hidden)closeLogin();else if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop");else if(!$("#detail-backdrop").hidden)closeModal("#detail-backdrop");return;}
+  if(ev.key==="Escape"){if(!$("#login-backdrop").hidden)closeLogin();else if(!$("#orders-backdrop").hidden)closeModal("#orders-backdrop");else if(!$("#checkout-backdrop").hidden)closeModal("#checkout-backdrop");else if(!$("#detail-backdrop").hidden)closeModal("#detail-backdrop");return;}
   if(ev.key==="/"&&!["INPUT","SELECT","TEXTAREA"].includes(document.activeElement?.tagName)){ev.preventDefault();$("#event-search").focus();}
   if(ev.key!=="Tab")return;
-  const panel=!$("#login-backdrop").hidden?$("#login-dialog"):!$("#checkout-backdrop").hidden?$("#checkout-dialog"):!$("#detail-backdrop").hidden?$("#event-dialog"):null;if(!panel)return;
+  const panel=!$("#login-backdrop").hidden?$("#login-dialog"):!$("#orders-backdrop").hidden?$("#orders-dialog"):!$("#checkout-backdrop").hidden?$("#checkout-dialog"):!$("#detail-backdrop").hidden?$("#event-dialog"):null;if(!panel)return;
   const focusables=$$("button:not([disabled]),select,input,a[href]",panel).filter(el=>el.getClientRects().length);
   if(!focusables.length)return;
   if(ev.shiftKey&&document.activeElement===focusables[0]){ev.preventDefault();focusables.at(-1).focus();}
@@ -487,13 +621,15 @@ async function start(){
  window.addEventListener("storage",ev=>{
   if(ev.key==="paselisto:commerce:demo:v1"){fetch("./data/eventos-clientes-demo.json").then(r=>r.json()).then(c=>{store=loadCommerce(c);filters();renderCards();renderFeatured();}).catch(()=>{});}
  });
+ // Event-page CTA returns to the existing authenticated demo checkout.
+ // Reject unknown combinations instead of opening a checkout for a reference event.
  const params=new URLSearchParams(location.search);
- const selected=params.get("checkout"),ticket=params.get("type");
- if(selected&&ticket&&selected.length<=160&&ticket.length<=100){
-  const event=selectedEvent(selected);
-  if(event?.ticketTypes.some(t=>t.id===ticket)){
+ const checkoutEvent=params.get("checkout"),checkoutType=params.get("type");
+ if(checkoutEvent && checkoutType && checkoutEvent.length<=160 && checkoutType.length<=100){
+  const event=selectedEvent(checkoutEvent);
+  if(event?.ticketTypes.some(t=>t.id===checkoutType)){
    history.replaceState(null,"",location.pathname+location.hash);
-   openCheckout(selected,ticket).catch(error=>console.error("PaseListo",error.message));
+   openCheckout(checkoutEvent,checkoutType).catch(error=>console.error("PaseListo",error.message));
   }
  }
 }
