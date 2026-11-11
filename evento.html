@@ -26,7 +26,7 @@
  </div>
 </header>
 <main id="event-content" class="event-page-main">
- <div class="demo-ribbon" role="note"><strong>Versión demostrativa.</strong> Los espectáculos de referencia no están a la venta; las compras simuladas solo funcionan en el servidor local.</div>
+ <div class="demo-ribbon" role="note"><strong>Versión demostrativa.</strong> Explora eventos reales y prueba el proceso de compra con tarifas ficticias. No se realizan pagos, reservas ni se emiten entradas válidas.</div>
  <div class="event-page-wrap">
   <nav class="event-breadcrumb" aria-label="Ruta de navegación"><a href="./index.html#cartelera">Cartelera</a><span aria-hidden="true">/</span><span id="event-breadcrumb-name">Evento</span></nav>
   <div id="event-page-status" class="event-page-loading" role="status">Preparando la ficha del evento…</div>
@@ -103,6 +103,26 @@
       <h2 id="tickets-heading">Elige tu entrada.</h2>
       <div id="event-ticket-list"></div>
       <p class="event-page-ticket-note" id="ticket-disclaimer"></p>
+      <section id="reference-checkout" class="reference-checkout" aria-label="Simulador de compra integrado" hidden>
+       <p class="reference-checkout-step" id="reference-checkout-step">PASO 1 DE 3 · SELECCIÓN</p>
+       <div id="reference-checkout-select">
+        <label class="reference-checkout-field">Cantidad de entradas ficticias
+         <select id="reference-ticket-quantity" aria-label="Cantidad de entradas de prueba"><option value="1">1 entrada</option><option value="2">2 entradas</option><option value="3">3 entradas</option><option value="4">4 entradas</option><option value="5">5 entradas</option><option value="6">6 entradas</option></select>
+        </label>
+        <p id="reference-checkout-preview" role="status" aria-live="polite"></p>
+        <button id="reference-checkout-next" type="button" class="reference-checkout-action">Continuar al resumen</button>
+       </div>
+       <div id="reference-checkout-review" hidden>
+        <h3>Revisa tu simulación</h3>
+        <div id="reference-checkout-summary" class="reference-checkout-summary"></div>
+        <p class="reference-checkout-notice">No introduzcas datos personales ni bancarios. Esta prueba no cobra ni reserva entradas del evento real.</p>
+        <div class="reference-checkout-buttons">
+         <button id="reference-checkout-back" type="button" class="reference-checkout-secondary">Modificar selección</button>
+         <button id="reference-checkout-confirm" type="button" class="reference-checkout-action">Confirmar simulación</button>
+        </div>
+       </div>
+       <div id="reference-checkout-complete" hidden role="status" aria-live="polite"></div>
+      </section>
      </div>
     </aside>
    </div>
