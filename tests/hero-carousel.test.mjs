@@ -89,8 +89,10 @@ test("portada conserva navegación visual y descarta afiches fallidos",async()=>
  assert.ok(marketplace.includes("visibilitychange"));
  assert.ok(marketplace.includes("eventDetailHref(event.id)"));
  assert.ok(marketplace.includes('realPoster(event,true)'));
- assert.ok(marketplace.includes('heroBrokenIds.add(event.id)'));
- assert.ok(marketplace.includes('heroImage.addEventListener("error",skipBrokenImage)'));
+ assert.ok(!marketplace.includes("heroBrokenIds"));
+ assert.ok(!marketplace.includes("brokenReferenceImages"));
+ assert.ok(!marketplace.includes("skipBrokenImage"));
+ assert.ok(!marketplace.includes("referenceCard.remove()"));
  assert.ok(marketplace.includes('hasHeroPoster(e,"reference")'));
  assert.ok(marketplace.includes('installImages()'));
  assert.ok(style.includes(".hero-carousel .hero-inner"));
