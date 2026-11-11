@@ -61,7 +61,8 @@
           "priceClp": 28000,
           "capacity": 32
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-luces-del-sur",
@@ -94,7 +95,8 @@
           "priceClp": 45000,
           "capacity": 50
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-escena-de-humor",
@@ -127,7 +129,8 @@
           "priceClp": 12000,
           "capacity": 60
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-orbita",
@@ -154,7 +157,8 @@
           "priceClp": 20000,
           "capacity": 100
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-escena-infantil",
@@ -187,7 +191,8 @@
           "priceClp": 8000,
           "capacity": 50
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-jazz-puerto",
@@ -220,7 +225,8 @@
           "priceClp": 13000,
           "capacity": 45
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-norte-vivo",
@@ -247,7 +253,8 @@
           "priceClp": 16000,
           "capacity": 180
         }
-      ]
+      ],
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-travesia",
@@ -273,6 +280,36 @@
           "name": "General",
           "priceClp": 14000,
           "capacity": 110
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-festival-masivo-2027",
+      "organizerId": "org-escena",
+      "title": "Festival de Alta Demanda · DEMO",
+      "subtitle": "Prueba de sala de espera virtual y compra regulada",
+      "category": "Festivales",
+      "genre": "Música / Experiencias",
+      "city": "Concepción",
+      "venue": "Recinto masivo ficticio · DEMO",
+      "date": "2027-05-15",
+      "time": "17:00",
+      "description": "Evento completamente ficticio con seis mil cupos para verificar listas de espera, turnos de compra, seguridad y máximos de entradas por usuario en un servidor de demostración.",
+      "accent": "#83B887",
+      "visual": "M",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "maxTicketsPerPerson": 7,
+      "waitlistEnabled": true,
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 22000,
+          "capacity": 6000
         }
       ]
     }
