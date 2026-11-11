@@ -3,6 +3,7 @@ import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
 import { selectHeroEvents, splitHeroTitle, hasHeroPoster, hasEventDescription } from "./hero-carousel.mjs";
 import { weekBounds } from "./week-events.mjs";
+import { eventRequiresWaitingRoom } from "./waiting-room.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -360,6 +361,34 @@ function renderCheckout(eventId,typeId,qty=1){
  try{summary=pricePreview(eventId,typeId,qty);}catch(err){$("#checkout-content").innerHTML='<p class="load-error">'+esc(err.message)+'</p>';return;}
  $("#checkout-content").innerHTML='<div class="checkout-head"><div class="detail-kicker">CUENTA VERIFICADA · COMPRA DE PRUEBA</div><h2 id="checkout-title">Tus entradas.</h2><p>'+esc(e.title)+' · '+esc(date(e.date))+' · '+esc(e.venue)+'</p><p class="signed-buyer">Sesión iniciada: '+esc(buyer.email)+'</p></div><form id="demo-checkout" class="checkout-form"><div class="checkout-controls"><label>Tipo de entrada<select name="ticketType">'+e.ticketTypes.map(t=>'<option value="'+esc(t.id)+'" '+(t.id===typeId?"selected":"")+'>'+esc(t.name)+'</option>').join("")+'</select></label><label>Cantidad<select name="quantity">'+Array.from({length:maxQuantity},(_,i)=>i+1).map(n=>'<option value="'+n+'" '+(n===qty?"selected":"")+'>'+n+'</option>').join("")+'</select></label></div><div class="fee-summary"><div><span>Entrada base × '+qty+'</span><strong>'+clp(summary.faceValueClp)+'</strong></div><div><span>Cargo por servicio × '+qty+'</span><strong>'+clp(summary.serviceFeeClp)+'</strong></div><div class="fee-total"><span>Total del comprador</span><strong>'+clp(summary.totalClp)+'</strong></div><small>Los cargos de esta simulación están incluidos. No se efectuará ningún cobro.</small></div>'+(insufficient?'<p class="load-error" role="alert">Solo quedan '+remaining+' cupos de prueba para esta selección.</p>':'')+'<label class="ack"><input type="checkbox" required name="acceptDemo"> Entiendo que es una simulación sin pago, reserva ni boleto válido.</label><button type="submit" class="checkout-submit" '+(insufficient?'disabled':'')+'>Continuar pedido de prueba · '+clp(summary.totalClp)+' ↗</button></form>';
 }
+function renderWaitingRoom(eventId,typeId,entry,message=""){
+ const event=selectedEvent(eventId);if(!event)return;
+ ui.checkout=null;
+ const status=entry?.status||"not_joined";
+ if(status==="admitted"){renderCheckout(eventId,typeId,1);return;}
+ const waiting=status==="waiting";
+ const label=waiting?"En lista de espera · posición "+esc(entry.position??"pendiente")
+  :status==="expired"?"Tu turno caducó"
+  :status==="used"?"Tu turno ya fue utilizado"
+  :status==="cancelled"?"Saliste de la lista de espera":"Acceso regulado";
+ const controls=waiting
+  ?'<button type="button" class="checkout-submit" data-waitlist-action="refresh">Actualizar mi posición</button><button type="button" class="waitlist-secondary" data-waitlist-action="leave">Abandonar lista</button>'
+  :'<button type="button" class="checkout-submit" data-waitlist-action="join">Ingresar a la lista de espera</button>';
+ $("#checkout-content").innerHTML='<div class="checkout-head"><div class="detail-kicker">LISTA DE ESPERA · DEMO</div>'+
+  '<h2 id="checkout-title">Espera tu turno.</h2><p>'+esc(event.title)+'</p>'+
+  '<p>La posición y el permiso de compra son asignados por el servidor al comprador autenticado. Modificar esta página no habilita una compra.</p>'+
+  '</div><div class="waitlist-panel" role="status" aria-live="polite"><strong>'+label+'</strong><p>'+
+  (waiting?'Cuando haya acceso, actualiza tu posición para continuar con la selección de entradas.':'Solo podrás comprar al recibir un turno activo de prueba.')+
+  '</p>'+(message?'<p class="waitlist-feedback">'+esc(message)+'</p>':'')+
+  '<div class="waitlist-actions">'+controls+'</div></div>';
+}
+async function checkWaitingRoom(eventId,typeId,action="status"){
+ const entry=action==="status"
+  ?await buyerRequest("waitlist/status?eventId="+encodeURIComponent(eventId),undefined,"GET")
+  :await buyerRequest("waitlist/"+action,{eventId});
+ renderWaitingRoom(eventId,typeId,entry);
+ return entry;
+}
 async function openCheckout(eventId,typeId){
  closeModal("#detail-backdrop",false);
  await refreshBuyer();
@@ -369,7 +398,12 @@ async function openCheckout(eventId,typeId){
  ui.lastFocus=document.activeElement;
  $("#checkout-backdrop").hidden=false;document.body.classList.add("dialog-open");
  ui.checkout=null;
- renderCheckout(eventId,typeId,1);$("#checkout-dialog").focus();
+ ui.waitlistEvent={eventId,typeId};
+ if(eventRequiresWaitingRoom(selectedEvent(eventId))){
+  try{await checkWaitingRoom(eventId,typeId);}
+  catch(err){renderWaitingRoom(eventId,typeId,{status:"not_joined"},err.message);}
+ }else renderCheckout(eventId,typeId,1);
+ $("#checkout-dialog").focus();
 }
 function orderSuccess(order){
  ui.checkout=null;
@@ -510,6 +544,15 @@ async function start(){
   if(target.closest("[data-close-detail]")||target.id==="detail-backdrop"){closeModal("#detail-backdrop");return;}
   if(target.closest("[data-close-checkout]")||target.id==="checkout-backdrop"){closeModal("#checkout-backdrop");renderCards();return;}
   if(target.closest("[data-clear-filters]"))resetFilters();
+ });
+ $("#checkout-content").addEventListener("click",async ev=>{
+  const control=ev.target.closest("[data-waitlist-action]");
+  if(!control || control.disabled)return;
+  const eventId=ui.waitlistEvent?.eventId,typeId=ui.waitlistEvent?.typeId;
+  if(!eventId||!typeId)return;
+  control.disabled=true;
+  try{await checkWaitingRoom(eventId,typeId,control.dataset.waitlistAction==="refresh"?"status":control.dataset.waitlistAction);}
+  catch(error){renderWaitingRoom(eventId,typeId,{status:"not_joined"},error.message);}
  });
  $("#checkout-content").addEventListener("change",ev=>{
   if(!ui.checkout)return;
