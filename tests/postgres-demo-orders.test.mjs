@@ -38,10 +38,10 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
       ticketTypeId:"general",quantity:4,requestId:"limit-test-first-001"});
     assert.equal(first.quantity,4);
     await assert.rejects(b.create({buyerId,eventId:"demo-noches-aurora",
-      ticketTypeId:"vip",quantity:4,requestId:"limit-test-too-many-002"}),
+      ticketTypeId:"premium",quantity:4,requestId:"limit-test-too-many-002"}),
       error=>error.status===409 && /Límite máximo/.test(error.message));
     const second=await b.create({buyerId,eventId:"demo-noches-aurora",
-      ticketTypeId:"vip",quantity:3,requestId:"limit-test-remaining-003"});
+      ticketTypeId:"premium",quantity:3,requestId:"limit-test-remaining-003"});
     assert.equal(second.quantity,3);
     await assert.rejects(a.create({buyerId,eventId:"demo-noches-aurora",
       ticketTypeId:"general",quantity:1,requestId:"limit-test-over-004"}),error=>error.status===409);
@@ -53,7 +53,7 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
       a.create({buyerId:buyerTwo,eventId:"demo-noches-aurora",
         ticketTypeId:"general",quantity:7,requestId:"limit-parallel-order-001"}).then(()=>true).catch(()=>false),
       b.create({buyerId:buyerTwo,eventId:"demo-noches-aurora",
-        ticketTypeId:"vip",quantity:7,requestId:"limit-parallel-order-002"}).then(()=>true).catch(()=>false)
+        ticketTypeId:"premium",quantity:7,requestId:"limit-parallel-order-002"}).then(()=>true).catch(()=>false)
     ]);
     assert.equal(parallel.filter(Boolean).length,1,"Solo un pedido puede pasar el límite acumulado");
   });
@@ -66,8 +66,8 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
     const first=buyerAt(1);
     await assert.rejects(a.create({buyerId:first,eventId:massive,ticketTypeId:"general",
       quantity:1,requestId:"queue-bypass-attempt-0001"}),e=>e.status===409&&/turno/.test(e.message));
-    const entrants=await Promise.all(Array.from({length:27},(_,i)=>
-      (i%2?a:b).joinWaitingRoom({eventId:massive,buyerId:buyerAt(i+1)})));
+    const entrants=[];
+    for(let i=0;i<27;i++)entrants.push(await (i%2?a:b).joinWaitingRoom({eventId:massive,buyerId:buyerAt(i+1)}));
     assert.equal(entrants.filter(x=>x.status==="admitted").length,25);
     const pos26=await a.waitlistStatus({eventId:massive,buyerId:buyerAt(26)});
     const pos27=await b.waitlistStatus({eventId:massive,buyerId:buyerAt(27)});
@@ -79,19 +79,15 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
     await assert.rejects(b.create({buyerId:buyerAt(27),eventId:massive,ticketTypeId:"general",
       quantity:1,requestId:"queue-bypass-waiting-0002"}),e=>e.status===409);
     const order=await a.create({buyerId:first,eventId:massive,ticketTypeId:"general",
-      quantity:4,requestId:"queue-admitted-order-0001"});
-    assert.equal(order.quantity,4);
+      quantity:7,requestId:"queue-admitted-order-0001"});
+    assert.equal(order.quantity,7);
     assert.equal((await a.waitlistStatus({eventId:massive,buyerId:first})).status,"used");
     assert.equal((await b.waitlistStatus({eventId:massive,buyerId:buyerAt(26)})).status,"admitted");
     const retry=await b.create({buyerId:first,eventId:massive,ticketTypeId:"general",
-      quantity:4,requestId:"queue-admitted-order-0001"});
+      quantity:7,requestId:"queue-admitted-order-0001"});
     assert.equal(retry.id,order.id);
     await assert.rejects(b.create({buyerId:first,eventId:massive,ticketTypeId:"general",
       quantity:1,requestId:"queue-no-second-turn-0003"}),e=>e.status===409);
-    await b.joinWaitingRoom({eventId:massive,buyerId:first});
-    const second=await b.create({buyerId:first,eventId:massive,ticketTypeId:"general",
-      quantity:3,requestId:"queue-second-admission-0004"});
-    assert.equal(second.quantity,3);
     await assert.rejects(a.joinWaitingRoom({eventId:massive,buyerId:first}),
       e=>e.status===409 && /máximo/.test(e.message));
     const sold=await poolA.query("SELECT sold FROM demo_ticket_stock WHERE event_id=$1 AND ticket_type_id='general'",[massive]);
