@@ -7,6 +7,7 @@
  * The supplied pool must implement query() and connect() (node-postgres API).
  */
 import { seedCommerce, quote, simulateOrder, eventTicketLimit } from "../src/commerce-domain.mjs";
+import { createPostgresDemoWaitlist } from "./postgres-demo-waitlist.mjs";
 
 const bad = (status, message) => Object.assign(new Error(message), { status });
 const toOrder = row => ({
@@ -30,8 +31,10 @@ export function createPostgresDemoOrders({ pool, catalog }) {
   }
   const seed = seedCommerce(catalog);
   const published = seed.events.filter(e => e.status === "published");
+  const waiting=createPostgresDemoWaitlist({pool,catalog});
 
   async function initialize() {
+    await pool.query("SELECT entry_id FROM demo_waitlist LIMIT 0"); // db/005 required
     // Existing capacity and sold counts must never be reset on server restarts.
     // An explicit migration is required to change an event's capacity.
     for (const event of published) {
@@ -121,6 +124,10 @@ export function createPostgresDemoOrders({ pool, catalog }) {
       if(Number(purchased.rows[0].total)+quantity>maxPerBuyer)
         throw bad(409,"Límite máximo de boletos por persona excedido");
 
+      // A massive event requires a server-owned admitted FIFO turn. This is
+      // checked inside the same transaction as stock and ticket allocation.
+      const admission=await waiting.requireAdmission(client,{eventId,buyerId});
+
       const stock = await client.query(
         `SELECT capacity, sold FROM demo_ticket_stock
          WHERE event_id = $1 AND ticket_type_id = $2 FOR UPDATE`,
@@ -154,6 +161,7 @@ export function createPostgresDemoOrders({ pool, catalog }) {
         [order.id, buyerId, requestId, eventId, ticketTypeId, order.organizerId,
          quantity, JSON.stringify(order.pricing), order.createdAt]
       );
+      await waiting.consumeAdmission(client,admission,eventId);
       await client.query("COMMIT");
       active = false;
       return { ...order, requestId };
@@ -165,5 +173,8 @@ export function createPostgresDemoOrders({ pool, catalog }) {
     }
   }
 
-  return { initialize, inventory, ordersForBuyer, create };
+  return { initialize, inventory, ordersForBuyer, create,
+    joinWaitingRoom:waiting.joinWaitingRoom,
+    leaveWaitingRoom:waiting.leaveWaitingRoom,
+    waitlistStatus:waiting.waitlistStatus };
 }
