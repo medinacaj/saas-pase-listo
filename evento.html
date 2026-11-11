@@ -61,6 +61,19 @@
       <h2 id="venue-heading">Sobre el recinto.</h2>
       <p id="venue-description"></p>
       <div class="event-page-location"><span aria-hidden="true">⌖</span><span id="venue-location"></span></div>
+      <div class="venue-geolocation" aria-labelledby="venue-geolocation-heading">
+       <div class="venue-geolocation-head">
+        <h3 id="venue-geolocation-heading">Ubicación geográfica</h3>
+        <span id="venue-geolocation-status" class="venue-geolocation-status">Verificando mapa</span>
+       </div>
+       <div id="venue-geolocation-map" class="venue-geolocation-map" role="region" aria-label="Ubicación del recinto en OpenStreetMap"></div>
+       <p id="venue-geolocation-note" class="venue-geolocation-note"></p>
+       <div class="venue-geolocation-actions">
+        <a id="venue-geolocation-link" class="venue-geolocation-link" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer" hidden>Abrir ubicación en OpenStreetMap <span aria-hidden="true">↗</span></a>
+        <a id="venue-geolocation-search" class="venue-geolocation-search" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer" hidden>Buscar recinto en OpenStreetMap <span aria-hidden="true">↗</span></a>
+       </div>
+       <p class="venue-geolocation-credit">Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">colaboradores de OpenStreetMap</a></p>
+      </div>
       <div class="venue-details-grid" aria-label="Información práctica del recinto">
        <div><small>DIRECCIÓN EXACTA</small><strong id="venue-address"></strong></div>
        <div><small>APERTURA DE PUERTAS</small><strong id="venue-doors"></strong></div>
