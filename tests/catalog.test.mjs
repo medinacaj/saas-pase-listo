@@ -141,3 +141,19 @@ test("Centro de Control conserva atribución pero no publica enlaces externos en
  assert.doesNotMatch(references,/href=/);
  assert.doesNotMatch(references,/sourceUrl|posterSourceUrl/);
 });
+
+test("la portada solo muestra eventos reales y conserva DEMO fuera del catálogo visible",()=>{
+ assert.ok(portal.includes('id="real-events-grid"'));
+ assert.ok(portal.includes('id="events-grid" hidden aria-hidden="true"'));
+ assert.doesNotMatch(portal,/Compra de demostración|EVENTOS FICTICIOS|Prueba la selección de entradas/);
+ assert.match(portal,/Eventos reales/);
+ assert.match(portal,/Cartelera de referencia/);
+ assert.match(marketplace,/function allCatalogEvents\(\)\{return realEvents\(\);\}/);
+ assert.match(marketplace,/const real=realEvents\(\)\.filter\(matches\)/);
+ assert.match(marketplace,/\$\("#events-grid"\)\.replaceChildren\(\)/);
+ assert.match(marketplace,/selectHeroEvents\(realSamples,\[\],current\(\),6\)/);
+ assert.match(marketplace,/eventos reales de referencia/);
+ assert.doesNotMatch(marketplace,/eventos de compra DEMO/);
+ // Preserve internal purchase simulations and their test coverage, not public sales.
+ assert.ok(demo.events.length>=8);
+});
