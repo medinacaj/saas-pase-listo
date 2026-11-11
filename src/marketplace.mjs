@@ -329,44 +329,6 @@ function orderSuccess(order){
  $("#checkout-content").innerHTML='<div class="demo-success"><div class="success-symbol" aria-hidden="true">✓</div><div class="detail-kicker">PEDIDO DE PRUEBA REGISTRADO</div><h2 id="checkout-title">¡Simulación completada!</h2><p>Este registro de prueba está asociado a tu cuenta de desarrollo. No hay pago, reserva real ni entrada válida.</p><div class="demo-receipt"><span>N.º de simulación</span><strong>'+esc(order.id)+'</strong><span>Evento</span><strong>'+esc(event?.title||"Evento DEMO")+'</strong><span>Total teórico</span><strong>'+clp(order.pricing.totalClp)+'</strong></div><button type="button" data-close-checkout class="checkout-submit">Volver a la cartelera ↗</button></div>';
 }
 function resetFilters(){ui.query="";ui.category="Todos";ui.city="all";ui.period="all";$("#event-search").value="";$("#date-filter").value="all";filters();renderCards();}
-const isLocalPreview=["localhost","127.0.0.1","[::1]"].includes(location.hostname);
-const isInternalLab=isLocalPreview && new URLSearchParams(location.search).get("modo")==="pruebas";
-function setupPurchaseLab(){
- const link=$("#lab-trigger"),panel=$("#lab-testing");
- if(link)link.hidden=!isLocalPreview;
- if(!panel || !isInternalLab)return;
- panel.hidden=false;
- const eventSelect=$("#lab-event"),ticketSelect=$("#lab-ticket");
- const events=allEvents();
- eventSelect.replaceChildren();
- for(const event of events){
-  const option=document.createElement("option");
-  option.value=event.id;option.textContent=event.title+" · "+event.city;
-  eventSelect.append(option);
- }
- function updateTickets(){
-  const event=events.find(item=>item.id===eventSelect.value);
-  ticketSelect.replaceChildren();
-  if(!event)return;
-  for(const type of event.ticketTypes||[]){
-   const option=document.createElement("option");
-   option.value=type.id;
-   option.textContent=type.name+" · "+clp(type.priceClp)+" base";
-   ticketSelect.append(option);
-  }
-  $("#lab-event-description").textContent=event.description||"Evento ficticio de prueba";
- }
- eventSelect.addEventListener("change",updateTickets);
- updateTickets();
- $("#lab-feedback").textContent="Solo funciona con el servidor local de compradores (npm run api:buyers). No genera entradas ni pagos reales.";
- $("#lab-checkout-form").addEventListener("submit",async ev=>{
-  ev.preventDefault();
-  const eventId=eventSelect.value,ticketTypeId=ticketSelect.value;
-  if(!events.some(item=>item.id===eventId && item.ticketTypes.some(t=>t.id===ticketTypeId)))return;
-  try{await openCheckout(eventId,ticketTypeId);}
-  catch(error){$("#lab-feedback").textContent=error.message;}
- });
-}
 
 async function start(){
  try{
@@ -379,7 +341,6 @@ async function start(){
   store=loadCommerce(catalog);
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
-  setupPurchaseLab();
 
   refreshBuyer();
  }catch(err){
