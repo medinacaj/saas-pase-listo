@@ -1,7 +1,7 @@
 import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
 import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
-import { DEMO_REFERENCE_TIERS, referenceQuote, referenceOrderReceipt } from "./reference-checkout.mjs";
+import { DEMO_REFERENCE_TIERS, referenceQuote, referenceOrderReceipt, referenceTicketLimit } from "./reference-checkout.mjs";
 import { locateVenue, googleMapsEmbedUrl, googleMapsLocationUrl, googleMapsVenueSearchUrl } from "./venue-geolocation.mjs";
 
 
@@ -165,6 +165,14 @@ function renderReferenceCheckout(event){
  const tiers=DEMO_REFERENCE_TIERS;
  let selectedId=tiers[0].id;
  const quantity=$("#reference-ticket-quantity");
+ const maxQuantity=referenceTicketLimit(event);
+ quantity.replaceChildren();
+ for(let n=1;n<=maxQuantity;n++){
+  const option=document.createElement("option");
+  option.value=String(n);option.textContent=n+" entrada"+(n===1?"":"s");
+  quantity.append(option);
+ }
+
  const step=$("#reference-checkout-step");
  const choose=$("#reference-checkout-select");
  const review=$("#reference-checkout-review");
@@ -242,7 +250,7 @@ function renderReferenceCheckout(event){
  });
  renderChoice();
  setText("#ticket-disclaimer",
-  "SIMULADOR: sectores, precios, cupos y cargos son ficticios. El organizador de este evento no vende entradas a través de PaseListo. No solicitamos datos bancarios ni personales.");
+  "Máximo de "+maxQuantity+" boletos por persona en esta simulación. SIMULADOR: sectores, precios, cupos y cargos son ficticios. El organizador de este evento no vende entradas a través de PaseListo. No solicitamos datos bancarios ni personales.");
 }
 
 function renderTickets(event,store,reference,inventory) {
