@@ -150,3 +150,12 @@ El comprador **no tiene que entrar a un laboratorio separado**. La página `inde
 Los eventos de terceros no tienen inventario, condiciones comerciales ni precios autorizados para venta. Se indica claramente en la ficha que **todos los valores y zonas de la prueba son ficticios**; no se recopilan datos bancarios ni personales, no se genera un cobro y no se presenta la prueba como una compra de ese espectáculo. Esta simulación de interfaz funciona también en GitHub Pages, sin backend, pero **no prueba la persistencia, la autenticación ni la disponibilidad real**.
 
 Las pruebas de integración técnica de autenticación, aforos y pedidos DEMO siguen operativas en `npm run api:buyers` y `npm test` utilizando el catálogo ficticio, sin obligar al visitante público a cambiar de experiencia. La implementación del flujo visual está en `src/reference-checkout.mjs` y `src/event-page.mjs`.
+
+
+### Corrección de desaparición de tarjetas (11/11/2026)
+
+Un fallo de manejo de afiches externos hacía que PaseListo **eliminara la tarjeta completa** de la cartelera cuando una URL remota fallaba. También podía interpretar `img.complete=true` con `naturalWidth=0` como error antes de que Safari comenzara a cargar una imagen diferida. La protección del hero, al detectar esa condición, descartaba diapositivas hasta vaciar el carrusel.
+
+Se corrigió `src/marketplace.mjs`: ahora el fallo real del afiche prueba primero la fuente alternativa y, si ninguna carga, conserva el evento y muestra su fallback visual; nunca retira la tarjeta ni excluye permanentemente el ID. La carga diferida solo se considera completada cuando hay ancho natural positivo, mientras que los fallos se manejan en el evento `error` real. El filtro editorial sigue mostrando únicamente referencias con **URL HTTPS de afiche y descripción completa** (6 eventos); ninguna de las 22 referencias fue borrada del JSON.
+
+`tests/poster-resilience.test.mjs` reproduce la carga diferida y los errores de las URLs, y verifica que la tarjeta permanezca. El test también se ejecuta desde el workflow público de `gh-pages`; se versionó el script de inicio para invalidar el caché anterior.
