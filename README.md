@@ -13,7 +13,7 @@ PaseListo es **la ticketera del propietario**, no un software de autoservicio pa
 
 ## Dos tipos de espectáculos, sin confundir permisos
 
-1. **Referencias visuales reales:** seis espectáculos anunciados en Chile, con fechas verificadas y afiches promocionales de terceros enlazados externamente: Gorillaz, Fauna Primavera, Camila, Deep Purple, Cirque du Soleil / Alegría y 31 Minutos. Se usan únicamente para mostrar cómo lucirían fichas reales. **No hay contrato de venta con PaseListo, autorización comercial del afiche, precios o cupos nuestros.** Por eso no ofrecen venta real, pero sus fichas ahora incluyen un **recorrido de compra ficticia sin pago ni reserva** para evaluar la experiencia.
+1. **Referencias visuales reales:** diez espectáculos anunciados en Chile, con fechas verificadas y afiches promocionales de terceros enlazados externamente: Gorillaz, Fauna Primavera, Camila, Deep Purple, Cirque du Soleil / Alegría y 31 Minutos. Se usan únicamente para mostrar cómo lucirían fichas reales. **No hay contrato de venta con PaseListo, autorización comercial del afiche, precios o cupos nuestros.** Por eso no ofrecen venta real, pero sus fichas ahora incluyen un **recorrido de compra ficticia sin pago ni reserva** para evaluar la experiencia.
 2. **Eventos de ensayo comercial:** ocho espectáculos y tres productores **inventados**. Estos muestran tipos de entradas y tarifas. El checkout solo se habilita con inicio de sesión verificado por servidor; GitHub Pages bloquea el pedido al no disponer de backend.
 
 Los datos promocionales reales están en `data/eventos-reales-referencia.json` con sus `sourceUrl`, `posterSourceUrl` y `posterCredit`. No copiamos los archivos de afiches a GitHub y su uso comercial está pendiente de autorización. Si alguna imagen externa no carga, se muestra un fallback tipográfico.
@@ -156,6 +156,17 @@ Las pruebas de integración técnica de autenticación, aforos y pedidos DEMO si
 
 Un fallo de manejo de afiches externos hacía que PaseListo **eliminara la tarjeta completa** de la cartelera cuando una URL remota fallaba. También podía interpretar `img.complete=true` con `naturalWidth=0` como error antes de que Safari comenzara a cargar una imagen diferida. La protección del hero, al detectar esa condición, descartaba diapositivas hasta vaciar el carrusel.
 
-Se corrigió `src/marketplace.mjs`: ahora el fallo real del afiche prueba primero la fuente alternativa y, si ninguna carga, conserva el evento y muestra su fallback visual; nunca retira la tarjeta ni excluye permanentemente el ID. La carga diferida solo se considera completada cuando hay ancho natural positivo, mientras que los fallos se manejan en el evento `error` real. El filtro editorial sigue mostrando únicamente referencias con **URL HTTPS de afiche y descripción completa** (6 eventos); ninguna de las 22 referencias fue borrada del JSON.
+Se corrigió `src/marketplace.mjs`: ahora el fallo real del afiche prueba primero la fuente alternativa y, si ninguna carga, conserva el evento y muestra su fallback visual; nunca retira la tarjeta ni excluye permanentemente el ID. La carga diferida solo se considera completada cuando hay ancho natural positivo, mientras que los fallos se manejan en el evento `error` real. El filtro editorial sigue mostrando únicamente referencias con **URL HTTPS de afiche y descripción completa** (10 eventos); ninguna de las 22 referencias fue borrada del JSON.
 
 `tests/poster-resilience.test.mjs` reproduce la carga diferida y los errores de las URLs, y verifica que la tarjeta permanezca. El test también se ejecuta desde el workflow público de `gh-pages`; se versionó el script de inicio para invalidar el caché anterior.
+
+
+### Recuperación de portada vacía y favicon (11/11/2026)
+
+Se identificó una causa independiente de la carga de afiches: en `gh-pages` faltaba `src/checkout-state.mjs`, importado por `src/marketplace.mjs`. El navegador rechazaba la carga del módulo principal, dejando **la cartelera completamente vacía incluso con datos correctos**. Se publicó el módulo faltante y se añadió `tests/pages-boot.test.mjs`, que recorre todas las importaciones ES de `marketplace.mjs` y `event-page.mjs` y falla el CI si alguna dependencia pública no existe.
+
+Como protección adicional, el HTML de `index.html` **prerenderiza diez tarjetas completas** en `#real-events-grid`: fechas, recintos, descripciones, enlaces individuales e ilustraciones propias alojadas en `assets/event-art/`. Se añaden cuatro espectáculos de la semana actual al grupo de seis referencias que ya tenían afiche: Cypress Hill, Feria del Sanguche, Creamfields Chile y León Gieco. El JavaScript puede sustituir las tarjetas por la versión filtrable, pero si falla el arranque la página sigue mostrando contenido y enlaces. El destacado principal también incluye una imagen/CTA inicial sin esperar al JavaScript.
+
+Las diez ilustraciones son **arte conceptual original de PaseListo, no afiches oficiales ni material autorizado por los organizadores**. Los seis afiches externos anteriores pueden seguir utilizándose como referencia, con los dibujos propios como alternativa si el servidor de terceros bloquea la imagen. No hay ventas reales; el recorrido de compra DEMO existente permanece.
+
+Se rediseñó el favicon `favicon.svg` como entrada verde lima con una P oscura sobre fondo oscuro y se referenció de forma versionada en inicio, detalles y administración. Se conserva la identidad de marca, sin depender de una imagen externa.
