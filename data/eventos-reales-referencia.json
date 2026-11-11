@@ -332,7 +332,8 @@
       "featured": true,
       "accent": "#f8af41",
       "posterFallbackUrl": "https://www.rockaxis.com/rxidashboard/wisi_photos/1772206047_Gorillaz%202.png",
-      "heroPriority": 86
+      "heroPriority": 86,
+      "description": "Gorillaz presenta The Mountain Tour 2026 en el Estadio Bicentenario de La Florida, en Santiago. Fecha y recinto a comprobar con el organizador antes de asistir."
     },
     {
       "id": "ref-fauna-primavera-2026",
@@ -353,7 +354,8 @@
       "featured": true,
       "accent": "#e7bb9b",
       "posterFallbackUrl": "https://uchile-media-storage.nyc3.cdn.digitaloceanspaces.com/2026/06/cartel-fauna-primavera-1-678x847.jpg",
-      "heroPriority": 90
+      "heroPriority": 90,
+      "description": "Fauna Primavera reúne propuestas de música independiente y rock en Parque Ciudad Empresarial, Santiago, entre el 26 y el 28 de noviembre de 2026."
     },
     {
       "id": "ref-camila-2026",
@@ -373,7 +375,8 @@
       "posterCredit": "Afiche promocional alojado en PuntoTicket",
       "featured": true,
       "accent": "#6b3f64",
-      "heroPriority": 93
+      "heroPriority": 93,
+      "description": "Camila presenta su Tour Adiós en Santander Arena, Santiago, el 20 de noviembre de 2026. Esta ficha muestra los datos anunciados como referencia visual."
     },
     {
       "id": "ref-deep-purple-2026",
@@ -392,7 +395,8 @@
       "posterSourceUrl": "https://www.tvn.cl/noticias/tendencias/deep-purple-confirma-concierto-en-chile",
       "posterCredit": "Afiche promocional difundido por TVN",
       "featured": false,
-      "accent": "#33373e"
+      "accent": "#33373e",
+      "description": "Deep Purple visita Santiago con su espectáculo de hard rock en Santander Arena, previsto para el 8 de diciembre de 2026."
     },
     {
       "id": "ref-alegria-2027",
@@ -411,7 +415,8 @@
       "posterSourceUrl": "https://www.voorus.cl/post/cirque-du-soleil-llega-a-chile-con-alegr%C3%ADa",
       "posterCredit": "Afiche promocional difundido por Voorus",
       "featured": false,
-      "accent": "#3c6d61"
+      "accent": "#3c6d61",
+      "description": "Alegría, de Cirque du Soleil, tiene funciones anunciadas en la Gran Carpa de Espacio Riesco, Santiago, durante enero de 2027."
     },
     {
       "id": "ref-31-minutos-2026",
@@ -430,7 +435,8 @@
       "posterSourceUrl": "https://www.puntoticket.com/31-minutos-claro-arena",
       "posterCredit": "Material promocional publicado en PuntoTicket",
       "featured": false,
-      "accent": "#f4793f"
+      "accent": "#f4793f",
+      "description": "31 Minutos presenta Radio Guaripolo en Claro Arena, Santiago, el 20 de diciembre de 2026, como espectáculo familiar."
     }
   ]
 }
