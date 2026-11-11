@@ -74,12 +74,13 @@ test("portada conserva navegación visual y descarta afiches fallidos",async()=>
  const [index,marketplace,style]=await Promise.all([
   read("../index.html"),read("../src/marketplace.mjs"),read("../src/hero-carousel.css")
  ]);
- for(const selector of ["hero-feature-title","hero-feature-link","hero-slide-count","hero-carousel-dots","hero-poster","hero-carousel-controls"]){
+ for(const selector of ["hero-feature-title","hero-feature-link","hero-carousel-dots","hero-poster","hero-carousel-controls"]){
   assert.ok(index.includes('id="'+selector+'"'),selector);
  }
- assert.ok(index.includes('data-hero-step="-1"'));
- assert.ok(index.includes('data-hero-step="1"'));
- assert.ok(index.includes("data-hero-toggle"));
+ assert.equal(index.includes('id="hero-slide-count"'),false);
+ assert.equal(index.includes("data-hero-step"),false);
+ assert.equal(index.includes("data-hero-toggle"),false);
+ assert.ok(index.includes('id="hero-carousel-dots"'));
  assert.ok(marketplace.includes('window.setInterval('));
  assert.ok(marketplace.includes("6500"));
  assert.ok(marketplace.includes("prefers-reduced-motion"));
@@ -93,6 +94,23 @@ test("portada conserva navegación visual y descarta afiches fallidos",async()=>
  assert.ok(marketplace.includes('installImages()'));
  assert.ok(style.includes(".hero-carousel .hero-inner"));
  assert.ok(style.includes(".hero-carousel-dot.is-active"));
+ assert.ok(style.includes("object-fit:cover"));
+ assert.ok(style.includes("position:absolute;inset:0"));
+ assert.ok(style.includes("height:clamp(310px,44svh,345px)"));
+ assert.ok(style.includes(".hero-carousel .hero-poster-bottom{display:none}"));
+ assert.ok(!style.includes("rotate(5deg)"));
+ assert.ok(marketplace.includes('"touchstart"'));
+ assert.ok(marketplace.includes('"touchend"'));
+ assert.ok(marketplace.includes('"touchcancel"'));
+ assert.ok(marketplace.includes('"pointerdown"'));
+ assert.ok(marketplace.includes('"pointerup"'));
+ assert.ok(marketplace.includes("advanceByGesture"));
+ assert.ok(marketplace.includes("Math.abs(dy)*1.3"));
+ assert.ok(marketplace.includes("stopImmediatePropagation"));
+ assert.ok(marketplace.includes('ev.key==="ArrowRight"'));
+ assert.equal(marketplace.includes("#hero-slide-count"),false);
+ assert.equal(marketplace.includes("[data-hero-toggle]"),false);
+ assert.equal(marketplace.includes("data-hero-step"),false);
  assert.ok(!index.includes('id="week-strip"'));
  assert.ok(index.includes('id="real-events-grid"'));
  assert.ok(index.includes('id="events-grid"'));
