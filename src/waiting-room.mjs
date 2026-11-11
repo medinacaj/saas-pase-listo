@@ -79,9 +79,9 @@ export function joinWaitingRoom(store,eventId,buyerId,now=Date.now()){
  reconcileWaitingRoom(store,eventId,now);
  const list=queue(store);
  const active=list.filter(e=>e.eventId===eventId&&["waiting","admitted"].includes(e.status));
- if(active.length>=WAITLIST_MAX_ENTRIES)fail("Lista de espera temporalmente completa");
  let row=list.find(e=>e.eventId===eventId&&e.buyerId===buyerId);
  if(!row||!["waiting","admitted"].includes(row.status)){
+  if(active.length>=WAITLIST_MAX_ENTRIES)fail("Lista de espera temporalmente completa");
   if(row){row.joinedAt=now;row.sequence=Math.max(0,...list.map(e=>e.sequence||0))+1;
    row.status="waiting";row.expiresAt=null;}
   else list.push({eventId,buyerId,joinedAt:now,
