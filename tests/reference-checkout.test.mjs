@@ -35,7 +35,7 @@ test("la simulación nunca genera pagos, reservas ni entradas reales",()=>{
 test("las fichas reales tienen imágenes y descripción pero precios oficiales no atribuidos",async()=>{
  const catalog=JSON.parse(await readFile(new URL("../data/eventos-reales-referencia.json",import.meta.url),"utf8"));
  const examples=catalog.events.filter(e=>Boolean(e.posterUrl));
- assert.equal(examples.length,6);
+ assert.equal(examples.length,10);
  assert.ok(examples.every(e=>e.description?.length>=40));
  assert.ok(examples.every(e=>!e.ticketTypes && !e.priceClp && !e.saleEnabled));
  const page=await readFile(new URL("../src/event-page.mjs",import.meta.url),"utf8");
