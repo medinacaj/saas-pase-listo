@@ -1,6 +1,7 @@
 import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
 import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
+import { locateVenue, osmEmbedUrl, osmLocationUrl, osmVenueSearchUrl } from "./venue-geolocation.mjs";
 
 
 const $ = selector => document.querySelector(selector);
@@ -45,6 +46,49 @@ function renderPoster(event,reference) {
   img.addEventListener("error",()=>{frame?.classList.add("image-failed");img.remove();},{once:true});
   if(img.complete && img.naturalWidth>0)frame?.classList.add("loaded");
  }
+}
+
+function renderGeolocation(event,reference,registry) {
+ const map=$("#venue-geolocation-map");
+ const status=$("#venue-geolocation-status");
+ const note=$("#venue-geolocation-note");
+ const link=$("#venue-geolocation-link");
+ const search=$("#venue-geolocation-search");
+ map.replaceChildren();
+ link.hidden=true;
+ search.hidden=true;
+ if(!reference) {
+  status.textContent="Recinto ficticio";
+  const message=document.createElement("p");
+  message.className="venue-geolocation-unavailable";
+  message.textContent="Este recinto pertenece a la demostración y no tiene una dirección real.";
+  map.append(message);
+  note.textContent="El plano de zonas que aparece más arriba es también ilustrativo.";
+  return;
+ }
+ const venue=locateVenue(event,registry);
+ if(!venue) {
+  status.textContent="Ubicación no verificada";
+  const message=document.createElement("p");
+  message.className="venue-geolocation-unavailable";
+  message.textContent="Todavía no tenemos coordenadas contrastadas de este recinto. No mostraremos un marcador aproximado.";
+  map.append(message);
+  note.textContent="Puedes comprobar el nombre del lugar mediante la búsqueda externa, pero confirma la dirección y accesos con el organizador.";
+  search.href=osmVenueSearchUrl(event);
+  search.hidden=false;
+  return;
+ }
+ status.textContent="Recinto localizado";
+ const iframe=document.createElement("iframe");
+ iframe.src=osmEmbedUrl(venue);
+ iframe.title="Mapa de "+event.venue+", "+event.city+", Chile";
+ iframe.loading="lazy";
+ iframe.referrerPolicy="strict-origin-when-cross-origin";
+ iframe.setAttribute("aria-label","Mapa interactivo de la ubicación del recinto");
+ map.append(iframe);
+ note.textContent=venue.note||"El marcador señala el recinto, no necesariamente la puerta de ingreso. Verifica los accesos antes de asistir.";
+ link.href=osmLocationUrl(venue);
+ link.hidden=false;
 }
 
 function renderVenue(event,reference) {
@@ -289,9 +333,11 @@ async function start() {
   return;
  }
  try{
-  const [demoResponse,refsResponse]=await Promise.all([
+  const [demoResponse,refsResponse,geoRegistry]=await Promise.all([
    fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),
-   fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"})
+   fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"}),
+   fetch("./data/recintos-openstreetmap.json")
+    .then(response=>response.ok?response.json():null).catch(()=>null)
   ]);
   if(!demoResponse.ok||!refsResponse.ok)throw Error("Catálogo no disponible");
   const catalog=await demoResponse.json(),refs=await refsResponse.json();
@@ -319,6 +365,7 @@ async function start() {
   setText("#event-organizer",reference?event.organizer:(store.organizers.find(o=>o.id===event.organizerId)?.name||"Organizador DEMO"));
   renderPoster(event,reference);
   renderVenue(event,reference);
+  renderGeolocation(event,reference,geoRegistry);
   $("#event-page-status").hidden=true;
   $("#event-page-view").hidden=false;
   const inventory=reference?{enabled:false}:await loadInventory();
