@@ -1,6 +1,6 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
-import { selectHeroEvents, splitHeroTitle } from "./hero-carousel.mjs";
+import { selectHeroEvents, splitHeroTitle, hasHeroPoster } from "./hero-carousel.mjs";
 import { weekBounds } from "./week-events.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
@@ -16,7 +16,8 @@ const ui={query:"",category:"Todos",city:"all",period:"all",eventId:null,checkou
 let buyer=null;
 let buyerApiReady=false;
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
-function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
+const brokenReferenceImages=new Set();
+function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return [...realEvents(),...allEvents()];}
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
@@ -87,6 +88,17 @@ function installImages(){
    const fallback=img.dataset.fallback;
    if(fallback&&!img.dataset.tried){img.dataset.tried="1";img.src=fallback;return;}
    frame?.classList.add("image-failed");
+   const referenceCard=img.closest(".event-card.reference-event");
+   if(referenceCard){
+    const id=referenceCard.querySelector("[data-real-detail]")?.dataset.realDetail;
+    if(id)brokenReferenceImages.add(id);
+    referenceCard.remove();
+    const referenceCount=$("#real-events-grid .event-card").length;
+    const demoCount=$("#events-grid .event-card").length;
+    $("#results-description").textContent=referenceCount+" referencias reales y "+demoCount+" eventos de compra DEMO";
+    $("#event-count").textContent=(referenceCount+demoCount)+" fichas de ejemplo";
+    $("#empty-state").hidden=(referenceCount+demoCount)>0;
+   }
    img.remove();
   };
   img.addEventListener("load",loaded,{once:true});
@@ -126,6 +138,7 @@ function renderCards(){
 }
 
 let heroSlides=[];
+const heroBrokenIds=new Set();
 let heroIndex=0;
 let heroTimer=null;
 let heroPaused=false;
@@ -181,7 +194,23 @@ function showHeroSlide(manual=false){
   void node.offsetWidth;
   node.classList.add("is-changing");
  }
- installImages();
+ const heroImage=card.querySelector("img.poster-img");
+ if(heroImage){
+  const skipBrokenImage=()=>{
+   queueMicrotask(()=>{
+    // Let installImages try a configured backup before excluding this slide.
+    if(heroSlides[heroIndex]?.id!==event.id || heroImage.isConnected)return;
+    heroBrokenIds.add(event.id);
+    renderFeatured();
+   });
+  };
+  heroImage.addEventListener("error",skipBrokenImage);
+  installImages();
+  if(!heroImage.isConnected)skipBrokenImage();
+ }else{
+  heroBrokenIds.add(event.id);
+  queueMicrotask(renderFeatured);
+ }
 }
 function chooseHero(index,manual=true){
  if(heroSlides.length===0)return;
@@ -190,7 +219,8 @@ function chooseHero(index,manual=true){
  scheduleHero();
 }
 function renderFeatured(){
- heroSlides=selectHeroEvents(realSamples,publishedEvents(store),current(),6);
+ heroSlides=selectHeroEvents(realSamples,publishedEvents(store),current(),6)
+  .filter(event=>!heroBrokenIds.has(event.id));
  heroIndex=0;
  const dots=$("#hero-carousel-dots");
  dots.replaceChildren();
