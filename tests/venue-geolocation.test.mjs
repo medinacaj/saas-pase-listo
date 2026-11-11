@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
- venueKey, locateVenue, osmEmbedUrl, osmLocationUrl, osmVenueSearchUrl
+ venueKey, locateVenue, googleMapsEmbedUrl, googleMapsLocationUrl, googleMapsVenueSearchUrl
 } from "../src/venue-geolocation.mjs";
 
 const read=async name=>readFile(new URL(name,import.meta.url),"utf8");
@@ -33,22 +33,26 @@ test("registro OSM: coordenadas únicas y respaldadas para recintos reales",()=>
  assert.ok(real.events.filter(event=>locateVenue(event,registry)).length>=16);
 });
 
-test("OSM ofrece mapa integrado con pin y enlace directo al mismo lugar",()=>{
+test("Google Maps incorpora coordenadas del recinto con enlace externo",()=>{
  const place=locateVenue({venue:"Teatro Caupolicán",city:"Santiago"},registry);
- const url=new URL(osmEmbedUrl(place));
- assert.equal(url.origin,"https://www.openstreetmap.org");
- assert.equal(url.pathname,"/export/embed.html");
- assert.equal(url.searchParams.get("layer"),"mapnik");
- assert.equal(url.searchParams.get("marker"),"-33.45622,-70.64924");
- const bbox=url.searchParams.get("bbox").split(",").map(Number);
- assert.equal(bbox.length,4);
- assert.ok(bbox[0]<place.lon && bbox[2]>place.lon);
- assert.ok(bbox[1]<place.lat && bbox[3]>place.lat);
- const direct=new URL(osmLocationUrl(place));
- assert.equal(direct.origin,url.origin);
- assert.equal(direct.searchParams.get("mlat"),String(place.lat));
- assert.equal(direct.searchParams.get("mlon"),String(place.lon));
- assert.ok(direct.hash.startsWith("#map=16/"));
+ const url=new URL(googleMapsEmbedUrl(place));
+ assert.equal(url.origin,"https://maps.google.com");
+ assert.equal(url.pathname,"/maps");
+ assert.equal(url.searchParams.get("output"),"embed");
+ assert.equal(url.searchParams.get("q"),"-33.45622,-70.64924");
+ assert.equal(url.searchParams.get("z"),"16");
+ assert.equal(url.searchParams.get("hl"),"es");
+ const official=new URL(googleMapsEmbedUrl(place,"AIzaExampleGoogleMapsPublicRestrictedKey123"));
+ assert.equal(official.origin,"https://www.google.com");
+ assert.equal(official.pathname,"/maps/embed/v1/place");
+ assert.equal(official.searchParams.get("q"),"-33.45622,-70.64924");
+ assert.equal(official.searchParams.get("zoom"),"16");
+ assert.throws(()=>googleMapsEmbedUrl(place,"invalid key"),/Clave pública/);
+ const direct=new URL(googleMapsLocationUrl(place));
+ assert.equal(direct.origin,"https://www.google.com");
+ assert.equal(direct.searchParams.get("api"),"1");
+ assert.equal(direct.searchParams.get("query"),"-33.45622,-70.64924");
+ assert.ok(direct.pathname.includes("/maps/search/"));
 });
 
 test("sin coordenadas acreditadas no se asigna marcador ni se geocodifica por lotes",()=>{
@@ -58,15 +62,16 @@ test("sin coordenadas acreditadas no se asigna marcador ni se geocodifica por lo
  assert.equal(locateVenue({venue:"Santander Arena",city:"Santiago"},{
   venues:[{venue:"Santander Arena",city:"Santiago",country:"Chile",lat:120,lon:20,source:"https://mapcarta.com/es/x"}]
  }),null);
- assert.throws(()=>osmEmbedUrl({lat:NaN,lon:50}),/Coordenadas inválidas/);
- assert.throws(()=>osmLocationUrl({lat:-33,lon:Infinity}),/Coordenadas inválidas/);
- const url=new URL(osmVenueSearchUrl({venue:"Parque Ciudad Empresarial",city:"Santiago"}));
- assert.equal(url.origin,"https://www.openstreetmap.org");
- assert.equal(url.pathname,"/search");
+ assert.throws(()=>googleMapsEmbedUrl({lat:NaN,lon:50}),/Coordenadas inválidas/);
+ assert.throws(()=>googleMapsLocationUrl({lat:-33,lon:Infinity}),/Coordenadas inválidas/);
+ const url=new URL(googleMapsVenueSearchUrl({venue:"Parque Ciudad Empresarial",city:"Santiago"}));
+ assert.equal(url.origin,"https://www.google.com");
+ assert.equal(url.pathname,"/maps/search/");
  assert.equal(url.searchParams.get("query"),"Parque Ciudad Empresarial, Santiago, Chile");
+ assert.equal(url.searchParams.get("api"),"1");
 });
 
-test("ficha usa mapa OSM perezoso, conserva atribución y distingue plano de zonas",async()=>{
+test("ficha usa Google Maps perezoso, fuente visible y plano de zonas independiente",async()=>{
  const [html,js,css,server,packageJson]=await Promise.all([
   read("../evento.html"),read("../src/event-page.mjs"),read("../src/event-page.css"),
   read("../server/buyer-server.mjs"),read("../package.json").then(JSON.parse)
@@ -76,14 +81,16 @@ test("ficha usa mapa OSM perezoso, conserva atribución y distingue plano de zon
   assert.ok(html.includes('id="'+id+'"'),id);
  }
  assert.ok(html.includes('id="venue-zone-map"'),"El mapa de categorías debe permanecer");
- assert.ok(html.includes("colaboradores de OpenStreetMap"));
+ assert.ok(html.includes("Google Maps"));
+ assert.ok(html.includes("Coordenadas de referencia"));
+ assert.ok(html.includes('name="google-maps-embed-key"'));
  assert.ok(js.includes("renderGeolocation(event,reference,geoRegistry)"));
  assert.ok(js.includes("locateVenue(event,registry)"));
  assert.ok(js.includes('iframe.loading="lazy"'));
  assert.ok(js.includes('iframe.referrerPolicy="strict-origin-when-cross-origin"'));
- assert.ok(js.includes("osmEmbedUrl(venue)"));
- assert.ok(js.includes("osmLocationUrl(venue)"));
- assert.ok(js.includes("osmVenueSearchUrl(event)"));
+ assert.ok(js.includes("googleMapsEmbedUrl(venue,publicMapsKey)"));
+ assert.ok(js.includes("googleMapsLocationUrl(venue)"));
+ assert.ok(js.includes("googleMapsVenueSearchUrl(event)"));
  assert.ok(js.includes("Este recinto pertenece a la demostración"));
  assert.ok(js.includes("No mostraremos un marcador aproximado"));
  assert.ok(css.includes(".venue-geolocation-map iframe"));
