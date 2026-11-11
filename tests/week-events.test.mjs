@@ -57,7 +57,8 @@ test("la semana real del 9 al 15 de noviembre tiene eventos contrastados",async(
  assert.ok(selection.upcoming.every(e=>e.date>"2026-11-15"));
  const sources=refs.events.filter(e=>e.date>="2026-11-10"&&e.date<="2026-11-15");
  assert.ok(sources.every(e=>e.sourceUrl.startsWith("https://")&&e.verifiedOn==="2026-11-10"));
- assert.ok(sources.every(e=>!e.ticketTypes&&!e.priceClp&&!e.posterUrl));
+ assert.ok(sources.every(e=>!e.ticketTypes&&!e.priceClp&&!e.saleEnabled));
+ assert.ok(sources.filter(e=>e.posterUrl&&e.description).length>=4);
 });
 
 test("el carrusel reemplaza la franja semanal sin quitar las tarjetas de cartelera",async()=>{
