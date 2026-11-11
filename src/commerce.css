@@ -158,3 +158,13 @@
 
 /* Public cards: complete editorial details only. */
 .reference-event .event-description{font-size:12px;line-height:1.55;color:#6d756e;margin:7px 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Authenticated waiting-room gate for mass events in the local buyer DEMO. */
+.waitlist-panel{padding:20px;border:1px solid #bcd3ae;background:#f4faed;border-radius:14px;margin:18px 0;color:#293f2c}
+.waitlist-panel strong{font-size:22px;font-weight:800}
+.waitlist-panel p{font-size:12px;line-height:1.7;color:#566a50;margin:12px 0}
+.waitlist-panel .waitlist-feedback{font-weight:800;color:#834c22}
+.waitlist-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:15px}
+.waitlist-actions>*{min-height:43px}
+.waitlist-secondary{padding:11px 16px;border:1px solid #849e7a;border-radius:10px;background:transparent;color:#314a38;font-weight:800;cursor:pointer}
+.waitlist-secondary:focus-visible{outline:3px solid #85b76b;outline-offset:3px}
