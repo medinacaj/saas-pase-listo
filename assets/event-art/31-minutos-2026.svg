@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1150" role="img" aria-label="Imagen conceptual de 31 MINUTOS; no es afiche oficial">
+<defs><linearGradient id="bg" x2=".95" y2="1"><stop stop-color="#163a3d"/><stop offset=".58" stop-color="#399f96"/><stop offset="1" stop-color="#f5cf6d"/></linearGradient><radialGradient id="glow"><stop stop-color="#f5cf6d" stop-opacity=".85"/><stop offset="1" stop-color="#f5cf6d" stop-opacity="0"/></radialGradient></defs>
+<rect width="900" height="1150" fill="url(#bg)"/><circle cx="700" cy="560" r="445" fill="url(#glow)"/>
+<path d="M0 240H900" stroke="#fff" stroke-opacity=".16"/><text x="60" y="76" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="800" letter-spacing="4" fill="white" opacity=".9">PASELISTO  /  CARTELERA</text>
+<text x="58" y="180" font-family="Arial,Helvetica,sans-serif" font-size="105" font-weight="900" letter-spacing="-3" fill="#fff6e2">31 MINUTOS</text>
+<rect x="170" y="430" width="560" height="460" rx="65" fill="#ffda7b" stroke="#c9fae5" stroke-width="19"/>
+<rect x="245" y="495" width="410" height="145" rx="19" fill="#1a4546" stroke="#7ee8cb" stroke-width="10"/>
+<path d="M280 578Q450 450 610 578" fill="none" stroke="#f0cc7b" stroke-width="14"/>
+<circle cx="315" cy="752" r="52" fill="#25545a"/><circle cx="585" cy="752" r="52" fill="#25545a"/>
+<g fill="none" stroke="#b5f7e2" stroke-width="13"><path d="M120 540Q80 600 125 670"/><path d="M90 598Q56 645 95 705"/><path d="M60 656Q32 690 65 740"/><path d="M30 714Q8 735 35 775"/></g>
+<rect y="995" width="900" height="155" fill="#101b22" opacity=".96"/>
+<text x="55" y="1056" fill="white" font-family="Arial,sans-serif" font-size="29" font-weight="800">RADIO GUARIPOLO · DIC 2026</text>
+<text x="55" y="1105" fill="#ccf59b" font-family="Arial,sans-serif" font-size="20" letter-spacing="2">ARTE CONCEPTUAL · NO OFICIAL · SIN VENTA</text>
+</svg>
