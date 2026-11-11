@@ -10,8 +10,8 @@
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./src/portal.css?v=20261110-featured">
 <link rel="stylesheet" href="./src/commerce.css">
-<link rel="stylesheet" href="./src/hero-carousel.css?v=20261110-featured2">
-<script type="module" src="./src/marketplace.mjs?v=20261110-visual-only"></script>
+<link rel="stylesheet" href="./src/hero-carousel.css?v=20261111-fullbleed-swipe">
+<script type="module" src="./src/marketplace.mjs?v=20261111-fullbleed-swipe"></script>
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -24,7 +24,10 @@
 </header>
 <main id="contenido">
 <div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras requieren una sesión validada. GitHub Pages no acepta pedidos.</div>
-<section class="hero hero-carousel" id="inicio" aria-label="Carrusel de eventos destacados">
+<section class="hero hero-carousel" id="inicio" aria-label="Carrusel de eventos destacados" aria-roledescription="carrusel">
+ <div class="hero-visual">
+  <div class="hero-poster" id="hero-poster"><div class="hero-no-poster"><span>✳</span><strong>Destacados.</strong></div></div>
+ </div>
  <div class="hero-inner">
   <div class="hero-text" id="hero-feature-content">
    <div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span><span id="hero-feature-kicker">EVENTOS DESTACADOS</span></div>
@@ -32,22 +35,13 @@
    <p class="hero-feature-summary" id="hero-feature-summary">Explora los principales espectáculos y descubre sus detalles.</p>
    <div class="hero-feature-facts"><span id="hero-feature-date">Fecha por confirmar</span><span class="hero-facts-divider" aria-hidden="true">·</span><span id="hero-feature-venue">Recinto por confirmar</span></div>
    <div class="hero-feature-actions">
-    <a class="hero-cta" id="hero-feature-link" href="#cartelera">Ver ficha del evento <span aria-hidden="true">↗</span></a>
+    <a class="hero-cta" id="hero-feature-link" href="#cartelera">Ver evento <span aria-hidden="true">↗</span></a>
     <span class="hero-feature-notice" id="hero-feature-notice">REFERENCIA · SIN VENTA</span>
    </div>
-   <div class="hero-carousel-controls" id="hero-carousel-controls" role="group" aria-label="Controles del carrusel de eventos">
-    <button type="button" class="hero-control-arrow" data-hero-step="-1" aria-label="Evento anterior">←</button>
-    <span id="hero-slide-count" class="hero-slide-count" aria-label="Número de evento destacado">01 / 06</span>
-    <button type="button" class="hero-control-arrow" data-hero-step="1" aria-label="Siguiente evento">→</button>
-    <div class="hero-carousel-dots" id="hero-carousel-dots" role="group" aria-label="Elegir evento destacado"></div>
-    <button type="button" class="hero-play-toggle" data-hero-toggle aria-label="Pausar carrusel">Pausar</button>
+   <div class="hero-carousel-controls" id="hero-carousel-controls" role="group" aria-label="Elegir evento destacado">
+    <div class="hero-carousel-dots" id="hero-carousel-dots"></div>
    </div>
    <span class="hero-carousel-live sr-only" id="hero-carousel-live" aria-live="polite" aria-atomic="true"></span>
-  </div>
-  <div class="hero-visual">
-   <div class="hero-orbit orbit-one" aria-hidden="true"></div>
-   <div class="hero-orbit orbit-two" aria-hidden="true"></div>
-   <div class="hero-poster" id="hero-poster"><div class="hero-no-poster"><span>✳</span><strong>Destacados.</strong></div></div>
   </div>
  </div>
 </section>
