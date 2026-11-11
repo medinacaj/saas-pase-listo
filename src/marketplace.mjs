@@ -48,8 +48,7 @@ async function refreshInventory(){
  }
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
-const brokenReferenceImages=new Set();
-function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
+function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return realEvents();} // Home: real references only; DEMO sales remain in internal tests.
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
@@ -130,24 +129,21 @@ function installImages(){
   const loaded=()=>{if(img.naturalWidth>0)frame?.classList.add("loaded");};
   const failed=()=>{
    const fallback=img.dataset.fallback;
-   if(fallback&&!img.dataset.tried){img.dataset.tried="1";img.src=fallback;return;}
-   frame?.classList.add("image-failed");
-   const referenceCard=img.closest(".event-card.reference-event");
-   if(referenceCard){
-    const id=referenceCard.querySelector("[data-real-detail]")?.dataset.realDetail;
-    if(id)brokenReferenceImages.add(id);
-    referenceCard.remove();
-    const referenceCount=$("#real-events-grid .event-card").length;
-    const demoCount=0; // Fictional listings are no longer shown on the public home.
-    $("#results-description").textContent=referenceCount+" eventos reales de referencia";
-    $("#event-count").textContent=referenceCount+" eventos de referencia";
-    $("#empty-state").hidden=referenceCount>0;
+   if(fallback&&!img.dataset.tried){
+    img.dataset.tried="1";
+    img.src=fallback;
+    return;
    }
+   frame?.classList.add("image-failed");
+   // Never delete an event because a third-party host blocks a poster.
+   // The image is optional at runtime; the original catalog remains intact.
    img.remove();
   };
   img.addEventListener("load",loaded,{once:true});
   img.addEventListener("error",failed);
-  if(img.complete){if(img.naturalWidth>0)loaded();else failed();}
+  // An image can report complete before lazy loading starts. Zero width
+  // alone does not prove failure. Wait for its real error event.
+  if(img.complete&&img.naturalWidth>0)loaded();
  });
 }
 function filters(){
@@ -183,7 +179,6 @@ function renderCards(){
 
 
 let heroSlides=[];
-const heroBrokenIds=new Set();
 let heroIndex=0;
 let heroTimer=null;
 let heroPaused=false;
@@ -234,23 +229,7 @@ function showHeroSlide(manual=false){
   void node.offsetWidth;
   node.classList.add("is-changing");
  }
- const heroImage=card.querySelector("img.poster-img");
- if(heroImage){
-  const skipBrokenImage=()=>{
-   queueMicrotask(()=>{
-    // Let installImages try a configured backup before excluding this slide.
-    if(heroSlides[heroIndex]?.id!==event.id || heroImage.isConnected)return;
-    heroBrokenIds.add(event.id);
-    renderFeatured();
-   });
-  };
-  heroImage.addEventListener("error",skipBrokenImage);
-  installImages();
-  if(!heroImage.isConnected)skipBrokenImage();
- }else{
-  heroBrokenIds.add(event.id);
-  queueMicrotask(renderFeatured);
- }
+ installImages();
 }
 function chooseHero(index,manual=true){
  if(heroSlides.length===0)return;
@@ -260,8 +239,7 @@ function chooseHero(index,manual=true){
  scheduleHero();
 }
 function renderFeatured(){
- heroSlides=selectHeroEvents(realSamples,[],current(),6)
-  .filter(event=>!heroBrokenIds.has(event.id));
+ heroSlides=selectHeroEvents(realSamples,[],current(),6);
  heroIndex=0;
  const dots=$("#hero-carousel-dots");
  dots.replaceChildren();
