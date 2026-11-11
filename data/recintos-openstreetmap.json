@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "title": "PaseListo — georreferenciación de recintos reales mediante OpenStreetMap",
+  "updatedAt": "2026-11-10",
+  "scope": "Coordenadas de referencia del recinto o complejo, no verificación de accesos de eventos ni de direcciones postales.",
+  "license": "Datos cartográficos OpenStreetMap, © colaboradores OpenStreetMap, ODbL 1.0. Fuente derivada de fichas Mapcarta con identificadores OSM.",
+  "venues": [
+    {
+      "venue": "Teatro Caupolicán",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.45622,
+      "lon": -70.64924,
+      "osmType": "way",
+      "osmId": 41690263,
+      "source": "https://mapcarta.com/es/W41690263",
+      "note": "Punto del edificio; verificar acceso y puertas con el organizador.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Santander Arena",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.46273,
+      "lon": -70.66194,
+      "osmType": "way",
+      "osmId": 32864171,
+      "source": "https://mapcarta.com/es/W32864171",
+      "note": "Centro del recinto en Parque O'Higgins; no representa una puerta de acceso.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Club Hípico de Santiago",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.46393,
+      "lon": -70.66853,
+      "osmType": "way",
+      "osmId": 15239307,
+      "source": "https://mapcarta.com/es/W15239307",
+      "note": "Ubicación del complejo; el acceso al festival puede variar.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Parque Padre Hurtado",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.43179,
+      "lon": -70.54534,
+      "osmType": "way",
+      "osmId": 220750456,
+      "source": "https://mapcarta.com/es/37333088",
+      "note": "Ubicación general del parque; no identifica el acceso específico al evento.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Teatro Universidad de Concepción",
+      "city": "Concepción",
+      "country": "Chile",
+      "lat": -36.82794,
+      "lon": -73.04963,
+      "osmType": "way",
+      "osmId": 747913898,
+      "source": "https://mapcarta.com/es/25732746",
+      "note": "Ubicación del teatro; verificar el ingreso correspondiente al espectáculo.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Estadio Bicentenario La Florida",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.5408,
+      "lon": -70.57818,
+      "osmType": "way",
+      "osmId": 39791043,
+      "source": "https://mapcarta.com/es/W39791043",
+      "note": "Ubicación del estadio; los accesos pueden cambiar por evento.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Claro Arena",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.39593,
+      "lon": -70.50072,
+      "osmType": "way",
+      "osmId": 23672224,
+      "source": "https://mapcarta.com/es/37333092",
+      "note": "Ubicación del estadio San Carlos de Apoquindo; no marca un acceso específico.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Gran Carpa, Espacio Riesco",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.38438,
+      "lon": -70.62264,
+      "osmType": "way",
+      "osmId": 134629113,
+      "source": "https://mapcarta.com/es/W134629113",
+      "note": "Referencia del complejo Espacio Riesco: no es la ubicación exacta de la carpa.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Trotamundos Valparaíso",
+      "city": "Valparaíso",
+      "country": "Chile",
+      "lat": -33.04284,
+      "lon": -71.62292,
+      "osmType": "node",
+      "osmId": 4550334790,
+      "source": "https://mapcarta.com/es/N4550334790",
+      "note": "Ubicación cartográfica del establecimiento Trotamundos Valparaíso.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Teatro Provincial de Curicó",
+      "city": "Curicó",
+      "country": "Chile",
+      "lat": -34.98514,
+      "lon": -71.23857,
+      "osmType": "way",
+      "osmId": 533870928,
+      "source": "https://mapcarta.com/es/W533870928",
+      "note": "Ubicación del teatro; acceso y horario por confirmar.",
+      "checkedAt": "2026-11-10"
+    },
+    {
+      "venue": "Club Chocolate",
+      "city": "Santiago",
+      "country": "Chile",
+      "lat": -33.43225,
+      "lon": -70.63741,
+      "osmType": "way",
+      "osmId": 572851836,
+      "source": "https://mapcarta.com/es/W572851836",
+      "note": "Ubicación del recinto; horarios y condiciones de ingreso por confirmar.",
+      "checkedAt": "2026-11-10"
+    }
+  ]
+}
