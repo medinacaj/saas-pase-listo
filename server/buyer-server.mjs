@@ -9,6 +9,7 @@ import { promisify } from "node:util";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { seedCommerce, simulateOrder, available, quote } from "../src/commerce-domain.mjs";
+import { waitingRoomStatus, joinWaitingRoom, leaveWaitingRoom, eventRequiresWaitingRoom } from "../src/waiting-room.mjs";
 import { createPostgresDemoOrders } from "./postgres-demo-orders.mjs";
 import { createPostgresDemoAuth } from "./postgres-demo-auth.mjs";
 
@@ -100,6 +101,7 @@ const assetTypes = new Map([
   ["/src/venue-zones.mjs", ["src/venue-zones.mjs", "text/javascript"]],
   ["/src/event-page.css", ["src/event-page.css", "text/css"]],
   ["/src/commerce-domain.mjs", ["src/commerce-domain.mjs", "text/javascript"]],
+  ["/src/waiting-room.mjs", ["src/waiting-room.mjs", "text/javascript"]],
   ["/src/checkout-state.mjs", ["src/checkout-state.mjs", "text/javascript"]],
   ["/src/portal.css", ["src/portal.css", "text/css"]],
   ["/src/commerce.css", ["src/commerce.css", "text/css"]],
@@ -198,6 +200,19 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         toJson(res, 200, { events, updatedAt: ordersBackend ? null : db.market.updatedAt });
         return;
       }
+      if (req.method === "GET" && path === "waitlist/status") {
+        const session=await activeSession(req,sessions,authBackend);
+        if(!session || (!authBackend&&!db.buyers.some(b=>b.id===session.buyerId)))
+          throw bad(401,"Inicia sesión para consultar la lista de espera");
+        const eventId=url.searchParams.get("eventId");
+        if(typeof eventId!=="string"||!/^demo-[a-z0-9-]{3,100}$/i.test(eventId))
+          throw bad(422,"Evento de espera inválido");
+        const entry=ordersBackend
+          ? await ordersBackend.waitlistStatus({eventId,buyerId:session.buyerId})
+          : await mutate(next=>waitingRoomStatus(next.market,eventId,session.buyerId));
+        toJson(res,200,entry,{"Cache-Control":"no-store"});
+        return;
+      }
       if (req.method === "GET" && path === "orders") {
         const session = await activeSession(req, sessions, authBackend);
         if (!session || (!authBackend && !db.buyers.some(b => b.id === session.buyerId))) throw bad(401, "Debes iniciar sesión para consultar pedidos");
@@ -279,6 +294,19 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
         toJson(res, 200, { authenticated: false }, { "Set-Cookie": cookie("") });
         return;
       }
+      if(path==="waitlist/join" || path==="waitlist/leave"){
+        const eventId=payload.eventId;
+        if(typeof eventId!=="string"||!/^demo-[a-z0-9-]{3,100}$/i.test(eventId))
+          throw bad(422,"Evento de espera inválido");
+        const action=path==="waitlist/join"?"joinWaitingRoom":"leaveWaitingRoom";
+        const result=ordersBackend
+          ? await ordersBackend[action]({eventId,buyerId:session.buyerId})
+          : await mutate(next=>path==="waitlist/join"
+            ?joinWaitingRoom(next.market,eventId,session.buyerId)
+            :leaveWaitingRoom(next.market,eventId,session.buyerId));
+        toJson(res,200,result,{"Cache-Control":"no-store"});
+        return;
+      }
       if (path === "orders") {
         const requestId = String(payload.requestId || "");
         if (!/^[a-z0-9-]{12,70}$/i.test(requestId)) throw bad(422, "Identificador de solicitud inválido");
@@ -304,7 +332,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       throw bad(404, "Ruta desconocida");
     } catch (err) {
       // Avoid leaking file paths, crypto details or internal errors in HTTP responses.
-      const status = Number.isInteger(err.status) ? err.status : (/insuficientes|no está publicado|Límite máximo de boletos por persona/.test(err.message) ? 409 : /fuera de rango|inválid[oa]/i.test(err.message) ? 422 : 500);
+      const status = Number.isInteger(err.status) ? err.status : (/insuficientes|no está publicado|Límite máximo de boletos por persona|turno autorizado|Ya alcanzaste|lista de espera/i.test(err.message) ? 409 : /fuera de rango|inválid[oa]/i.test(err.message) ? 422 : 500);
       toJson(res, status, { error: status === 500 ? "Error interno del servidor de demostración" : err.message });
     }
   });
