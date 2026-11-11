@@ -26,6 +26,8 @@ jobs:
           node --check src/event-page-domain.mjs
           node --check src/venue-geolocation.mjs
           node --check src/control.mjs
+      - name: Regression test on broken third-party posters
+        run: node --test tests/poster-resilience.test.mjs
       - name: Verify event cards and catalogs
         run: |
           node --input-type=module <<'JS'
