@@ -19,6 +19,7 @@ jobs:
           node --check src/marketplace.mjs
           node --check src/hero-carousel.mjs
           node --check src/commerce-domain.mjs
+          node --check src/waiting-room.mjs
           node --check src/event-page.mjs
           node --check src/reference-checkout.mjs
           node --check src/week-events.mjs
@@ -27,7 +28,7 @@ jobs:
           node --check src/venue-geolocation.mjs
           node --check src/control.mjs
       - name: Regression test on broken third-party posters
-        run: node --test tests/poster-resilience.test.mjs tests/pages-boot.test.mjs
+        run: node --test tests/poster-resilience.test.mjs tests/pages-boot.test.mjs tests/waiting-room.test.mjs tests/admin-event-controls.test.mjs
       - name: Verify event cards and catalogs
         run: |
           node --input-type=module <<'JS'
@@ -58,6 +59,17 @@ jobs:
           assert.ok(details.includes('id="reference-checkout-confirm"'), 'Demo confirmation step missing');
           assert.ok(detailJs.includes('renderReferenceCheckout(event)'), 'Real reference checkout not enabled');
           assert.ok(detailJs.includes('referenceOrderReceipt(quote,crypto.randomUUID())'), 'Demo receipt generation missing');
+          assert.ok(readFileSync('admin.html','utf8').includes('name="maxTicketsPerPerson" value="7"'),
+            'Admin must start at seven tickets per buyer');
+          assert.ok(readFileSync('admin.html','utf8').includes('id="event-waitlist-enabled"'),
+            'Admin waiting room toggle missing');
+          assert.ok(readFileSync('src/control.mjs','utf8').includes('data.capacity>=5000'),
+            'Mandatory queue threshold missing');
+          assert.ok(script.includes('eventRequiresWaitingRoom(selectedEvent(eventId))'),
+            'Massive buyers must visit waiting room before checkout');
+          assert.ok(readFileSync('src/commerce-domain.mjs','utf8').includes('useWaitingRoomAdmission(store,eventId,validBuyer)'),
+            'Unadmitted orders must be rejected by domain');
+
           assert.ok(!page.includes('lab-testing')&&!script.includes('setupPurchaseLab()'), 'Separate buying lab must be removed');
           const {hasHeroPoster,hasEventDescription}=await import('./src/hero-carousel.mjs');
           const photographed=refs.events.filter(e=>hasHeroPoster(e,'reference')&&hasEventDescription(e));
