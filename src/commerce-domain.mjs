@@ -108,7 +108,7 @@ export function quote(store, eventId, ticketTypeId, quantityInput, { availabilit
   const venueShareClp = Math.round(serviceFeeClp * venueShareBps / 10000);
   return { eventId, ticketTypeId, quantity, currency:"CLP", unitBaseClp:baseClp, faceValueClp, feePerTicketClp, serviceFeeClp, totalClp, venueShareClp, platformShareClp: serviceFeeClp - venueShareClp, note:"Simulación de cobro; sin procesamiento de pagos, impuestos ni recaudación" };
 }
-export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId, idempotencyKey }) {
+export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId, idempotencyKey }, { admissionValidatedByDatabase=false }={}) {
   // The optional key makes local DEMO retries deterministic; production needs DB uniqueness.
   if (idempotencyKey !== undefined) {
     const key = text(idempotencyKey, 8, 128, "Clave de idempotencia");
@@ -126,7 +126,9 @@ export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId,
   const event = eventOrFail(store, eventId);
   if(purchasedByBuyer(store,eventId,buyerId)+pricing.quantity>eventTicketLimit(event))
     fail("Límite máximo de boletos por persona para este evento excedido");
-  useWaitingRoomAdmission(store,eventId,validBuyer);
+  // Only the trusted PostgreSQL adapter may skip this in-memory gate after it
+  // validates the buyer\u0027s queued admission under a database transaction lock.
+  if(!admissionValidatedByDatabase)useWaitingRoomAdmission(store,eventId,validBuyer);
   const order = {
     id: "SIM-" + id().slice(0, 8).toUpperCase(),
     status:"demo_confirmed",
