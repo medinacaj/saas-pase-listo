@@ -62,7 +62,7 @@
           "capacity": 32
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-luces-del-sur",
@@ -96,7 +96,7 @@
           "capacity": 50
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-escena-de-humor",
@@ -130,7 +130,7 @@
           "capacity": 60
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-orbita",
@@ -158,7 +158,7 @@
           "capacity": 100
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-escena-infantil",
@@ -192,7 +192,7 @@
           "capacity": 50
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-jazz-puerto",
@@ -226,7 +226,7 @@
           "capacity": 45
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-norte-vivo",
@@ -254,7 +254,7 @@
           "capacity": 180
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     },
     {
       "id": "demo-travesia",
@@ -282,7 +282,7 @@
           "capacity": 110
         }
       ],
-      "maxTicketsPerPerson": 10
+      "maxTicketsPerPerson": 7
     }
   ]
 }
