@@ -70,9 +70,12 @@ jobs:
           const { selectHeroEvents }=await import('./src/hero-carousel.mjs');
           const highlights=selectHeroEvents(refs.events,demo.events,'2026-11-10',6);
           assert.equal(highlights.length,6,'Need six featured event slides');
-          assert.equal(highlights[0].id,'ref-creamfields-2026','Headline must reflect curated weekly event');
-          assert.ok(highlights.some(e=>e.posterUrl),'Include a real upcoming poster');
+          assert.equal(highlights[0].id,'ref-camila-2026','First visual highlight should use a published poster');
+          assert.ok(highlights.every(e=>e.posterUrl?.startsWith('https://')),'All slides must have HTTPS image sources');
           assert.ok(highlights.every(e=>e.id&&e.date&&e.venue),'Featured event incomplete');
+          assert.ok(script.includes('hasHeroPoster(e,"reference")'),'Image-less reference cards must be hidden');
+          assert.ok(script.includes('heroBrokenIds.add(event.id)'),'Broken hero posters must be excluded');
+          assert.ok(carousel.includes('hasHeroPoster(item,kind)'),'Hero image filter missing');
           assert.ok(refs.events.filter(e=>e.date>='2026-11-10'&&e.date<='2026-11-15').length>=16,'Verified weekly catalog must remain complete');
           console.log('Featured event carousel, catalog and event detail pages validated.');
           JS
