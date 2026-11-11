@@ -24,7 +24,7 @@
 </div>
 </header>
 <main id="contenido">
-<div class="demo-ribbon" role="note"><strong>Vista de demostración.</strong> Eventos reales solo como referencia visual; las compras requieren una sesión validada. GitHub Pages no acepta pedidos.</div>
+<div class="demo-ribbon" role="note"><strong>Cartelera de referencia.</strong> Eventos reales utilizados para mostrar el diseño de PaseListo. No hay venta de entradas ni pagos habilitados.</div>
 <section class="hero hero-carousel" id="inicio" aria-label="Carrusel de eventos destacados" aria-roledescription="carrusel">
  <div class="hero-visual">
   <div class="hero-poster" id="hero-poster"><div class="hero-no-poster"><span>✳</span><strong>Destacados.</strong></div></div>
@@ -55,18 +55,18 @@
 <label class="select-wrap"><span>Fecha</span><select id="date-filter"><option value="all">Todas las próximas fechas</option><option value="month">Este mes</option><option value="thirty">Próximos 30 días</option><option value="later">Más adelante</option></select></label>
 </div><div class="category-list" id="category-list" role="group" aria-label="Filtrar por categoría"></div></div>
 <div class="catalog-toolbar"><span id="results-description" aria-live="polite">Buscando eventos…</span><button type="button" id="clear-filters" hidden>Limpiar filtros ↗</button></div>
-<div class="listing-head"><div><h3>Espectáculos anunciados</h3><p>Afiches reales de referencia; todavía no están a la venta en PaseListo.</p></div><span class="status-example">REFERENCIAS</span></div>
+<div class="listing-head"><div><h3>Eventos reales</h3><p>Explora conciertos, festivales y espectáculos reales como ejemplos visuales de la plataforma.</p></div><span class="status-example">SOLO REFERENCIA</span></div>
 <div id="real-events-grid" class="events-grid"></div>
-<div class="listing-head demo-listing-head"><div><h3>Compra de demostración</h3><p>Prueba la selección de entradas y el desglose de precios.</p></div><span class="status-demo">EVENTOS FICTICIOS</span></div>
-<div id="events-grid" class="events-grid"></div>
-<div id="empty-state" class="empty-state" hidden><div aria-hidden="true">✳</div><h3>Prueba otro filtro.</h3><p>No hay eventos de prueba para esta selección.</p><button type="button" data-clear-filters>Volver a todos</button></div>
+<!-- Mantener el anclaje interno para las pruebas del flujo DEMO; no se publican eventos ficticios. -->
+<div id="events-grid" hidden aria-hidden="true"></div>
+<div id="empty-state" class="empty-state" hidden><div aria-hidden="true">✳</div><h3>Sin resultados.</h3><p>No hay eventos reales de referencia que coincidan con estos filtros.</p><button type="button" data-clear-filters>Ver todos los eventos</button></div>
 <p class="catalog-footnote">Los espectáculos reales se muestran únicamente como referencias, sin contrato de venta ni permisos comerciales de afiches acreditados. No se procesan pagos reales.</p>
 </section>
 </main>
 <footer class="site-footer">
 <div class="footer-top"><a class="footer-brand" href="#inicio">paselisto<span>.</span></a><p>Eventos que se viven.</p></div>
-<div class="footer-bottom"><span>© PaseListo · 2026</span><span>Compras de prueba sin dinero real</span><a href="./admin.html">Centro de Control ↗</a></div>
-<div class="footer-disclaimer">Prototipo sin cobros ni entradas válidas. Las imágenes de terceros son referencias de diseño con derechos comerciales pendientes de verificación.</div>
+<div class="footer-bottom"><span>© PaseListo · 2026</span><span>Cartelera informativa · Sin venta de entradas</span><a href="./admin.html">Centro de Control ↗</a></div>
+<div class="footer-disclaimer">Los espectáculos y afiches de terceros son referencias visuales; los derechos comerciales y acuerdos de venta no están acreditados.</div>
 </footer>
 <div class="detail-backdrop" id="detail-backdrop" hidden>
 <section class="detail-dialog marketplace-dialog" id="event-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" tabindex="-1">
