@@ -162,9 +162,12 @@ test("la portada solo muestra eventos reales y conserva DEMO fuera del catálogo
 test("la portada muestra fichas completas y la compra DEMO sigue el mismo recorrido del comprador",async()=>{
  const {hasHeroPoster,hasEventDescription}=await import("../src/hero-carousel.mjs");
  const visuals=refs.events.filter(e=>hasHeroPoster(e,"reference")&&hasEventDescription(e));
- assert.equal(visuals.length,6);
+ assert.equal(visuals.length,10);
  assert.ok(visuals.every(e=>e.description.trim().length>=40));
  assert.ok(visuals.every(e=>e.posterUrl.startsWith("https://")));
+ assert.equal((portal.match(/data-static-reference="/g)||[]).length,10);
+ assert.ok(portal.includes('data-static-fallback="true"'));
+ assert.ok(visuals.every(e=>portal.includes('data-static-reference="'+e.id+'"')));
  assert.match(marketplace,/hasHeroPoster\(e,"reference"\)&&hasEventDescription\(e\)/);
  assert.ok(marketplace.includes('esc(event.description)'));
  assert.equal(portal.includes('id="lab-trigger"'),false);
