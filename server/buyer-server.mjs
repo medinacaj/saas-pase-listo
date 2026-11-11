@@ -93,6 +93,7 @@ const assetTypes = new Map([
   ["/src/hero-carousel.mjs", ["src/hero-carousel.mjs", "text/javascript"]],
   ["/src/hero-carousel.css", ["src/hero-carousel.css", "text/css"]],
   ["/src/event-page.mjs", ["src/event-page.mjs", "text/javascript"]],
+  ["/src/venue-geolocation.mjs", ["src/venue-geolocation.mjs", "text/javascript"]],
   ["/src/event-page-domain.mjs", ["src/event-page-domain.mjs", "text/javascript"]],
   ["/src/week-events.mjs", ["src/week-events.mjs", "text/javascript"]],
   ["/src/venue-zones.mjs", ["src/venue-zones.mjs", "text/javascript"]],
@@ -106,7 +107,8 @@ const assetTypes = new Map([
   ["/src/control.css", ["src/control.css", "text/css"]],
   ["/src/brand-system.css", ["src/brand-system.css", "text/css"]],
   ["/data/eventos-clientes-demo.json", ["data/eventos-clientes-demo.json", "application/json"]],
-  ["/data/eventos-reales-referencia.json", ["data/eventos-reales-referencia.json", "application/json"]]
+  ["/data/eventos-reales-referencia.json", ["data/eventos-reales-referencia.json", "application/json"]],
+  ["/data/recintos-openstreetmap.json", ["data/recintos-openstreetmap.json", "application/json"]]
 ]);
 export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.json"), ordersBackend = null, authBackend = null } = {}) {
   if (authBackend && !ordersBackend) throw Error("La autenticación SQL requiere también pedidos SQL en esta demo");
