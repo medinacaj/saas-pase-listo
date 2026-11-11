@@ -18,6 +18,8 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
   t.after(async () => { await Promise.all([poolA.end(), poolB.end()]); });
   const migration = await readFile(new URL("../db/001_demo_inventory_orders.sql", import.meta.url), "utf8");
   await poolA.query(migration);
+  const limitMigration = await readFile(new URL("../db/004_demo_max_tickets_per_buyer.sql", import.meta.url), "utf8");
+  await poolA.query(limitMigration);
   const reset = async () => {
     await poolA.query("TRUNCATE TABLE demo_orders, demo_ticket_stock RESTART IDENTITY CASCADE");
   };
@@ -25,6 +27,35 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
   const b = createPostgresDemoOrders({ pool: poolB, catalog });
   await reset();
   await Promise.all([a.initialize(), b.initialize()]);
+
+  await t.test("límite de 10 por comprador acumula categorías y resiste pedidos simultáneos", async () => {
+    await reset();
+    await Promise.all([a.initialize(),b.initialize()]);
+    const buyerId="buyer-22222222-2222-4222-8222-222222222222";
+    const first=await a.create({buyerId,eventId:"demo-noches-aurora",
+      ticketTypeId:"general",quantity:7,requestId:"limit-test-first-001"});
+    assert.equal(first.quantity,7);
+    await assert.rejects(b.create({buyerId,eventId:"demo-noches-aurora",
+      ticketTypeId:"vip",quantity:4,requestId:"limit-test-too-many-002"}),
+      error=>error.status===409 && /Límite máximo/.test(error.message));
+    const second=await b.create({buyerId,eventId:"demo-noches-aurora",
+      ticketTypeId:"vip",quantity:3,requestId:"limit-test-remaining-003"});
+    assert.equal(second.quantity,3);
+    await assert.rejects(a.create({buyerId,eventId:"demo-noches-aurora",
+      ticketTypeId:"general",quantity:1,requestId:"limit-test-over-004"}),
+      error=>error.status===409);
+    const repeat=await b.create({buyerId,eventId:"demo-noches-aurora",
+      ticketTypeId:"general",quantity:7,requestId:"limit-test-first-001"});
+    assert.equal(repeat.id,first.id,"Reintento idempotente permitido aunque el usuario alcanzó el límite");
+    const buyerTwo="buyer-33333333-3333-4333-8333-333333333333";
+    const parallel=await Promise.all([
+      a.create({buyerId:buyerTwo,eventId:"demo-noches-aurora",
+        ticketTypeId:"general",quantity:7,requestId:"limit-parallel-order-001"}).then(()=>true).catch(()=>false),
+      b.create({buyerId:buyerTwo,eventId:"demo-noches-aurora",
+        ticketTypeId:"vip",quantity:7,requestId:"limit-parallel-order-002"}).then(()=>true).catch(()=>false)
+    ]);
+    assert.equal(parallel.filter(Boolean).length,1,"Solo un pedido puede pasar el límite acumulado");
+  });
 
   await t.test("ocho pedidos paralelos no superan dos entradas, aun entre pools", async () => {
     await poolA.query(
