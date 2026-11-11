@@ -13,8 +13,8 @@ test("precios y cargos de prueba se calculan sin alterar el catálogo real",()=>
   quantity:2,unitClp:35000,subtotalClp:70000,serviceFeeClp:7000,totalClp:77000,demo:true
  });
  assert.equal(DEMO_REFERENCE_TIERS.length,3);
- assert.equal(REFERENCE_CHECKOUT_MAX_QUANTITY,10);
- assert.equal(referenceQuote(event,"vip",10).quantity,10);
+ assert.equal(REFERENCE_CHECKOUT_MAX_QUANTITY,7);
+ assert.equal(referenceQuote(event,"vip",7).quantity,7);
  assert.equal(referenceQuote(event,"general","1").totalClp,22000);
  assert.equal(referenceQuote(event,"vip",6).totalClp,396000);
 });
@@ -26,7 +26,7 @@ test("la simulación nunca genera pagos, reservas ni entradas reales",()=>{
  assert.equal(receipt.ticketIssued,false);
  assert.equal(receipt.id,"SIM-F3BC56F0-7C6");
  assert.equal(receipt.totalClp,22000);
- for(const input of [0,11,-1,2.4,Infinity,"muchas",null]){
+ for(const input of [0,8,-1,2.4,Infinity,"muchas",null]){
   assert.throws(()=>referenceQuote({id:"ref-camila-2026"},"general",input));
  }
  assert.throws(()=>referenceQuote({id:"demo-noches-aurora"},"general",1),/referencia no válido/);
@@ -46,7 +46,7 @@ test("las fichas reales tienen imágenes y descripción pero precios oficiales n
  assert.ok(page.includes("No solicitamos datos bancarios ni personales."));
 });
 
-test("un evento puede configurar un límite menor o mayor que diez",()=>{
+test("un evento puede configurar un límite menor o mayor que siete",()=>{
  assert.equal(referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:4},"general",4).quantity,4);
  assert.throws(()=>referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:4},"general",5),/fuera de rango/);
  assert.equal(referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:15},"general",15).quantity,15);
