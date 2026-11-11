@@ -51,11 +51,11 @@ export function createPostgresDemoWaitlist({pool,catalog}){
   if(!rows.length)return {required:true,status:"not_joined",position:null};
   const row=rows[0];let place=null;
   if(row.status==="waiting"){
-   const rank=await client.query(`SELECT count(*)::int AS n FROM demo_waitlist
-    WHERE event_id=$1 AND status='waiting'
-    AND (joined_at,entry_id)<=( $2::timestamptz,$3::bigint )`,
-    [eventId,row.joined_at,row.entry_id]);
-   place=Number(rank.rows[0].n);
+   const rank=await client.query(`SELECT rn::int AS n FROM (
+    SELECT buyer_id, row_number() OVER (ORDER BY joined_at,entry_id) AS rn
+    FROM demo_waitlist WHERE event_id=$1 AND status='waiting'
+   ) queued WHERE buyer_id=$2`,[eventId,buyerId]);
+   place=Number(rank.rows[0]?.n||0);
   }
   return {required:true,status:row.status,position:place,
    expiresAt:row.status==="admitted"?new Date(row.expires_at).getTime():null};
