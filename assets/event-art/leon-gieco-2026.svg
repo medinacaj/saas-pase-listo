@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1150" role="img" aria-label="Ilustración conceptual de LEÓN GIECO. No es un cartel oficial.">
+ <defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1b3042"/><stop offset=".58" stop-color="#495b59"/><stop offset="1" stop-color="#edb96b"/></linearGradient>
+  <radialGradient id="glow"><stop stop-color="#edb96b" stop-opacity=".75"/><stop offset="1" stop-color="#edb96b" stop-opacity="0"/></radialGradient>
+ </defs>
+ <rect width="900" height="1150" fill="url(#bg)"/>
+ <circle cx="650" cy="660" r="420" fill="url(#glow)"/>
+ <g opacity=".17" stroke="#fff" stroke-width="1"><path d="M0 0H900"/><path d="M0 73H900"/><path d="M0 146H900"/><path d="M0 219H900"/><path d="M0 292H900"/><path d="M0 365H900"/><path d="M0 438H900"/><path d="M0 511H900"/><path d="M0 584H900"/><path d="M0 657H900"/><path d="M0 730H900"/><path d="M0 803H900"/><path d="M0 876H900"/><path d="M0 949H900"/><path d="M0 1022H900"/><path d="M0 1095H900"/><path d="M0 1168H900"/></g>
+ <text x="60" y="73" font-family="Arial,sans-serif" font-size="25" letter-spacing="5" font-weight="800" fill="#ffffff" opacity=".86">PASELISTO  /  AGENDA CULTURAL</text>
+ <text x="58" y="170" font-family="Arial,Helvetica,sans-serif" font-size="91" letter-spacing="-4" font-weight="900" fill="#fff5e6">LEÓN GIECO</text>
+ 
+ <g transform="rotate(-18 455 650)">
+    <ellipse cx="455" cy="718" rx="210" ry="240" fill="#a85c38" stroke="#f9dc9d" stroke-width="22"/>
+    <ellipse cx="455" cy="730" rx="84" ry="100" fill="#1d3036" stroke="#e7b96c" stroke-width="17"/>
+    <rect x="413" y="160" width="84" height="390" rx="21" fill="#b97d4f" stroke="#e7be7c" stroke-width="12"/>
+    <path d="M415 220H500M415 275H500M415 330H500M415 385H500M415 440H500" stroke="#644c31" stroke-width="6"/>
+    <path d="M425 210V918" stroke="#fff2c6" stroke-width="2.5" opacity=".9"/><path d="M438 210V918" stroke="#fff2c6" stroke-width="2.5" opacity=".9"/><path d="M451 210V918" stroke="#fff2c6" stroke-width="2.5" opacity=".9"/><path d="M464 210V918" stroke="#fff2c6" stroke-width="2.5" opacity=".9"/><path d="M477 210V918" stroke="#fff2c6" stroke-width="2.5" opacity=".9"/><path d="M490 210V918" stroke="#fff2c6" stroke-width="2.5" opacity=".9"/>
+    <path d="M390 890Q450 925 520 890" fill="none" stroke="#422f28" stroke-width="18"/>
+  </g>
+  <g fill="#fbe2a7" opacity=".7"><circle cx="10" cy="40" r="2"/><circle cx="107" cy="93" r="3"/><circle cx="204" cy="146" r="4"/><circle cx="301" cy="199" r="5"/><circle cx="398" cy="252" r="2"/><circle cx="495" cy="305" r="3"/><circle cx="592" cy="358" r="4"/><circle cx="689" cy="411" r="5"/><circle cx="786" cy="464" r="2"/><circle cx="883" cy="517" r="3"/><circle cx="100" cy="570" r="4"/><circle cx="197" cy="623" r="5"/><circle cx="294" cy="676" r="2"/><circle cx="391" cy="729" r="3"/><circle cx="488" cy="782" r="4"/><circle cx="585" cy="835" r="5"/><circle cx="682" cy="888" r="2"/><circle cx="779" cy="41" r="3"/><circle cx="876" cy="94" r="4"/><circle cx="93" cy="147" r="5"/><circle cx="190" cy="200" r="2"/><circle cx="287" cy="253" r="3"/><circle cx="384" cy="306" r="4"/><circle cx="481" cy="359" r="5"/></g>
+ <path d="M0 989H900V1150H0Z" fill="#0b151b" opacity=".94"/>
+ <text x="56" y="1045" font-family="Arial,sans-serif" font-size="31" font-weight="800" fill="#eff5e9">CONCEPCIÓN · 15 NOV</text>
+ <text x="57" y="1099" font-family="Arial,sans-serif" font-size="20" letter-spacing="2" fill="#ccf59b">ARTE CONCEPTUAL · NO OFICIAL · SIN VENTA</text>
+ </svg>
