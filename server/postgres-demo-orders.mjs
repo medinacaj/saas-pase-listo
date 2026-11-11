@@ -6,7 +6,7 @@
  * Requires db/001_demo_inventory_orders.sql to have been applied beforehand.
  * The supplied pool must implement query() and connect() (node-postgres API).
  */
-import { seedCommerce, quote, simulateOrder } from "../src/commerce-domain.mjs";
+import { seedCommerce, quote, simulateOrder, eventTicketLimit } from "../src/commerce-domain.mjs";
 
 const bad = (status, message) => Object.assign(new Error(message), { status });
 const toOrder = row => ({
@@ -79,7 +79,7 @@ export function createPostgresDemoOrders({ pool, catalog }) {
     if (typeof requestId !== "string" || !/^[a-z0-9-]{12,70}$/i.test(requestId)) {
       throw bad(422, "Identificador de solicitud inválido");
     }
-    if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 6) {
+    if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100) {
       throw bad(422, "Cantidad fuera de rango");
     }
     const client = await pool.connect();
@@ -105,6 +105,21 @@ export function createPostgresDemoOrders({ pool, catalog }) {
         active = false;
         return existing;
       }
+
+      const ticketEvent=published.find(event=>event.id===eventId);
+      if(!ticketEvent)throw bad(422,"Evento de prueba inexistente");
+      const maxPerBuyer=eventTicketLimit(ticketEvent);
+      if(quantity>maxPerBuyer)throw bad(409,"Límite máximo de boletos por persona excedido");
+      // Serialize *all* orders for this buyer and event, including different
+      // ticket categories, to prevent a parallel-request limit bypass.
+      await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        [buyerId + ":" + eventId + ":buyer-event-limit"]);
+      const purchased=await client.query(
+        "SELECT COALESCE(SUM(quantity), 0)::int AS total FROM demo_orders WHERE buyer_id=$1 AND event_id=$2 AND status='demo_confirmed'",
+        [buyerId,eventId]
+      );
+      if(Number(purchased.rows[0].total)+quantity>maxPerBuyer)
+        throw bad(409,"Límite máximo de boletos por persona excedido");
 
       const stock = await client.query(
         `SELECT capacity, sold FROM demo_ticket_stock
