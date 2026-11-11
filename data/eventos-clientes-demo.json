@@ -283,6 +283,35 @@
         }
       ],
       "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-festival-masivo-2027",
+      "organizerId": "org-escena",
+      "title": "Festival de Alta Demanda · DEMO",
+      "subtitle": "Prueba de sala de espera virtual y compra regulada",
+      "category": "Festivales",
+      "genre": "Música / Experiencias",
+      "city": "Concepción",
+      "venue": "Recinto masivo ficticio · DEMO",
+      "date": "2027-05-15",
+      "time": "17:00",
+      "description": "Evento completamente ficticio con seis mil cupos para verificar listas de espera, turnos de compra, seguridad y máximos de entradas por usuario en un servidor de demostración.",
+      "accent": "#83B887",
+      "visual": "M",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "maxTicketsPerPerson": 7,
+      "waitlistEnabled": true,
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 22000,
+          "capacity": 6000
+        }
+      ]
     }
   ]
 }
