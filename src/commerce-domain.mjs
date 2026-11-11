@@ -72,13 +72,24 @@ export function available(store, eventId, ticketTypeId) {
   const simulatedQty = store.orders.filter((o) => o.eventId === eventId && o.ticketTypeId === ticketTypeId && o.status === "demo_confirmed").reduce((sum, o) => sum + o.quantity, 0);
   return Math.max(0, type.capacity - simulatedQty);
 }
+export const DEFAULT_MAX_TICKETS_PER_PERSON = 10;
+export const MAX_CONFIGURABLE_TICKETS_PER_PERSON = 100;
+// Older DEMO events keep the new default without rewriting saved orders.
+export function eventTicketLimit(event) {
+ const value=event?.maxTicketsPerPerson??DEFAULT_MAX_TICKETS_PER_PERSON;
+ return bounded(value,1,MAX_CONFIGURABLE_TICKETS_PER_PERSON,"Máximo de boletos por persona");
+}
+export function purchasedByBuyer(store, eventId, buyerId) {
+ return store.orders.filter(order=>order.eventId===eventId && order.buyerId===buyerId &&
+   order.status==="demo_confirmed").reduce((sum,order)=>sum+order.quantity,0);
+}
 export function quote(store, eventId, ticketTypeId, quantityInput, { availabilityRequired = true } = {}) {
   // Preview-only callers may show price for sold-out DEMO entries; orders always
   // use the default availability check inside simulateOrder.
   const event = eventOrFail(store, eventId);
   if (event.status !== "published") fail("Este evento no está publicado");
   const type = typeOrFail(event, ticketTypeId);
-  const quantity = bounded(quantityInput, 1, 6, "Cantidad");
+  const quantity = bounded(quantityInput, 1, eventTicketLimit(event), "Cantidad");
   if (!Number.isSafeInteger(type.capacity) || type.capacity < 0) fail("Aforo DEMO inválido");
   if (availabilityRequired && available(store, eventId, ticketTypeId) < quantity) fail("Entradas DEMO insuficientes");
   const bps = bounded(store.contract.buyerFeeBps, 0, 4000, "Porcentaje de servicio");
@@ -108,6 +119,8 @@ export function simulateOrder(store, { eventId, ticketTypeId, quantity, buyerId,
   }
   const pricing = quote(store, eventId, ticketTypeId, quantity);
   const event = eventOrFail(store, eventId);
+  if(purchasedByBuyer(store,eventId,buyerId)+pricing.quantity>eventTicketLimit(event))
+    fail("Límite máximo de boletos por persona para este evento excedido");
   const order = {
     id: "SIM-" + id().slice(0, 8).toUpperCase(),
     status:"demo_confirmed",
@@ -147,6 +160,7 @@ export function createOrganizerEvent(store, organizationId, input) {
   if (!["Música","Festivales","Comedia","Teatro","Familia","Experiencias"].includes(category)) fail("Categoría inválida");
   const priceClp=bounded(input.priceClp,0,5000000,"Precio base");
   const capacity=bounded(input.capacity,1,100000,"Aforo");
+  const maxTicketsPerPerson=bounded(input.maxTicketsPerPerson??DEFAULT_MAX_TICKETS_PER_PERSON,1,MAX_CONFIGURABLE_TICKETS_PER_PERSON,"Máximo de boletos por persona");
   const posterUrl=String(input.posterUrl ?? "").trim();
   if (posterUrl) {
     let u;
@@ -170,7 +184,7 @@ export function createOrganizerEvent(store, organizationId, input) {
     category,genre:category,city,venue,date,time,
     description:text(input.description||"Evento de prueba publicado desde el panel de organizador",10,750,"Descripción"),
     accent:/^#[0-9A-Fa-f]{6}$/.test(input.accent||"")?input.accent:"#D2F178",
-    visual:"✳",featured:false,status:"published",
+    visual:"✳",featured:false,status:"published",maxTicketsPerPerson,
     posterUrl:posterUrl||null,posterRights:posterUrl?"declarados_por_usuario_sin_verificar":"demo",
     ticketTypes:[{id:"general",name:"General",priceClp,capacity}]
   };
