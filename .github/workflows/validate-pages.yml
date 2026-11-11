@@ -111,7 +111,16 @@ jobs:
           assert.ok(highlights.every(e=>e.posterUrl?.startsWith('https://')),'All slides must have HTTPS image sources');
           assert.ok(highlights.every(e=>e.id&&e.date&&e.venue),'Featured event incomplete');
           assert.ok(script.includes('hasHeroPoster(e,"reference")'),'Image-less reference cards must be hidden');
-          assert.ok(script.includes('heroBrokenIds.add(event.id)'),'Broken hero posters must be excluded');
+          assert.ok(!script.includes('heroBrokenIds'),'Remote image failures must not remove carousel slides');
+          assert.ok(!script.includes('brokenReferenceImages'),'Remote image failures must not hide reference events');
+          assert.ok(!script.includes('referenceCard.remove()'),'Remote poster errors must not delete event cards');
+          assert.ok(script.includes('if(img.complete&&img.naturalWidth>0)loaded()'),
+            'Lazy poster load must not be treated as a failure before error');
+          assert.ok(script.includes('real.map(realCard).join("")'),
+            'Reference cards must be rendered from event catalog');
+          const shown=refs.events.filter(e=>(e.endDate||e.date)>='2026-11-11'
+            &&hasHeroPoster(e,'reference')&&hasEventDescription(e));
+          assert.equal(shown.length,6,'All six photographed reference events must be present');
           assert.ok(carousel.includes('hasHeroPoster(item,kind)'),'Hero image filter missing');
           assert.ok(refs.events.filter(e=>e.date>='2026-11-10'&&e.date<='2026-11-15').length>=16,'Verified weekly catalog must remain complete');
           const geoRegistry=JSON.parse(readFileSync('data/recintos-openstreetmap.json','utf8'));
