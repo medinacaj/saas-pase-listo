@@ -72,7 +72,7 @@ export function available(store, eventId, ticketTypeId) {
   const simulatedQty = store.orders.filter((o) => o.eventId === eventId && o.ticketTypeId === ticketTypeId && o.status === "demo_confirmed").reduce((sum, o) => sum + o.quantity, 0);
   return Math.max(0, type.capacity - simulatedQty);
 }
-export const DEFAULT_MAX_TICKETS_PER_PERSON = 10;
+export const DEFAULT_MAX_TICKETS_PER_PERSON = 7;
 export const MAX_CONFIGURABLE_TICKETS_PER_PERSON = 100;
 // Older DEMO events keep the new default without rewriting saved orders.
 export function eventTicketLimit(event) {
