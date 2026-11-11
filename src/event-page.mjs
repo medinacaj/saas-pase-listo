@@ -1,7 +1,7 @@
 import { loadCommerce, quote } from "./commerce-domain.mjs";
 import { forecastAvailable, daysUntilEvent, weatherDescription } from "./event-page-domain.mjs";
 import { buildVenueZones, zoneBandPath, zoneBandLabelY } from "./venue-zones.mjs";
-import { locateVenue, osmEmbedUrl, osmLocationUrl, osmVenueSearchUrl } from "./venue-geolocation.mjs";
+import { locateVenue, googleMapsEmbedUrl, googleMapsLocationUrl, googleMapsVenueSearchUrl } from "./venue-geolocation.mjs";
 
 
 const $ = selector => document.querySelector(selector);
@@ -74,20 +74,22 @@ function renderGeolocation(event,reference,registry) {
   message.textContent="Todavía no tenemos coordenadas contrastadas de este recinto. No mostraremos un marcador aproximado.";
   map.append(message);
   note.textContent="Puedes comprobar el nombre del lugar mediante la búsqueda externa, pero confirma la dirección y accesos con el organizador.";
-  search.href=osmVenueSearchUrl(event);
+  search.href=googleMapsVenueSearchUrl(event);
   search.hidden=false;
   return;
  }
  status.textContent="Recinto localizado";
  const iframe=document.createElement("iframe");
- iframe.src=osmEmbedUrl(venue);
+ const publicMapsKey=document.querySelector('meta[name="google-maps-embed-key"]')?.content?.trim()||"";
+ iframe.src=googleMapsEmbedUrl(venue,publicMapsKey);
  iframe.title="Mapa de "+event.venue+", "+event.city+", Chile";
  iframe.loading="lazy";
  iframe.referrerPolicy="strict-origin-when-cross-origin";
- iframe.setAttribute("aria-label","Mapa interactivo de la ubicación del recinto");
+ iframe.setAttribute("aria-label","Google Maps con la ubicación del recinto");
+ iframe.allowFullscreen=true;
  map.append(iframe);
  note.textContent=venue.note||"El marcador señala el recinto, no necesariamente la puerta de ingreso. Verifica los accesos antes de asistir.";
- link.href=osmLocationUrl(venue);
+ link.href=googleMapsLocationUrl(venue);
  link.hidden=false;
 }
 
