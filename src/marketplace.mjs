@@ -18,7 +18,7 @@ let buyerApiReady=false;
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
 const brokenReferenceImages=new Set();
 function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
-function allCatalogEvents(){return [...realEvents(),...allEvents()];}
+function allCatalogEvents(){return realEvents();} // Home: real references only; DEMO sales remain in internal tests.
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
 function quoteOrPrice(event,type){try{return quote(store,event.id,type.id,1).totalClp;}catch{return type.priceClp;}}
@@ -94,10 +94,10 @@ function installImages(){
     if(id)brokenReferenceImages.add(id);
     referenceCard.remove();
     const referenceCount=$("#real-events-grid .event-card").length;
-    const demoCount=$("#events-grid .event-card").length;
-    $("#results-description").textContent=referenceCount+" referencias reales y "+demoCount+" eventos de compra DEMO";
-    $("#event-count").textContent=(referenceCount+demoCount)+" fichas de ejemplo";
-    $("#empty-state").hidden=(referenceCount+demoCount)>0;
+    const demoCount=0; // Fictional listings are no longer shown on the public home.
+    $("#results-description").textContent=referenceCount+" eventos reales de referencia";
+    $("#event-count").textContent=referenceCount+" eventos de referencia";
+    $("#empty-state").hidden=referenceCount>0;
    }
    img.remove();
   };
@@ -125,17 +125,18 @@ function matches(event){
  return !ui.query||normalize([event.title,event.subtitle,event.city,event.venue,event.category,event.genre].join(" ")).includes(normalize(ui.query));
 }
 function renderCards(){
- const events=allEvents(),filtered=events.filter(matches);
  const real=realEvents().filter(matches);
  $("#real-events-grid").innerHTML=real.map(realCard).join("");
- $("#events-grid").innerHTML=filtered.map(card).join("");
- $("#event-count").textContent=(events.length+realEvents().length)+" fichas de ejemplo";
- $("#results-description").textContent=real.length+" referencias reales y "+filtered.length+" eventos de compra DEMO";
- $("#empty-state").hidden=(filtered.length+real.length)>0;
+ // The internal DEMO purchase model is intentionally not listed on the public home.
+ $("#events-grid").replaceChildren();
+ $("#event-count").textContent=realEvents().length+" eventos de referencia";
+ $("#results-description").textContent=real.length+" eventos reales de referencia";
+ $("#empty-state").hidden=real.length>0;
  $("#clear-filters").hidden=!ui.query&&ui.category==="Todos"&&ui.city==="all"&&ui.period==="all";
  $$("[data-category]").forEach(el=>{el.classList.toggle("active",el.dataset.category===ui.category);el.setAttribute("aria-pressed",String(el.dataset.category===ui.category));});
  installImages();
 }
+
 
 let heroSlides=[];
 const heroBrokenIds=new Set();
@@ -215,7 +216,7 @@ function chooseHero(index,manual=true){
  scheduleHero();
 }
 function renderFeatured(){
- heroSlides=selectHeroEvents(realSamples,publishedEvents(store),current(),6)
+ heroSlides=selectHeroEvents(realSamples,[],current(),6)
   .filter(event=>!heroBrokenIds.has(event.id));
  heroIndex=0;
  const dots=$("#hero-carousel-dots");
@@ -342,7 +343,7 @@ async function start(){
   refreshBuyer();
  }catch(err){
   $("#hero-poster").innerHTML='<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible.</strong></div>';
-  $("#events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
+  $("#real-events-grid").innerHTML='<p class="load-error">Intenta recargar la plataforma.</p>';
   console.error("PaseListo",err.message);return;
  }
  const heroControls=$("#hero-carousel-controls");
