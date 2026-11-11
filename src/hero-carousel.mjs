@@ -1,5 +1,17 @@
 import { chileToday, weekBounds } from "./week-events.mjs";
 
+// A featured slide must resolve to a real HTTPS image accepted by its poster renderer.
+// DEMO uploads are allowed only with the explicitly declared (unverified) rights status.
+export function hasHeroPoster(event, kind) {
+ if(!event || typeof event.posterUrl!=="string")return false;
+ try {
+  const url=new URL(event.posterUrl);
+  if(url.protocol!=="https:" || !url.hostname || url.username || url.password)return false;
+  return kind==="reference" ||
+    (kind==="demo" && event.posterRights==="declarados_por_usuario_sin_verificar");
+ } catch { return false; }
+}
+
 // Picks editorial highlights from the catalog, without implying ticket availability.
 // Priorities may be curated by the editor; expired events are excluded automatically.
 export function selectHeroEvents(references, demos, today = chileToday(), limit = 6) {
@@ -10,7 +22,7 @@ export function selectHeroEvents(references, demos, today = chileToday(), limit 
    typeof item.title==="string"&&item.title.trim() &&
    /^\d{4}-\d{2}-\d{2}$/.test(item.date||"") &&
    (kind==="reference"||item.status==="published") &&
-   (item.endDate||item.date)>=today
+   (item.endDate||item.date)>=today && hasHeroPoster(item,kind)
  ).map(item=>({...item,kind})):[];
 
  const unique=new Map();
@@ -22,8 +34,8 @@ export function selectHeroEvents(references, demos, today = chileToday(), limit 
  const rank=(a,b)=>weight(b)-weight(a)||a.date.localeCompare(b.date)||a.title.localeCompare(b.title,"es");
  const inWeek=events.filter(e=>e.date<=end&&(e.endDate||e.date)>=today).sort(rank);
  const upcoming=events.filter(e=>e.date>end).sort(rank);
- // Keep a prominent mix: four current-week shows and up to two upcoming
- // highlights with approved reference posters, if available.
+ // Show up to four photographed events from this week, then fill remaining
+ // slots with upcoming events that also have image URLs.
  const slots=Math.min(4,safeLimit);
  const picked=[...inWeek.slice(0,slots),...upcoming.slice(0,safeLimit-slots)];
  const seen=new Set(picked.map(e=>e.id));
