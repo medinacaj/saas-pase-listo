@@ -1,7 +1,7 @@
 import { loadCommerce, publishedEvents, available, quote } from "./commerce-domain.mjs";
 import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
-import { selectHeroEvents, splitHeroTitle, hasHeroPoster } from "./hero-carousel.mjs";
+import { selectHeroEvents, splitHeroTitle, hasHeroPoster, hasEventDescription } from "./hero-carousel.mjs";
 import { weekBounds } from "./week-events.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
@@ -49,7 +49,7 @@ async function refreshInventory(){
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
 const brokenReferenceImages=new Set();
-function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
+function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return realEvents();} // Home: real references only; DEMO sales remain in internal tests.
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
@@ -89,6 +89,7 @@ function realCard(event){
   '<div class="event-information"><div class="event-taxonomy">'+esc(event.category)+'<span>✳</span>'+esc(event.city)+'</div>'+
   '<h3 class="card-heading">'+esc(event.title)+'</h3>'+
   '<p class="event-subtitle">'+esc(event.subtitle)+'</p>'+
+  '<p class="event-description">'+esc(event.description)+'</p>'+
   '<div class="event-meta"><span>'+esc(short(event.date))+'</span><span class="meta-dot">·</span><span>'+esc(event.venue)+'</span></div>'+
   '<div class="event-bottom real-bottom"><span>Solo referencia · Sin venta</span><span aria-hidden="true">↗</span></div></div>'+
   '<button class="card-hitbox" type="button" data-real-detail="'+esc(event.id)+'" aria-label="Ver ficha de '+esc(event.title)+'. Ejemplo sin venta en PaseListo"></button></article>';
@@ -431,6 +432,45 @@ async function showAccount(){
  }
 }
 function resetFilters(){ui.query="";ui.category="Todos";ui.city="all";ui.period="all";$("#event-search").value="";$("#date-filter").value="all";filters();renderCards();}
+const isLocalPreview=["localhost","127.0.0.1","[::1]"].includes(location.hostname);
+const isInternalLab=isLocalPreview && new URLSearchParams(location.search).get("modo")==="pruebas";
+function setupPurchaseLab(){
+ const link=$("#lab-trigger"),panel=$("#lab-testing");
+ if(link)link.hidden=!isLocalPreview;
+ if(!panel || !isInternalLab)return;
+ panel.hidden=false;
+ const eventSelect=$("#lab-event"),ticketSelect=$("#lab-ticket");
+ const events=allEvents();
+ eventSelect.replaceChildren();
+ for(const event of events){
+  const option=document.createElement("option");
+  option.value=event.id;option.textContent=event.title+" · "+event.city;
+  eventSelect.append(option);
+ }
+ function updateTickets(){
+  const event=events.find(item=>item.id===eventSelect.value);
+  ticketSelect.replaceChildren();
+  if(!event)return;
+  for(const type of event.ticketTypes||[]){
+   const option=document.createElement("option");
+   option.value=type.id;
+   option.textContent=type.name+" · "+clp(type.priceClp)+" base";
+   ticketSelect.append(option);
+  }
+  $("#lab-event-description").textContent=event.description||"Evento ficticio de prueba";
+ }
+ eventSelect.addEventListener("change",updateTickets);
+ updateTickets();
+ $("#lab-feedback").textContent="Solo funciona con el servidor local de compradores (npm run api:buyers). No genera entradas ni pagos reales.";
+ $("#lab-checkout-form").addEventListener("submit",async ev=>{
+  ev.preventDefault();
+  const eventId=eventSelect.value,ticketTypeId=ticketSelect.value;
+  if(!events.some(item=>item.id===eventId && item.ticketTypes.some(t=>t.id===ticketTypeId)))return;
+  try{await openCheckout(eventId,ticketTypeId);}
+  catch(error){$("#lab-feedback").textContent=error.message;}
+ });
+}
+
 async function start(){
  try{
   const [response,realResponse]=await Promise.all([
@@ -442,6 +482,7 @@ async function start(){
   store=loadCommerce(catalog);
   realSamples=Array.isArray(visuals.events)?visuals.events:[];
   filters();renderCards();renderFeatured();
+  setupPurchaseLab();
 
   refreshBuyer().then(refreshInventory).catch(()=>{});
  }catch(err){
