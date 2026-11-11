@@ -96,3 +96,23 @@
 .event-ticket-row.is-zone-selected{background:#eff4e8;box-shadow:0 0 0 1px #d8e4ce;border-radius:12px;padding-left:13px;padding-right:13px}
 @media(max-width:560px){.venue-map-panel{padding:9px}.venue-map-legend{grid-template-columns:1fr;gap:7px}.venue-zone-key{min-height:52px;padding:10px}.venue-map-selection{margin-top:10px}.venue-zone-svg-label{font-size:20px}}
 @media(prefers-reduced-motion:reduce){.venue-zone-key,.venue-map-zone path,.event-ticket-row{transition:none}}
+
+
+/* Verified OpenStreetMap venue locations, separate from illustrated ticket zones. */
+.venue-geolocation{margin:24px 0 22px;border:1px solid #e2e8de;border-radius:17px;background:#fffefa;padding:clamp(14px,2.6vw,22px)}
+.venue-geolocation-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.venue-geolocation-head h3{font-family:var(--pl-display,Georgia,serif);font-size:clamp(20px,2.5vw,28px);letter-spacing:-.5px;margin:0;font-weight:600}
+.venue-geolocation-status{font-size:10px;font-weight:800;color:#436c3b;background:#e7f2df;border-radius:999px;padding:7px 10px}
+.venue-geolocation-map{width:100%;height:clamp(235px,30vw,335px);background:#f0f4eb;overflow:hidden;border:1px solid #dce4d9;border-radius:12px;display:flex;align-items:stretch;justify-content:center}
+.venue-geolocation-map iframe{display:block;width:100%;height:100%;border:0}
+.venue-geolocation-unavailable{align-self:center;max-width:390px;padding:18px;text-align:center;font-size:13px;line-height:1.8;color:#576856;margin:0}
+.venue-geolocation-note{margin:12px 0 0!important;color:#677564!important;font-size:11px!important;line-height:1.7!important}
+.venue-geolocation-actions{margin-top:16px;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.venue-geolocation-link,.venue-geolocation-search{display:inline-flex;align-items:center;gap:12px;padding:12px 15px;border-radius:9px;background:#d5f18f;color:#243227;font-size:12px;font-weight:850;text-decoration:none;transition:background .2s,transform .2s}
+.venue-geolocation-link:hover,.venue-geolocation-search:hover{background:#c7eb77;transform:translateY(-1px)}
+.venue-geolocation-link:focus-visible,.venue-geolocation-search:focus-visible{outline:2px solid #344e30;outline-offset:3px}
+.venue-geolocation-actions [hidden]{display:none!important}
+.venue-geolocation-credit{font-size:10px!important;color:#7e867d!important;margin:12px 0 0!important}
+.venue-geolocation-credit a{color:#42603f;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:550px){.venue-geolocation{padding:12px}.venue-geolocation-map{height:250px}.venue-geolocation-head{align-items:start}}
+@media(prefers-reduced-motion:reduce){.venue-geolocation-link,.venue-geolocation-search{transition:none}}
