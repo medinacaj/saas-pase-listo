@@ -172,16 +172,11 @@ function showHeroSlide(manual=false){
  const href=eventDetailHref(event.id);
  $("#hero-feature-link").href=href;
  $("#hero-feature-link").setAttribute("aria-label","Ver ficha de "+event.title);
- $("#hero-slide-count").textContent=String(heroIndex+1).padStart(2,"0")+
-  " / "+String(heroSlides.length).padStart(2,"0");
  const card=$("#hero-poster");
  const artwork=event.kind==="reference"?realPoster(event,true):poster(event);
  card.style.setProperty("--hero-accent",/^#[a-f0-9]{6}$/i.test(event.accent||"")?event.accent:"#d2f58b");
  card.classList.toggle("hero-poster-typographic",!event.posterUrl);
- card.innerHTML='<a class="hero-art-link" href="'+esc(href)+'" aria-label="Ver ficha de '+esc(event.title)+'">'+
-  artwork+'<span class="hero-poster-bottom"><small>'+
-  (event.kind==="reference"?"EVENTO DE REFERENCIA · SIN VENTA":"EVENTO DEMO · SIN COMPRA REAL")+
-  '</small><strong>'+esc(event.title)+' <span aria-hidden="true">↗</span></strong></span></a>';
+ card.innerHTML='<a class="hero-art-link" href="'+esc(href)+'" aria-label="Ver ficha de '+esc(event.title)+'">'+artwork+'</a>';
  $("#hero-carousel-dots").querySelectorAll("[data-hero-index]").forEach(dot=>{
   const active=Number(dot.dataset.heroIndex)===heroIndex;
   dot.classList.toggle("is-active",active);
@@ -214,6 +209,7 @@ function showHeroSlide(manual=false){
 }
 function chooseHero(index,manual=true){
  if(heroSlides.length===0)return;
+ if(manual)heroPaused=true; // a person taking control stops auto-advance
  heroIndex=(index%heroSlides.length+heroSlides.length)%heroSlides.length;
  showHeroSlide(manual);
  scheduleHero();
@@ -245,8 +241,6 @@ function renderFeatured(){
   return;
  }
  $("#hero-carousel-controls").hidden=heroSlides.length<2;
- const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches===true;
- $("#hero-carousel-controls").querySelector("[data-hero-toggle]").hidden=reduceMotion;
  showHeroSlide();
  scheduleHero();
 }
@@ -353,18 +347,8 @@ async function start(){
  }
  const heroControls=$("#hero-carousel-controls");
  heroControls.addEventListener("click",ev=>{
-  const target=ev.target.closest("button");
-  if(!target)return;
-  if(target.hasAttribute("data-hero-step")){
-   chooseHero(heroIndex+Number(target.dataset.heroStep));
-  }else if(target.hasAttribute("data-hero-index")){
-   chooseHero(Number(target.dataset.heroIndex));
-  }else if(target.hasAttribute("data-hero-toggle")){
-   heroPaused=!heroPaused;
-   target.textContent=heroPaused?"Reanudar":"Pausar";
-   target.setAttribute("aria-label",heroPaused?"Reanudar carrusel":"Pausar carrusel");
-   scheduleHero();
-  }
+  const target=ev.target.closest("[data-hero-index]");
+  if(target)chooseHero(Number(target.dataset.heroIndex));
  });
  const hero=$("#inicio");
  hero.addEventListener("mouseenter",()=>{heroHover=true;scheduleHero();});
@@ -374,6 +358,48 @@ async function start(){
   if(!hero.contains(ev.relatedTarget)){heroHover=false;scheduleHero();}
  });
  document.addEventListener("visibilitychange",scheduleHero);
+ // Horizontal swipe changes slides without blocking vertical page scrolling.
+ // Suppress the synthetic link click that Safari can emit at touchend.
+ let touchOrigin=null,mouseOrigin=null,lastSwipeAt=0;
+ const advanceByGesture=(dx,dy)=>{
+  if(Math.abs(dx)<45 || Math.abs(dx)<=Math.abs(dy)*1.3)return false;
+  lastSwipeAt=Date.now();
+  chooseHero(heroIndex+(dx<0?1:-1));
+  return true;
+ };
+ hero.addEventListener("touchstart",ev=>{
+  if(ev.touches.length!==1){touchOrigin=null;return;}
+  const point=ev.touches[0];
+  touchOrigin={x:point.clientX,y:point.clientY};
+ },{passive:true});
+ hero.addEventListener("touchend",ev=>{
+  if(!touchOrigin || ev.changedTouches.length!==1)return;
+  const point=ev.changedTouches[0],origin=touchOrigin;
+  touchOrigin=null;
+  advanceByGesture(point.clientX-origin.x,point.clientY-origin.y);
+ },{passive:true});
+ hero.addEventListener("touchcancel",()=>{touchOrigin=null;},{passive:true});
+ hero.addEventListener("pointerdown",ev=>{
+  if(ev.pointerType==="mouse" && ev.button===0){
+   mouseOrigin={x:ev.clientX,y:ev.clientY};
+  }
+ });
+ hero.addEventListener("pointerup",ev=>{
+  if(ev.pointerType!=="mouse"||!mouseOrigin)return;
+  const origin=mouseOrigin;mouseOrigin=null;
+  advanceByGesture(ev.clientX-origin.x,ev.clientY-origin.y);
+ });
+ hero.addEventListener("click",ev=>{
+  if(Date.now()-lastSwipeAt<450){
+   ev.preventDefault();
+   ev.stopImmediatePropagation();
+  }
+ },true);
+ hero.addEventListener("keydown",ev=>{
+  if(ev.key!=="ArrowLeft"&&ev.key!=="ArrowRight")return;
+  ev.preventDefault();
+  chooseHero(heroIndex+(ev.key==="ArrowRight"?1:-1));
+ });
  $("#event-search").addEventListener("input",ev=>{ui.query=ev.target.value;renderCards();});
  $("#city-filter").addEventListener("change",ev=>{ui.city=ev.target.value;renderCards();});
  $("#date-filter").addEventListener("change",ev=>{ui.period=ev.target.value;renderCards();});
