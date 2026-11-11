@@ -20,6 +20,7 @@ jobs:
           node --check src/hero-carousel.mjs
           node --check src/commerce-domain.mjs
           node --check src/event-page.mjs
+          node --check src/reference-checkout.mjs
           node --check src/week-events.mjs
           node --check src/venue-zones.mjs
           node --check src/event-page-domain.mjs
@@ -49,6 +50,23 @@ jobs:
           assert.ok(details.includes('id="venue-zone-legend"'), 'Zone legend missing');
           assert.ok(detailJs.includes('renderVenueMap(event,store,reference,inventory)'), 'Zone map not rendered');
           assert.ok(detailJs.includes('data-ticket-zone'), 'Map not linked to ticket prices');
+          assert.ok(detailJs.includes('PLANO 100 % FICTICIO'), 'Mock venue sectors must be disclosed');
+          assert.ok(detailJs.includes('changeDemoTier?.(target.dataset.zoneSelect)'), 'Mock zone selector must update ticket selection');
+          assert.ok(details.includes('id="reference-checkout"'), 'Integrated checkout step missing');
+          assert.ok(details.includes('id="reference-checkout-confirm"'), 'Demo confirmation step missing');
+          assert.ok(detailJs.includes('renderReferenceCheckout(event)'), 'Real reference checkout not enabled');
+          assert.ok(detailJs.includes('referenceOrderReceipt(quote,crypto.randomUUID())'), 'Demo receipt generation missing');
+          assert.ok(!page.includes('lab-testing')&&!script.includes('setupPurchaseLab()'), 'Separate buying lab must be removed');
+          const {hasHeroPoster,hasEventDescription}=await import('./src/hero-carousel.mjs');
+          const photographed=refs.events.filter(e=>hasHeroPoster(e,'reference')&&hasEventDescription(e));
+          assert.equal(photographed.length,6,'Only complete photo+description examples should be visible');
+          assert.ok(script.includes('hasEventDescription(e)'), 'Public references need descriptions');
+          const {referenceQuote,referenceOrderReceipt}=await import('./src/reference-checkout.mjs');
+          const quoteDemo=referenceQuote({id:'ref-camila-2026'},'general',2);
+          assert.equal(quoteDemo.totalClp,44000,'Demo subtotal and fee miscalculated');
+          const receiptDemo=referenceOrderReceipt(quoteDemo,'12345678-abcdef');
+          assert.equal(receiptDemo.paymentProcessed,false,'Demo must never process real payments');
+          assert.equal(receiptDemo.ticketIssued,false,'Demo must never issue valid tickets');
           assert.ok(detailJs.includes('SIN PLANO VERIFICADO'), 'Unverified venue warning missing');
           assert.ok(zones.includes('ZONE_COLORS'), 'Category color palette missing');
           const eventPage=readFileSync('evento.html','utf8');
