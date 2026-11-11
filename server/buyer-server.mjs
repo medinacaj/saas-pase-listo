@@ -304,7 +304,7 @@ export function buildBuyerServer({ filePath = join(root, ".local", "buyer-demo.j
       throw bad(404, "Ruta desconocida");
     } catch (err) {
       // Avoid leaking file paths, crypto details or internal errors in HTTP responses.
-      const status = Number.isInteger(err.status) ? err.status : (/insuficientes|no está publicado/.test(err.message) ? 409 : 500);
+      const status = Number.isInteger(err.status) ? err.status : (/insuficientes|no está publicado|Límite máximo de boletos por persona/.test(err.message) ? 409 : /fuera de rango|inválid[oa]/i.test(err.message) ? 422 : 500);
       toJson(res, status, { error: status === 500 ? "Error interno del servidor de demostración" : err.message });
     }
   });
