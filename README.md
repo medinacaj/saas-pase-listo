@@ -134,3 +134,10 @@ En cada ficha `evento.html?id=<ID>` se muestra una sección **Ubicación geográ
 **Integración oficial recomendada:** la API Google Maps Embed usa `https://www.google.com/maps/embed/v1/place`, requiere proyecto de Google Cloud, facturación habilitada y clave API (las solicitudes de Maps Embed actualmente no tienen cargo). Se puede configurar una clave **pública restringida** al dominio web y exclusivamente a Maps Embed API en `<meta name="google-maps-embed-key" content="">` de `evento.html`; no incorporar una clave sin restricciones ni reutilizar credenciales privadas. Si la meta contiene una clave válida, se utiliza automáticamente la URL de la API oficial.
 
 Las coordenadas existentes se mantienen en `data/recintos-openstreetmap.json` por trazabilidad de la procedencia original de los datos —© colaboradores de OpenStreetMap, licencia ODbL—, aunque **el mapa mostrado al público es Google Maps**. Los 11 recintos del catálogo permiten localizar 20 de las 22 referencias actuales. Las coordenadas son puntos del recinto o complejo, no de una puerta de ingreso; se deben revisar accesos y exactitud antes de poner eventos a la venta.
+
+
+### Portada de ejemplos reales, sin «Compra de demostración» (11/11/2026)
+
+La página pública `index.html` presenta únicamente **eventos reales como referencias visuales**. Se eliminó de la vista la sección «Compra de demostración» y sus tarjetas de eventos ficticios. Los filtros de ciudad, categoría, fecha y búsqueda, los contadores y el carrusel trabajan exclusivamente con referencias reales (y se conservan únicamente las que tienen afiche HTTPS, conforme a la opción visual A).
+
+El catálogo `data/eventos-clientes-demo.json`, el servidor y los tests de pedidos simulados permanecen en el repositorio **exclusivamente para desarrollo y pruebas internas**; no se borran ni se confunden con ventas autorizadas. Se mantiene un contenedor oculto y vacío en la portada por compatibilidad técnica, sin generar tarjetas ficticias. Los eventos reales no tienen compra habilitada en PaseListo, pues no existen contratos comerciales ni inventario verificado.
