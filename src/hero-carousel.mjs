@@ -12,6 +12,11 @@ export function hasHeroPoster(event, kind) {
  } catch { return false; }
 }
 
+// A public card needs substantial editorial copy, not a title or a date alone.
+export function hasEventDescription(event) {
+ return typeof event?.description==="string" && event.description.trim().length>=40;
+}
+
 // Picks editorial highlights from the catalog, without implying ticket availability.
 // Priorities may be curated by the editor; expired events are excluded automatically.
 export function selectHeroEvents(references, demos, today = chileToday(), limit = 6) {
@@ -22,7 +27,7 @@ export function selectHeroEvents(references, demos, today = chileToday(), limit 
    typeof item.title==="string"&&item.title.trim() &&
    /^\d{4}-\d{2}-\d{2}$/.test(item.date||"") &&
    (kind==="reference"||item.status==="published") &&
-   (item.endDate||item.date)>=today && hasHeroPoster(item,kind)
+   (item.endDate||item.date)>=today && hasHeroPoster(item,kind) && hasEventDescription(item)
  ).map(item=>({...item,kind})):[];
 
  const unique=new Map();
