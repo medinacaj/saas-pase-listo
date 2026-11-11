@@ -159,7 +159,7 @@ test("la portada solo muestra eventos reales y conserva DEMO fuera del catálogo
 });
 
 
-test("la portada presenta únicamente fichas completas y conserva un laboratorio local para compras",async()=>{
+test("la portada muestra fichas completas y la compra DEMO sigue el mismo recorrido del comprador",async()=>{
  const {hasHeroPoster,hasEventDescription}=await import("../src/hero-carousel.mjs");
  const visuals=refs.events.filter(e=>hasHeroPoster(e,"reference")&&hasEventDescription(e));
  assert.equal(visuals.length,6);
@@ -167,17 +167,17 @@ test("la portada presenta únicamente fichas completas y conserva un laboratorio
  assert.ok(visuals.every(e=>e.posterUrl.startsWith("https://")));
  assert.match(marketplace,/hasHeroPoster\(e,"reference"\)&&hasEventDescription\(e\)/);
  assert.ok(marketplace.includes('esc(event.description)'));
- assert.ok(portal.includes('id="lab-trigger"'));
- assert.ok(portal.includes('id="lab-testing"'));
- assert.ok(portal.includes('id="lab-checkout-form"'));
- assert.ok(portal.includes('id="lab-event"'));
- assert.ok(portal.includes('id="lab-ticket"'));
- assert.ok(marketplace.includes('new URLSearchParams(location.search).get("modo")==="pruebas"'));
- assert.ok(marketplace.includes('isLocalPreview &&'));
- assert.ok(marketplace.includes('link.hidden=!isLocalPreview'));
- assert.ok(marketplace.includes('panel.hidden=false'));
- assert.ok(marketplace.includes('await openCheckout(eventId,ticketTypeId)'));
- assert.ok(marketplace.includes('setupPurchaseLab()'));
+ assert.equal(portal.includes('id="lab-trigger"'),false);
+ assert.equal(portal.includes('id="lab-testing"'),false);
+ assert.equal(marketplace.includes("setupPurchaseLab()"),false);
+ const page=await read("../evento.html");
+ const eventJs=await read("../src/event-page.mjs");
+ assert.ok(page.includes('id="reference-checkout"'));
+ assert.ok(page.includes('id="reference-checkout-next"'));
+ assert.ok(page.includes('id="reference-checkout-confirm"'));
+ assert.ok(eventJs.includes('renderReferenceCheckout(event)'));
+ assert.ok(eventJs.includes('referenceOrderReceipt(quote,crypto.randomUUID())'));
+ assert.ok(eventJs.includes('changeDemoTier?.(target.dataset.zoneSelect)'));
  assert.ok(!portal.includes('Compra de demostración'));
  // The fixture remains intact for local authentication, inventory and purchase tests.
  assert.ok(demo.events.length>=8);
