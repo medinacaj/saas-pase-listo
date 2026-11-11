@@ -36,12 +36,15 @@
       "time": null,
       "organizer": "Organizador no confirmado por PaseListo",
       "sourceUrl": "https://www.puntoticket.com/Landing/ListadoEventosTodos",
-      "posterCredit": "Fecha y recinto contrastados en cartelera pública; sin afiche reproducido",
+      "posterCredit": "Ilustración editorial original de PaseListo para prueba de interfaz. Arte conceptual no oficial.",
       "featured": false,
       "accent": "#54776b",
       "verifiedOn": "2026-11-10",
       "verificationScope": "fecha y recinto",
-      "heroPriority": 95
+      "heroPriority": 95,
+      "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/cypress-hill-2026.svg",
+      "description": "Cypress Hill llega a Santiago con un concierto de hip-hop programado para el 11 de noviembre de 2026 en el Teatro Caupolicán. Esta ficha es una referencia de diseño, no una oferta de entradas.",
+      "visualNote": "El afiche es ilustrativo, no promocional oficial."
     },
     {
       "id": "ref-edo-caroe-valpo-2026-11-11",
@@ -114,12 +117,15 @@
       "time": null,
       "organizer": "Organizador no confirmado por PaseListo",
       "sourceUrl": "https://www.puntoticket.com/Landing/ListadoEventosTodos",
-      "posterCredit": "Fecha y recinto contrastados en cartelera pública; sin afiche reproducido",
+      "posterCredit": "Ilustración editorial original de PaseListo para prueba de interfaz. Arte conceptual no oficial.",
       "featured": false,
       "accent": "#dbaa78",
       "verifiedOn": "2026-11-10",
       "verificationScope": "fecha y recinto",
-      "heroPriority": 91
+      "heroPriority": 91,
+      "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/feria-sanguche-2026.svg",
+      "description": "La Feria del Sanguche reúne propuestas gastronómicas en Parque Padre Hurtado, Santiago, del 13 al 15 de noviembre de 2026. Los precios y sectores que muestra PaseListo son exclusivamente simulados.",
+      "visualNote": "El afiche es ilustrativo, no promocional oficial."
     },
     {
       "id": "ref-luar-la-l-2026-11-13",
@@ -172,12 +178,15 @@
       "time": null,
       "organizer": "Organizador no confirmado por PaseListo",
       "sourceUrl": "https://www.puntoticket.com/Landing/ListadoEventosTodos",
-      "posterCredit": "Fecha y recinto contrastados en cartelera pública; sin afiche reproducido",
+      "posterCredit": "Ilustración editorial original de PaseListo para prueba de interfaz. Arte conceptual no oficial.",
       "featured": false,
       "accent": "#8f83b3",
       "verifiedOn": "2026-11-10",
       "verificationScope": "fecha y recinto",
-      "heroPriority": 98
+      "heroPriority": 98,
+      "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/creamfields-2026.svg",
+      "description": "Creamfields Chile reúne actuaciones de música electrónica y espectáculos audiovisuales durante el 14 y 15 de noviembre en el Club Hípico de Santiago. Consulta la programación y accesos oficiales antes de asistir.",
+      "visualNote": "El afiche es ilustrativo, no promocional oficial."
     },
     {
       "id": "ref-los-tres-unplugged-2026",
@@ -268,12 +277,15 @@
       "time": "19:00",
       "organizer": "Organizador no confirmado por PaseListo",
       "sourceUrl": "https://www.todoenconce.cl/panoramas/",
-      "posterCredit": "Fecha y recinto contrastados en cartelera pública; sin afiche reproducido",
+      "posterCredit": "Ilustración editorial original de PaseListo para prueba de interfaz. Arte conceptual no oficial.",
       "featured": false,
       "accent": "#7a937f",
       "verifiedOn": "2026-11-10",
       "verificationScope": "fecha y recinto",
-      "heroPriority": 88
+      "heroPriority": 88,
+      "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/leon-gieco-2026.svg",
+      "description": "León Gieco tiene una presentación anunciada en el Teatro Universidad de Concepción para el 15 de noviembre de 2026. Esta ficha permite explorar el recinto y probar una compra ficticia sin pagos reales.",
+      "visualNote": "El afiche es ilustrativo, no promocional oficial."
     },
     {
       "id": "ref-alanys-lagos-2026",
