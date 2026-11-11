@@ -47,7 +47,7 @@ function renderEvents(){
  '<tr><td><strong>'+esc(e.title)+'</strong><small>'+esc(e.venue)+'</small><small class="internal-event-id">ID interno: <code>'+esc(e.id)+'</code></small></td>'+
  '<td>'+esc(e.organizerName)+'</td>'+
  '<td>'+esc(e.city)+'<small>'+esc(e.date)+'</small></td>'+
- '<td>'+e.issuedDemo+' / '+e.ticketTypes.reduce((n,t)=>n+t.capacity,0)+'<small>Máx. '+(e.maxTicketsPerPerson??10)+' por persona</small></td>'+
+ '<td>'+e.issuedDemo+' / '+e.ticketTypes.reduce((n,t)=>n+t.capacity,0)+'<small>Máx. '+(e.maxTicketsPerPerson??7)+' por persona</small></td>'+
  '<td><span class="status '+(e.status==="paused"?"paused":"")+'">'+(e.status==="published"?"Publicación DEMO":"Pausado DEMO")+'</span></td>'+
  '<td><button type="button" class="action-btn '+(e.status==="published"?"danger":"")+'" data-toggle-event="'+esc(e.id)+'">'+(e.status==="published"?"Pausar":"Reactivar")+'</button></td></tr>').join(""):'<tr><td colspan="6" class="empty">No existen eventos ficticios.</td></tr>';
 }
