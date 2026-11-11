@@ -64,7 +64,7 @@ test("el catálogo real aporta seis diapositivas futuras con afiche, no ejemplos
  const demos=await read("../data/eventos-clientes-demo.json").then(JSON.parse);
  const selected=selectHeroEvents(refs.events,demos.events,"2026-11-10",6);
  assert.equal(selected.length,6);
- assert.equal(selected[0].id,"ref-camila-2026");
+ assert.equal(selected[0].id,"ref-creamfields-2026");
  assert.ok(selected.every(e=>hasHeroPoster(e,e.kind)));
  assert.ok(selected.every(e=>e.posterUrl.startsWith("https://")));
  assert.ok(selected.every(e=>e.kind==="reference"));
