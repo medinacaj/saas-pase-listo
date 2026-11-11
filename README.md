@@ -110,11 +110,11 @@ Para un uso comercial futuro debe existir una configuración de recinto aprobada
 
 ### Carrusel de eventos destacados en la portada
 
-El bloque principal oscuro de `index.html` contiene un **carrusel editorial de eventos destacados** (ya no una franja debajo del menú). Muestra cuatro eventos de esta semana y hasta dos próximos destacados, seleccionados automáticamente a partir del catálogo con prioridad editorial `heroPriority`; los eventos vencidos desaparecen al cambiar de fecha. Cada diapositiva actualiza título, subtítulo, fecha, ciudad, recinto, composición de afiche y enlaces a `evento.html?id=<ID>`.
+El bloque principal oscuro de `index.html` contiene un **carrusel editorial de eventos destacados** (ya no una franja debajo del menú). **Solo se admiten eventos con un afiche HTTPS disponible en su ficha**, seleccionados según la fecha y la prioridad editorial `heroPriority`; los eventos vencidos desaparecen al cambiar de fecha. Si ninguno de los eventos de la semana tiene afiche, se priorizan los próximos que sí lo tengan, sin inventar imágenes. Cada diapositiva actualiza título, subtítulo, fecha, ciudad, recinto, composición de afiche y enlaces a `evento.html?id=<ID>`.
 
 La rotación ocurre cada 6,5 segundos; hay flechas anterior/siguiente, indicadores de posición y control de pausa. Se detiene al pasar el mouse, al enfocar controles o enlaces, al ocultar la pestaña y cuando el navegador prefiere movimiento reducido. El diseño se adapta a móviles. Se preservan las tarjetas de la cartelera y la estructura de navegación sin añadir encabezados altos ni una segunda barra de eventos.
 
-Los afiches existentes se muestran solo como referencias con derechos de explotación comercial **no acreditados**. Las referencias recientes sin permisos de reproducción usan composiciones tipográficas, no imágenes copiadas. Todos los destacados externos indican **«Referencia · sin venta»**. Las páginas públicas siguen sin pagos ni entradas válidas.
+Los afiches existentes se muestran solo como referencias con derechos de explotación comercial **no acreditados**. **Opción A (solo imágenes):** las referencias sin URL válida de afiche se ocultan tanto del carrusel como de las tarjetas de la portada; las imágenes externas que no cargan se retiran visualmente. Permanecen en el catálogo y en sus fichas individuales, sin inventar material promocional. Todos los destacados externos indican **«Referencia · sin venta»**. Las páginas públicas siguen sin pagos ni entradas válidas.
 
 #### Verificación del catálogo semanal (10/11/2026)
 
