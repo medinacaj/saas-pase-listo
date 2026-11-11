@@ -123,3 +123,14 @@ La primera franja semanal solo leía seis referencias de diseño y ocho eventos 
 El carrusel de la portada destaca algunos de los eventos relevantes de esa semana y dos próximos espectáculos; el resto continúa disponible en la cartelera. Los nuevos registros tienen IDs internos únicos, URL de la fuente, fecha de verificación y aviso de que **no existe contrato, inventario ni venta en PaseListo**. Para estos nuevos eventos se usan tarjetas tipográficas, sin copiar afiches promocionales ni publicar precios de terceros.
 
 **Importante:** la comprobación se hizo en la fecha indicada, no es una sincronización automática ni una verificación futura de disponibilidad. Para operación real debe existir una ingesta periódica de eventos mediante fuentes autorizadas, revisión de modificaciones/cancelaciones y contratos comerciales antes de poner entradas a la venta.
+
+
+### Georreferenciación de recintos mediante OpenStreetMap
+
+Cada ficha individual `evento.html?id=<ID>` incluye, debajo de «Sobre el recinto», una sección **Ubicación geográfica** independiente del plano ilustrativo de categorías/zonas. Para lugares con coordenadas documentadas muestra un mapa OpenStreetMap incrustado con marcador y un enlace «Abrir ubicación en OpenStreetMap». El iframe utiliza `loading="lazy"` para solicitar el mapa solo al aproximarse a esa sección.
+
+El archivo `data/recintos-openstreetmap.json` contiene **11 recintos en Chile** con latitud, longitud, identificador OSM, procedencia, fecha de comprobación y advertencias sobre accesos. Los eventos que comparten recinto usan la misma referencia: no se repiten coordenadas en los registros de eventos. Un marcador señala el recinto o complejo, **no necesariamente la entrada, estacionamiento o punto exacto de celebración**.
+
+Si el recinto real no tiene coordenadas contrastadas, la ficha muestra «Ubicación no verificada» y ofrece una búsqueda manual en OpenStreetMap **sin colocar ningún pin ficticio**. Los recintos creados para la DEMO son imaginarios: no se les asocia ubicación real, búsqueda ni ruta. No hay llamadas automáticas a Nominatim ni consultas de geocodificación por cada visita. El módulo `src/venue-geolocation.mjs` valida coordenadas y exige coincidencia exacta entre recinto y ciudad.
+
+Atribución: **© colaboradores de OpenStreetMap**, licencia ODbL. Las coordenadas del registro proceden de objetos OSM localizables desde Mapcarta. Se debe verificar y mantener actualizado este catálogo antes de publicar información de accesibilidad o accesos al público. OpenStreetMap ofrece capacidad comunitaria de mejor esfuerzo y no constituye una infraestructura de mapas garantizada para un servicio comercial de alto tráfico; antes de producción conviene contratar mapas basados en OSM con SLA o infraestructura propia.
