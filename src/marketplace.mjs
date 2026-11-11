@@ -48,7 +48,8 @@ async function refreshInventory(){
  }
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
-function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")).sort((a,b)=>a.date.localeCompare(b.date));}
+const brokenReferenceImages=new Set();
+function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&!brokenReferenceImages.has(e.id)).sort((a,b)=>a.date.localeCompare(b.date));}
 function allCatalogEvents(){return [...realEvents(),...allEvents()];}
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
@@ -130,6 +131,17 @@ function installImages(){
    const fallback=img.dataset.fallback;
    if(fallback&&!img.dataset.tried){img.dataset.tried="1";img.src=fallback;return;}
    frame?.classList.add("image-failed");
+   const referenceCard=img.closest(".event-card.reference-event");
+   if(referenceCard){
+    const id=referenceCard.querySelector("[data-real-detail]")?.dataset.realDetail;
+    if(id)brokenReferenceImages.add(id);
+    referenceCard.remove();
+    const referenceCount=$("#real-events-grid .event-card").length;
+    const demoCount=$("#events-grid .event-card").length;
+    $("#results-description").textContent=referenceCount+" referencias reales y "+demoCount+" eventos de compra DEMO";
+    $("#event-count").textContent=(referenceCount+demoCount)+" fichas de ejemplo";
+    $("#empty-state").hidden=(referenceCount+demoCount)>0;
+   }
    img.remove();
   };
   img.addEventListener("load",loaded,{once:true});
