@@ -23,6 +23,7 @@ jobs:
           node --check src/week-events.mjs
           node --check src/venue-zones.mjs
           node --check src/event-page-domain.mjs
+          node --check src/venue-geolocation.mjs
           node --check src/control.mjs
       - name: Verify event cards and catalogs
         run: |
@@ -77,5 +78,24 @@ jobs:
           assert.ok(script.includes('heroBrokenIds.add(event.id)'),'Broken hero posters must be excluded');
           assert.ok(carousel.includes('hasHeroPoster(item,kind)'),'Hero image filter missing');
           assert.ok(refs.events.filter(e=>e.date>='2026-11-10'&&e.date<='2026-11-15').length>=16,'Verified weekly catalog must remain complete');
+          const geoRegistry=JSON.parse(readFileSync('data/recintos-openstreetmap.json','utf8'));
+          const {locateVenue,osmEmbedUrl,osmLocationUrl}=await import('./src/venue-geolocation.mjs');
+          assert.ok(geoRegistry.venues.length>=11,'Venue coordinate catalog is incomplete');
+          const mapped=refs.events.filter(e=>locateVenue(e,geoRegistry));
+          assert.ok(mapped.length>=20,'Real event venue coverage has regressed');
+          assert.ok(demo.events.every(e=>!locateVenue(e,geoRegistry)),
+            'Never invent geographical pins for fictitious demo venues');
+          const santander=locateVenue({venue:'Santander Arena',city:'Santiago'},geoRegistry);
+          assert.ok(santander&&santander.lat===-33.46273,'Santander Arena point absent');
+          assert.ok(osmEmbedUrl(santander).startsWith('https://www.openstreetmap.org/export/embed.html?'));
+          assert.ok(osmLocationUrl(santander).includes('#map=16/'));
+          assert.ok(details.includes('id="venue-geolocation-map"'),'OSM embedded map missing');
+          assert.ok(details.includes('colaboradores de OpenStreetMap'),'OSM attribution missing');
+          assert.ok(detailJs.includes('renderGeolocation(event,reference,geoRegistry)'),'Geo map not loaded in event details');
+          assert.ok(detailJs.includes('iframe.loading="lazy"'),'OSM iframe must load lazily');
+          assert.ok(detailJs.includes('No mostraremos un marcador aproximado'),'Unverified venues need a safe placeholder');
+          assert.ok(!readFileSync('src/venue-geolocation.mjs','utf8').includes('nominatim.openstreetmap.org'),
+            'Do not geocode every page view through public Nominatim');
+          console.log('Geolocated real event venues:',mapped.length,'of',refs.events.length);
           console.log('Featured event carousel, catalog and event detail pages validated.');
           JS
