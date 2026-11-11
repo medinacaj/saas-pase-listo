@@ -44,7 +44,8 @@
       "heroPriority": 95,
       "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/cypress-hill-2026.svg",
       "description": "Cypress Hill llega a Santiago con un concierto de hip-hop programado para el 11 de noviembre de 2026 en el Teatro Caupolicán. Esta ficha es una referencia de diseño, no una oferta de entradas.",
-      "visualNote": "El afiche es ilustrativo, no promocional oficial."
+      "visualNote": "El afiche es ilustrativo, no promocional oficial.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/cypress-hill-2026.svg"
     },
     {
       "id": "ref-edo-caroe-valpo-2026-11-11",
@@ -125,7 +126,8 @@
       "heroPriority": 91,
       "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/feria-sanguche-2026.svg",
       "description": "La Feria del Sanguche reúne propuestas gastronómicas en Parque Padre Hurtado, Santiago, del 13 al 15 de noviembre de 2026. Los precios y sectores que muestra PaseListo son exclusivamente simulados.",
-      "visualNote": "El afiche es ilustrativo, no promocional oficial."
+      "visualNote": "El afiche es ilustrativo, no promocional oficial.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/feria-sanguche-2026.svg"
     },
     {
       "id": "ref-luar-la-l-2026-11-13",
@@ -186,7 +188,8 @@
       "heroPriority": 98,
       "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/creamfields-2026.svg",
       "description": "Creamfields Chile reúne actuaciones de música electrónica y espectáculos audiovisuales durante el 14 y 15 de noviembre en el Club Hípico de Santiago. Consulta la programación y accesos oficiales antes de asistir.",
-      "visualNote": "El afiche es ilustrativo, no promocional oficial."
+      "visualNote": "El afiche es ilustrativo, no promocional oficial.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/creamfields-2026.svg"
     },
     {
       "id": "ref-los-tres-unplugged-2026",
@@ -285,7 +288,8 @@
       "heroPriority": 88,
       "posterUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/leon-gieco-2026.svg",
       "description": "León Gieco tiene una presentación anunciada en el Teatro Universidad de Concepción para el 15 de noviembre de 2026. Esta ficha permite explorar el recinto y probar una compra ficticia sin pagos reales.",
-      "visualNote": "El afiche es ilustrativo, no promocional oficial."
+      "visualNote": "El afiche es ilustrativo, no promocional oficial.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/leon-gieco-2026.svg"
     },
     {
       "id": "ref-alanys-lagos-2026",
@@ -343,9 +347,10 @@
       "posterCredit": "Afiche promocional difundido por DG Medios (publicación oficial)",
       "featured": true,
       "accent": "#f8af41",
-      "posterFallbackUrl": "https://www.rockaxis.com/rxidashboard/wisi_photos/1772206047_Gorillaz%202.png",
+      "posterFallbackUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/gorillaz-2026.svg",
       "heroPriority": 86,
-      "description": "Gorillaz presenta The Mountain Tour 2026 en el Estadio Bicentenario de La Florida, en Santiago. Fecha y recinto a comprobar con el organizador antes de asistir."
+      "description": "Gorillaz presenta The Mountain Tour 2026 en el Estadio Bicentenario de La Florida, en Santiago. Fecha y recinto a comprobar con el organizador antes de asistir.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/gorillaz-2026.svg"
     },
     {
       "id": "ref-fauna-primavera-2026",
@@ -365,9 +370,10 @@
       "posterCredit": "Afiche del festival difundido por Rockaxis",
       "featured": true,
       "accent": "#e7bb9b",
-      "posterFallbackUrl": "https://uchile-media-storage.nyc3.cdn.digitaloceanspaces.com/2026/06/cartel-fauna-primavera-1-678x847.jpg",
+      "posterFallbackUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/fauna-primavera-2026.svg",
       "heroPriority": 90,
-      "description": "Fauna Primavera reúne propuestas de música independiente y rock en Parque Ciudad Empresarial, Santiago, entre el 26 y el 28 de noviembre de 2026."
+      "description": "Fauna Primavera reúne propuestas de música independiente y rock en Parque Ciudad Empresarial, Santiago, entre el 26 y el 28 de noviembre de 2026.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/fauna-primavera-2026.svg"
     },
     {
       "id": "ref-camila-2026",
@@ -388,7 +394,9 @@
       "featured": true,
       "accent": "#6b3f64",
       "heroPriority": 93,
-      "description": "Camila presenta su Tour Adiós en Santander Arena, Santiago, el 20 de noviembre de 2026. Esta ficha muestra los datos anunciados como referencia visual."
+      "description": "Camila presenta su Tour Adiós en Santander Arena, Santiago, el 20 de noviembre de 2026. Esta ficha muestra los datos anunciados como referencia visual.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/camila-2026.svg",
+      "posterFallbackUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/camila-2026.svg"
     },
     {
       "id": "ref-deep-purple-2026",
@@ -408,7 +416,9 @@
       "posterCredit": "Afiche promocional difundido por TVN",
       "featured": false,
       "accent": "#33373e",
-      "description": "Deep Purple visita Santiago con su espectáculo de hard rock en Santander Arena, previsto para el 8 de diciembre de 2026."
+      "description": "Deep Purple visita Santiago con su espectáculo de hard rock en Santander Arena, previsto para el 8 de diciembre de 2026.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/deep-purple-2026.svg",
+      "posterFallbackUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/deep-purple-2026.svg"
     },
     {
       "id": "ref-alegria-2027",
@@ -428,7 +438,9 @@
       "posterCredit": "Afiche promocional difundido por Voorus",
       "featured": false,
       "accent": "#3c6d61",
-      "description": "Alegría, de Cirque du Soleil, tiene funciones anunciadas en la Gran Carpa de Espacio Riesco, Santiago, durante enero de 2027."
+      "description": "Alegría, de Cirque du Soleil, tiene funciones anunciadas en la Gran Carpa de Espacio Riesco, Santiago, durante enero de 2027.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/alegria-2027.svg",
+      "posterFallbackUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/alegria-2027.svg"
     },
     {
       "id": "ref-31-minutos-2026",
@@ -448,7 +460,9 @@
       "posterCredit": "Material promocional publicado en PuntoTicket",
       "featured": false,
       "accent": "#f4793f",
-      "description": "31 Minutos presenta Radio Guaripolo en Claro Arena, Santiago, el 20 de diciembre de 2026, como espectáculo familiar."
+      "description": "31 Minutos presenta Radio Guaripolo en Claro Arena, Santiago, el 20 de diciembre de 2026, como espectáculo familiar.",
+      "illustrationUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/31-minutos-2026.svg",
+      "posterFallbackUrl": "https://medinacaj.github.io/saas-pase-listo/assets/event-art/31-minutos-2026.svg"
     }
   ]
 }
