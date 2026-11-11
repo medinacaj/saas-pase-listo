@@ -113,7 +113,7 @@ function renderVenue(event,reference) {
   ?"La dirección exacta, accesos, restricciones y horarios de apertura no están verificados por PaseListo."
   :"Este recinto es ficticio. La dirección, el estacionamiento y los accesos forman parte de una simulación.");
  setText("#event-conditions",reference
-  ?"La información de este espectáculo se utiliza como referencia visual. PaseListo no ha acreditado un contrato de venta con el organizador, ni precios, aforo o condiciones de ingreso. No se emiten entradas desde esta página."
+  ?"Esta ficha de un espectáculo real se usa exclusivamente para probar el recorrido de compra. Las zonas, tarifas y el pedido mostrado son ficticios; no hay contrato de venta, reservas ni entradas válidas."
   :"Este evento es completamente ficticio. Las categorías, los valores y las cantidades son de ensayo; no hay cobros, reservas reales ni entradas válidas.");
 }
 
@@ -302,11 +302,26 @@ function renderVenueMap(event,store,reference,inventory){
  const selection=$("#venue-zone-selection");
  const disclaimer=$("#venue-map-accuracy");
  if(reference){
-  setText("#venue-map-intro","Las zonas y categorías oficiales de este recinto no están acreditadas en PaseListo.");
-  map.innerHTML=venueDiagram([],false);
-  legend.innerHTML='<p class="venue-map-empty">Mapa de sectores pendiente de verificación con el organizador. No se asignan ubicaciones ni precios de terceros.</p>';
-  selection.hidden=true;
-  disclaimer.textContent="Gráfico neutro de espera: no representa el plano real del recinto.";
+  const zones=buildVenueZones(DEMO_REFERENCE_TIERS);
+  setText("#venue-map-intro","Explora una distribución ficticia y selecciona un sector para ensayar el proceso de compra.");
+  map.innerHTML=venueDiagram(zones);
+  legend.innerHTML=zones.map(zone=>
+   '<button type="button" class="venue-zone-key" data-zone-select="'+esc(zone.id)+'" aria-pressed="false">'+
+   '<span class="venue-zone-swatch" style="--zone-color:'+zone.color+'" aria-hidden="true"></span>'+
+   '<span class="venue-zone-key-name">'+esc(zone.name)+'</span>'+
+   '<strong class="venue-zone-key-price">'+clp(zone.priceClp)+'</strong></button>'
+  ).join("");
+  disclaimer.textContent="PLANO 100 % FICTICIO. No representa las zonas, butacas, precios ni disponibilidad del recinto real.";
+  const panel=map.closest(".venue-map-panel");
+  const onSelect=target=>{if(target?.dataset.zoneSelect)changeDemoTier?.(target.dataset.zoneSelect);};
+  panel.addEventListener("click",ev=>onSelect(ev.target.closest("[data-zone-select]")));
+  panel.addEventListener("keydown",ev=>{
+   if(ev.key!=="Enter"&&ev.key!==" ")return;
+   const target=ev.target.closest("g[data-zone-select]");
+   if(target){ev.preventDefault();onSelect(target);}
+  });
+  selection.hidden=false;
+  changeDemoTier?.(DEMO_REFERENCE_TIERS[0].id);
   return;
  }
  const zones=buildVenueZones(event.ticketTypes).map(zone=>{
@@ -444,9 +459,7 @@ async function start() {
   setText("#event-category",event.category+" / "+event.city+(reference?" / REFERENCIA":" / DEMO"));
   setText("#event-title",event.title);
   setText("#event-subtitle",event.subtitle||"");
-  setText("#event-description",reference
-   ?"Una ficha del espectáculo para consultar fecha, ciudad y recinto en un solo lugar. Esta referencia no representa una oferta de venta de PaseListo."
-   :event.description||"Evento ficticio de demostración.");
+  setText("#event-description",event.description||"Evento ficticio de demostración.");
   const end=event.endDate&&event.endDate!==event.date?" al "+date(event.endDate):"";
   setText("#event-when",date(event.date)+end+(event.time?" · "+event.time+" h":" · horario por confirmar"));
   setText("#event-venue",event.venue);
@@ -459,6 +472,10 @@ async function start() {
   $("#event-page-view").hidden=false;
   const inventory=reference?{enabled:false}:await loadInventory();
   renderTickets(event,store,reference,inventory);
+  if(reference){
+   setText("#tickets-heading","Elige tus entradas DEMO.");
+   document.querySelector(".event-page-tickets .event-page-section-label").textContent="SIMULACIÓN · SIN VENTA REAL";
+  }
   renderVenueMap(event,store,reference,inventory);
   await renderWeather(event);
  }catch{
