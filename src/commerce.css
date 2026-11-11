@@ -154,3 +154,23 @@
 .buyer-orders-dialog #buyer-logout{margin-top:20px}
 .checkout-submit:disabled{opacity:.6;cursor:wait}
 @media(max-width:600px){.buyer-order-top{flex-wrap:wrap}.buyer-orders-list{max-height:45vh}}
+
+
+/* Public cards: complete editorial details only. */
+.reference-event .event-description{font-size:12px;line-height:1.55;color:#6d756e;margin:7px 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.lab-header-link{display:inline-flex;align-items:center;text-decoration:none;border:1px solid #78945a;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800;color:#263c2c;background:#eff9d8}
+.lab-header-link:hover{background:#def3b0}
+.lab-header-link[hidden],.internal-lab[hidden]{display:none!important}
+.internal-lab{margin:30px 0;padding:clamp(16px,3vw,30px);border:1px solid #c9d9ba;background:#f2f8e9;border-radius:16px}
+.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.lab-head h3{font-size:clamp(22px,3vw,32px);margin:5px 0 9px}
+.lab-head p{font-size:13px;line-height:1.6;max-width:660px;color:#5a6957}
+.lab-head>a{color:#365131;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.lab-eyebrow{font-size:10px;letter-spacing:1px;font-weight:900;color:#496942}
+.lab-controls{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:14px;margin-top:20px}
+.lab-controls label{display:grid;gap:6px;font-size:12px;color:#38513d;font-weight:800}
+.lab-controls select{width:100%;min-width:0;padding:11px;border-radius:8px;border:1px solid #c0d1b5;background:#fff;font:inherit}
+.lab-submit{padding:12px 17px;border-radius:9px;border:0;background:#283c2c;color:#fff;font-weight:800;cursor:pointer}
+.lab-submit:focus-visible{outline:3px solid #759c5a;outline-offset:3px}
+.lab-description,.lab-feedback{color:#52654f;font-size:12px;line-height:1.7;margin:10px 0 0}
+@media(max-width:720px){.lab-controls{grid-template-columns:1fr}.lab-controls label,.lab-submit{width:100%}.lab-header-link{font-size:10px;padding:7px}}
