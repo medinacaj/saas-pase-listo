@@ -51,6 +51,12 @@
 <div class="pair"><label>Tipo de espectáculo<select name="category"><option>Música</option><option>Festivales</option><option>Comedia</option><option>Teatro</option><option>Familia</option><option>Experiencias</option></select></label><label>Color de cartel de prueba<input type="color" name="accent" value="#CFF47A"></label></div>
 <div class="pair"><label>Precio base DEMO (CLP)<input type="number" min="0" max="5000000" step="1" name="priceClp" value="15000" required></label><label>Cupos de prueba<input type="number" min="1" max="100000" step="1" name="capacity" value="100" required></label></div>
 <div class="pair"><label for="event-max-tickets">Máximo de boletos por persona<input id="event-max-tickets" type="number" min="1" max="100" step="1" name="maxTicketsPerPerson" value="7" required aria-describedby="event-max-tickets-help"></label><div><p class="helper" id="event-max-tickets-help">Predeterminado: 7. Limita la cantidad total que puede adquirir una misma persona para este evento, incluso si realiza varios pedidos DEMO. Valores permitidos: 1 a 100.</p></div></div>
+<fieldset class="waitlist-settings" aria-describedby="waitlist-policy-help">
+ <legend>Acceso y lista de espera</legend>
+ <label class="waitlist-switch"><input id="event-waitlist-enabled" type="checkbox" name="waitlistEnabled" value="on"><span><strong>Activar lista de espera virtual</strong><small>Organiza por turno a los compradores registrados antes de permitir pedidos DEMO.</small></span></label>
+ <p class="helper" id="waitlist-policy-help">Para eventos masivos (5.000 cupos o más), la lista de espera se activa de forma obligatoria. En eventos menores es opcional. La posición, la admisión y el límite por comprador los valida el servidor; esta versión pública solo demuestra la configuración y no realiza ventas reales.</p>
+ <p class="helper" id="waitlist-capacity-status" role="status">Lista de espera opcional para el aforo indicado.</p>
+</fieldset>
 <p class="helper">Se utilizará un cartel gráfico de ejemplo. Para afiches reales de un productor se requerirá licencia y revisión; no se habilita carga de imágenes de terceros desde esta demo.</p>
 <button class="primary-btn" type="submit">Registrar publicación DEMO ↗</button><p role="status" id="event-feedback"></p>
 </form></div>
