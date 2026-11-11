@@ -95,6 +95,8 @@ test("PostgreSQL DEMO: transacciones entre conexiones, idempotencia y ruta HTTP 
   });
 
   await t.test("ocho pedidos paralelos no superan dos entradas, aun entre pools", async () => {
+    await reset();
+    await Promise.all([a.initialize(),b.initialize()]);
     await poolA.query(
       "UPDATE demo_ticket_stock SET capacity = 2 WHERE event_id = $1 AND ticket_type_id = $2",
       ["demo-noches-aurora", "general"]
