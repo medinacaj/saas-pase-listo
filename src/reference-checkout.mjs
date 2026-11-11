@@ -6,7 +6,7 @@ export const DEMO_REFERENCE_TIERS=Object.freeze([
  Object.freeze({id:"preferente",name:"Preferente · DEMO",priceClp:35000}),
  Object.freeze({id:"vip",name:"VIP · DEMO",priceClp:60000})
 ]);
-export const REFERENCE_CHECKOUT_MAX_QUANTITY=10;
+export const REFERENCE_CHECKOUT_MAX_QUANTITY=7;
 export const referenceTicketLimit=event=>{
  const limit=event?.maxTicketsPerPerson??REFERENCE_CHECKOUT_MAX_QUANTITY;
  if(!Number.isSafeInteger(limit)||limit<1||limit>100)throw Error("Máximo de boletos por persona inválido");
