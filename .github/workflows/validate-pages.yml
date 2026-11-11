@@ -27,7 +27,7 @@ jobs:
           node --check src/venue-geolocation.mjs
           node --check src/control.mjs
       - name: Regression test on broken third-party posters
-        run: node --test tests/poster-resilience.test.mjs
+        run: node --test tests/poster-resilience.test.mjs tests/pages-boot.test.mjs
       - name: Verify event cards and catalogs
         run: |
           node --input-type=module <<'JS'
@@ -61,7 +61,7 @@ jobs:
           assert.ok(!page.includes('lab-testing')&&!script.includes('setupPurchaseLab()'), 'Separate buying lab must be removed');
           const {hasHeroPoster,hasEventDescription}=await import('./src/hero-carousel.mjs');
           const photographed=refs.events.filter(e=>hasHeroPoster(e,'reference')&&hasEventDescription(e));
-          assert.equal(photographed.length,6,'Only complete photo+description examples should be visible');
+          assert.equal(photographed.length,10,'Ten complete image+description reference events must be available');
           assert.ok(script.includes('hasEventDescription(e)'), 'Public references need descriptions');
           const {referenceQuote,referenceOrderReceipt}=await import('./src/reference-checkout.mjs');
           const quoteDemo=referenceQuote({id:'ref-camila-2026'},'general',2);
@@ -109,7 +109,7 @@ jobs:
           const { selectHeroEvents }=await import('./src/hero-carousel.mjs');
           const highlights=selectHeroEvents(refs.events,[],'2026-11-10',6);
           assert.equal(highlights.length,6,'Need six featured event slides');
-          assert.equal(highlights[0].id,'ref-camila-2026','First visual highlight should use a published poster');
+          assert.equal(highlights[0].id,'ref-creamfields-2026','First visual highlight should showcase a current-week event');
           assert.ok(highlights.every(e=>e.posterUrl?.startsWith('https://')),'All slides must have HTTPS image sources');
           assert.ok(highlights.every(e=>e.id&&e.date&&e.venue),'Featured event incomplete');
           assert.ok(script.includes('hasHeroPoster(e,"reference")'),'Image-less reference cards must be hidden');
@@ -122,7 +122,7 @@ jobs:
             'Reference cards must be rendered from event catalog');
           const shown=refs.events.filter(e=>(e.endDate||e.date)>='2026-11-11'
             &&hasHeroPoster(e,'reference')&&hasEventDescription(e));
-          assert.equal(shown.length,6,'All six photographed reference events must be present');
+          assert.equal(shown.length,10,'All ten illustrated reference events must be present');
           assert.ok(carousel.includes('hasHeroPoster(item,kind)'),'Hero image filter missing');
           assert.ok(refs.events.filter(e=>e.date>='2026-11-10'&&e.date<='2026-11-15').length>=16,'Verified weekly catalog must remain complete');
           const geoRegistry=JSON.parse(readFileSync('data/recintos-openstreetmap.json','utf8'));
