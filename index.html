@@ -20,7 +20,7 @@
 <div class="head-inner">
 <a class="brand" href="#inicio" aria-label="PaseListo inicio"><span class="brand-icon" aria-hidden="true">✳</span><span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span></a>
 <nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
-<div class="head-actions"><a id="lab-trigger" class="lab-header-link" href="./index.html?modo=pruebas#cartelera" hidden>Laboratorio de compras</a><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
+<div class="head-actions"><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
 </div>
 </header>
 <main id="contenido">
@@ -57,16 +57,7 @@
 <div class="catalog-toolbar"><span id="results-description" aria-live="polite">Buscando eventos…</span><button type="button" id="clear-filters" hidden>Limpiar filtros ↗</button></div>
 <div class="listing-head"><div><h3>Eventos reales</h3><p>Explora conciertos, festivales y espectáculos reales como ejemplos visuales de la plataforma.</p></div><span class="status-example">SOLO REFERENCIA</span></div>
 <div id="real-events-grid" class="events-grid"></div>
-<section id="lab-testing" class="internal-lab" aria-labelledby="lab-title" hidden>
- <div class="lab-head"><div><span class="lab-eyebrow">SOLO ENTORNO LOCAL · SIN DINERO REAL</span><h3 id="lab-title">Laboratorio de compras</h3><p>Ensaya inicio de sesión, selección de categorías, precios, inventario y pedidos ficticios. Estos eventos no forman parte de la cartelera pública.</p></div><a href="./index.html#cartelera">Volver a la cartelera</a></div>
- <form id="lab-checkout-form" class="lab-controls">
-  <label>Evento ficticio<select id="lab-event" required></select></label>
-  <label>Categoría de prueba<select id="lab-ticket" required></select></label>
-  <button type="submit" class="lab-submit">Probar compra DEMO</button>
- </form>
- <p id="lab-event-description" class="lab-description"></p>
- <p id="lab-feedback" class="lab-feedback" role="status" aria-live="polite"></p>
-</section>
+
 <!-- Mantener el anclaje interno para las pruebas del flujo DEMO; no se publican eventos ficticios. -->
 <div id="events-grid" hidden aria-hidden="true"></div>
 <div id="empty-state" class="empty-state" hidden><div aria-hidden="true">✳</div><h3>Sin resultados.</h3><p>No hay eventos reales de referencia que coincidan con estos filtros.</p><button type="button" data-clear-filters>Ver todos los eventos</button></div>
