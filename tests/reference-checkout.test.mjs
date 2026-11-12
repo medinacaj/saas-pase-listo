@@ -52,3 +52,25 @@ test("un evento puede configurar un límite menor o mayor que siete",()=>{
  assert.equal(referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:15},"general",15).quantity,15);
  assert.throws(()=>referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:0},"general",1),/inválido/);
 });
+
+test("recibo visual rechaza cotizaciones alteradas y eventos ajenos al catálogo de referencia",()=>{
+ const quote=referenceQuote({id:"ref-demo-2026"},"general",2);
+ const nonce="f3bc56f0-7c68-48de-a191-9a1b76aee435";
+ const receipt=referenceOrderReceipt(quote,nonce);
+ assert.equal(receipt.demo,undefined);
+ assert.equal(receipt.ticketIssued,false);
+ assert.equal(receipt.paymentProcessed,false);
+ for(const changed of [
+  {eventId:"real-event"},
+  {tierId:"vip"},
+  {tierName:"VIP"},
+  {quantity:3},
+  {unitClp:500},
+  {subtotalClp:1},
+  {serviceFeeClp:1},
+  {totalClp:1},
+  {demo:false},
+ ]) assert.throws(()=>referenceOrderReceipt({...quote,...changed},nonce),/Resumen de demostración inválido/);
+ assert.throws(()=>referenceOrderReceipt({demo:true,eventId:"ref-falso",tierId:"general",quantity:999,totalClp:1},nonce),/inválido/);
+});
+
