@@ -72,7 +72,10 @@ function renderPartners(){
 function renderReferences(){
  const items=ownerReferenceCatalog(refCatalog);
  const now=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Santiago",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- $("#references-grid").innerHTML=items.filter(e=>(e.endDate||e.date)>=now).map(e=>{
+ const visible=items.filter(e=>(e.endDate||e.date)>=now);
+ $("#referencias").hidden=visible.length===0;
+ document.querySelector('a[href="#referencias"]').hidden=visible.length===0;
+ $("#references-grid").innerHTML=visible.map(e=>{
   const url=safeUrl(e.posterUrl);
   const tone=/^#[a-f0-9]{6}$/i.test(e.accent)?e.accent:"#d7efb8";
   const img=url?'<img src="'+esc(url)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Afiche promocional real: '+esc(e.title)+'">':'';
@@ -84,12 +87,12 @@ function renderReferences(){
 }
 function render(){
  renderOverview();renderEvents();renderOrders();renderPartners();renderReferences();
- $(".ref-art img").forEach(img=>img.addEventListener("error",()=>img.remove(),{once:true}));
+ document.querySelectorAll(".ref-art img").forEach(img=>img.addEventListener("error",()=>img.remove(),{once:true}));
 }
 
 async function initialize(){
  try{
-  const [a,b]=await Promise.all([fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"})]);
+  const [a,b]=await Promise.all([fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),fetch("./data/eventos-reales-referencia.json?v=20261114-catalogo-limpio-1",{cache:"no-cache"})]);
   if(!a.ok||!b.ok)throw Error("Falta cargar datos DEMO");
   catalog=await a.json();refCatalog=await b.json();store=loadCommerce(catalog);
   render();

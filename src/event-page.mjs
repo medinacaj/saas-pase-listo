@@ -280,7 +280,7 @@ function renderTickets(event,store,reference,inventory) {
  setText("#ticket-disclaimer",
   "Todos los valores son ficticios, en CLP y por entrada. No se realizan pagos reales. "+
   (eventRequiresWaitingRoom(event)?"Evento masivo: acceso con lista de espera y turno autorizado por el servidor de prueba. ":"")+
-  (inventory.enabled?"Los cupos se verifican otra vez antes de registrar un pedido.":"GitHub Pages no dispone de servidor de compras."));
+  (inventory.enabled?"Los cupos se verifican otra vez antes de registrar un pedido.":"Esta instalación no tiene habilitado un servidor de compras."));
 }
 
 function venueDiagram(zones,interactive=true){
@@ -449,7 +449,7 @@ async function start() {
  try{
   const [demoResponse,refsResponse,geoRegistry]=await Promise.all([
    fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),
-   fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"}),
+   fetch("./data/eventos-reales-referencia.json?v=20261114-catalogo-limpio-1",{cache:"no-cache"}),
    fetch("./data/recintos-openstreetmap.json")
     .then(response=>response.ok?response.json():null).catch(()=>null)
   ]);

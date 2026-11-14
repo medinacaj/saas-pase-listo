@@ -170,8 +170,8 @@ function renderCards(){
  $("#real-events-grid").innerHTML=real.map(realCard).join("");
  // The internal DEMO purchase model is intentionally not listed on the public home.
  $("#events-grid").replaceChildren();
- $("#event-count").textContent=realEvents().length+" eventos de referencia";
- $("#results-description").textContent=real.length+" eventos reales de referencia";
+ $("#event-count").textContent=realEvents().length+" eventos publicados";
+ $("#results-description").textContent=real.length+" eventos publicados";
  $("#empty-state").hidden=real.length>0;
  $("#clear-filters").hidden=!ui.query&&ui.category==="Todos"&&ui.city==="all"&&ui.period==="all";
  $$("[data-category]").forEach(el=>{el.classList.toggle("active",el.dataset.category===ui.category);el.setAttribute("aria-pressed",String(el.dataset.category===ui.category));});
@@ -208,6 +208,7 @@ function showHeroSlide(manual=false){
   (event.endDate&&event.endDate!==event.date?" al "+date(event.endDate):"")+
   (event.time?" · "+event.time+" h":"");
  $("#hero-feature-venue").textContent=event.venue+" · "+event.city;
+ $(".hero-facts-divider").hidden=false;
  $("#hero-feature-notice").textContent=event.kind==="reference"
   ?"REFERENCIA · SIN VENTA":"EVENTO FICTICIO · DEMO";
  const href=eventDetailHref(event.id);
@@ -259,6 +260,12 @@ function renderFeatured(){
   $("#hero-title-main").textContent="Tu próxima";
   $("#hero-title-accent").textContent="gran noche.";
   $("#hero-feature-link").href="#cartelera";
+  $("#hero-feature-link").setAttribute("aria-label","Ver cartelera");
+  $("#hero-feature-link").textContent="Ver cartelera ↗";
+  $("#hero-feature-date").textContent="";
+  $("#hero-feature-venue").textContent="";
+  $(".hero-facts-divider").hidden=true;
+  $("#hero-feature-notice").textContent="SIN EVENTOS PUBLICADOS";
   $("#hero-poster").innerHTML='<div class="hero-no-poster"><span>✳</span><strong>Eventos en vivo.</strong></div>';
   $("#hero-carousel-controls").hidden=true;
   scheduleHero();
@@ -325,7 +332,7 @@ async function refreshBuyer(){
 function renderLoginForm(mode="login",message=""){
  const root=$("#buyer-auth-content");
  if(!buyerApiReady){
-  root.innerHTML='<div class="reference-disclaimer" role="status"><strong>Inicio de sesión no disponible en GitHub Pages.</strong><p>La compra está bloqueada hasta conectar el servidor de autenticación. No ingreses contraseñas en esta página.</p></div>';
+  root.innerHTML='<div class="reference-disclaimer" role="status"><strong>Inicio de sesión todavía no habilitado en TodoTicket.</strong><p>Este alojamiento todavía no tiene conectada una API de compradores segura. Por ahora solo puedes explorar eventos y probar simulaciones sin pago. No ingreses contraseñas ni datos personales.</p></div>';
   return;
  }
  root.innerHTML='<form id="buyer-auth-form" class="buyer-auth-form" data-mode="'+esc(mode)+'">'+
@@ -451,21 +458,19 @@ async function start(){
  try{
   const [response,realResponse]=await Promise.all([
    fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),
-   fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"})
+   fetch("./data/eventos-reales-referencia.json?v=20261114-catalogo-limpio-1",{cache:"no-cache"})
   ]);
   if(!response.ok||!realResponse.ok)throw Error("Catálogos no disponibles");
   const catalog=await response.json(),visuals=await realResponse.json();
   store=loadCommerce(catalog);
-  realSamples=Array.isArray(visuals.events)?visuals.events:[];
-  if(!realSamples.some(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)))
-   throw Error("No se cargaron referencias visuales completas");
+  if(!Array.isArray(visuals.events))throw Error("Catálogo de eventos inválido");
+  realSamples=visuals.events;
   filters();renderCards();renderFeatured();
 
   refreshBuyer().then(refreshInventory).catch(()=>{});
  }catch(err){
-  // Keep the ten pre-rendered linked cards and featured cover visible if
-  // a browser module, remote request or catalog initialization fails.
-  $("#results-description").textContent="Mostrando cartelera precargada; algunas funciones interactivas no están disponibles.";
+  // A failed request must never restore withdrawn examples from static HTML.
+  $("#results-description").textContent="Catálogo temporalmente no disponible. Intenta recargar la página.";
   console.error("PaseListo",err.message);return;
  }
  const heroControls=$("#hero-carousel-controls");

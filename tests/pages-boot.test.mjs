@@ -6,9 +6,6 @@ import {fileURLToPath} from "node:url";
 const root=resolve(dirname(fileURLToPath(import.meta.url)),"..");
 const read=path=>readFileSync(resolve(root,path),"utf8");
 const catalog=JSON.parse(read("data/eventos-reales-referencia.json"));
-const valid=catalog.events.filter(e=>e.posterUrl?.startsWith("https://")&&e.description?.trim().length>=40&&e.illustrationUrl);
-const current="2026-11-11";
-const upcoming=valid.filter(e=>(e.endDate||e.date)>=current);
 const html=read("index.html");
 
 test("marketplace and event detail resolve every browser import on public branch",()=>{
@@ -32,20 +29,12 @@ test("marketplace and event detail resolve every browser import on public branch
  assert.ok(visited.has("src/reference-checkout.mjs"),"Event detail requires purchase simulation");
  assert.ok(visited.has("src/hero-carousel.mjs"));
 });
-test("ten real events are pre-rendered before JavaScript downloads",()=>{
- assert.equal(upcoming.length,10);
+test("la portada sin JavaScript tampoco precarga eventos retirados",()=>{
+ assert.equal(catalog.events.length,0);
  const cards=[...html.matchAll(/<article class="event-card reference-event" data-static-reference="([^"]+)">/g)].map(x=>x[1]);
- assert.equal(cards.length,10);
- assert.equal(new Set(cards).size,cards.length);
- assert.deepEqual(new Set(cards),new Set(upcoming.map(e=>e.id)));
+ assert.equal(cards.length,0);
+ assert.doesNotMatch(html,/evento\.html\?id=ref-/);
  assert.ok(html.includes('id="real-events-grid" class="events-grid" data-static-fallback="true"'));
- for(const event of upcoming){
-  const filename=event.illustrationUrl.split("/").at(-1);
-  assert.ok(existsSync(resolve(root,"assets/event-art",filename)),event.id+" image missing");
-  assert.ok(html.includes('./assets/event-art/'+filename),'Static card does not render a local image: '+event.id);
-  assert.ok(html.includes('evento.html?id='+event.id),'Static card not linked to event checkout');
-  assert.ok(html.includes(event.title),'Event title missing from static fallback');
- }
 });
 test("PaseListo has custom brand favicon and cache-busted browser entrypoint",()=>{
  const favicon=read("favicon.svg");
@@ -65,11 +54,8 @@ test("public visual gallery keeps a single explicit no-payment buyer journey",()
  assert.ok(read("src/reference-checkout.mjs").includes("ticketIssued:false"));
 });
 
-test("a failed catalog request cannot erase the pre-rendered gallery",()=>{
- const source=read("src/marketplace.mjs");
- assert.ok(source.includes("Mostrando cartelera precargada"));
- assert.ok(source.includes("No se cargaron referencias visuales completas"));
- assert.ok(!source.includes('$("#real-events-grid").innerHTML=\'<p class="load-error"'));
- assert.ok(!source.includes('$("#hero-poster").innerHTML=\'<div class="hero-no-poster"><strong>Catálogo temporalmente no disponible'));
- assert.ok(html.includes('src="./assets/event-art/creamfields-2026.svg"'));
+test("un catálogo vacío no crea destacados ficticios",async()=>{
+ const {selectHeroEvents}=await import("../src/hero-carousel.mjs");
+ assert.deepEqual(selectHeroEvents(catalog.events,[],"2026-11-14",6),[]);
+ assert.doesNotMatch(html,/Creamfields|Feria del Sanguche|Los Tres/);
 });

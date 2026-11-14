@@ -26,8 +26,18 @@ export function referenceQuote(event,tierId,quantity){
   demo:true};
 }
 export function referenceOrderReceipt(quote,nonce){
- if(!quote?.demo || !Number.isSafeInteger(quote.totalClp) || quote.totalClp<0)
-  throw Error("Resumen de demostración inválido");
+ // Even a simulated receipt must never be issued from a forged arbitrary
+ // quote, non-reference event or tampered service-charge calculation.
+ const tier=DEMO_REFERENCE_TIERS.find(item=>item.id===quote?.tierId);
+ const count=quote?.quantity, validEvent=typeof quote?.eventId==="string" &&
+  /^ref-[a-z0-9-]+$/.test(quote.eventId);
+ if(!quote?.demo || !validEvent || !tier ||
+    !Number.isSafeInteger(count) || count<1 || count>100 ||
+    quote.tierName!==tier.name || quote.unitClp!==tier.priceClp ||
+    quote.subtotalClp!==tier.priceClp*count ||
+    quote.serviceFeeClp!==Math.round(tier.priceClp*count*.10) ||
+    quote.totalClp!==quote.subtotalClp+quote.serviceFeeClp)
+   throw Error("Resumen de demostración inválido");
  if(typeof nonce!=="string" || !/^[a-z0-9-]{8,80}$/i.test(nonce))
   throw Error("Identificador de demostración inválido");
  return {id:"SIM-"+nonce.slice(0,12).toUpperCase(),eventId:quote.eventId,

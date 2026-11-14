@@ -57,12 +57,9 @@ test("fuente alternativa de afiche intenta recuperarse antes de mostrar fallback
  assert.equal(p.wasImageRemoved(),true);
  assert.equal(p.wasCardRemoved(),false);
 });
-test("los seis ejemplos del catálogo mantienen imagen y descripción independientemente de fallos remotos",async()=>{
+test("el catálogo público vacío no inventa destacados por fallback gráfico",async()=>{
  const refs=JSON.parse(await readFile(new URL("../data/eventos-reales-referencia.json",import.meta.url),"utf8"));
  const examples=refs.events.filter(e=>(e.endDate||e.date)>="2026-11-11"&&hasHeroPoster(e,"reference")&&hasEventDescription(e));
- assert.equal(examples.length,10);
- assert.ok(examples.every(x=>x.posterUrl&&x.description.length>=40));
- assert.equal(selectHeroEvents(refs.events,[],"2026-11-11",6).length,6);
- assert.ok(marketplace.includes('const real=realEvents().filter(matches)'));
- assert.ok(marketplace.includes('real.map(realCard).join("")'));
+ assert.equal(examples.length,0);
+ assert.deepEqual(selectHeroEvents(refs.events,[],"2026-11-11",6),[]);
 });
