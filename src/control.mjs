@@ -1,4 +1,6 @@
 import {loadCommerce, saveCommerce, clearCommerce} from "./commerce-domain.mjs";
+import { catalogReconciliation, publicReferenceEvents } from "./catalog-ops.mjs";
+import { initOperationsDashboard } from "./operations-dashboard.mjs";
 import {ownerOverview,ownerEvents,ownerOrders,ownerRegisterPartner,ownerPublishEvent,ownerSetEventState,ownerSetFeePolicy,ownerSetShare,ownerCancelDemo,ownerReferenceCatalog} from "./control-domain.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -6,7 +8,7 @@ const money=n=>new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",ma
 const safeUrl=u=>{try{const url=new URL(u);return url.protocol==="https:"?url.href:"";}catch{return""}};
 const error=(target,msg)=>{const el=$(target);if(el){el.textContent=msg;el.classList.add("feedback","error");}};
 const success=(target,msg)=>{const el=$(target);if(el){el.textContent=msg;el.classList.remove("error");el.classList.add("feedback");}};
-let catalog,refCatalog,store;
+let catalog,refCatalog,store,renderOperations;
 function remember(){saveCommerce(store);render();}
 function setOrgSelect(){
  const select=$("#event-org"),value=select.value;
@@ -15,10 +17,12 @@ function setOrgSelect(){
 }
 function renderOverview(){
  const v=ownerOverview(store);
+ const reconcile=catalogReconciliation(store,refCatalog);
  const entries=[
- ["Productores y recintos",v.organizers,"Organizaciones sintéticas"],
- ["Eventos en catálogo",v.activeEvents,"Publicados en la tienda DEMO"],
- ["Entradas simuladas",v.tickets,"Órdenes sin pago ni emisión"],
+ ["Eventos visibles en tienda",reconcile.publicVisible,"Coincide con el portal de referencias"],
+ ["Eventos internos DEMO",v.activeEvents,"No están publicados en la tienda"],
+ ["Productores ficticios",v.organizers,"Organizaciones de simulación"],
+ ["Entradas simuladas",v.tickets,"Sin pago ni emisión válida"],
  ["Volumen total DEMO",money(v.grossClp),"No representa ingresos percibidos"]
  ];
  $("#metrics").innerHTML=entries.map(([label,value,hint])=>'<article><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong><small>'+esc(hint)+'</small></article>').join("");
@@ -70,9 +74,8 @@ function renderPartners(){
  setOrgSelect();
 }
 function renderReferences(){
- const items=ownerReferenceCatalog(refCatalog);
- const now=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Santiago",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- $("#references-grid").innerHTML=items.filter(e=>(e.endDate||e.date)>=now).map(e=>{
+ const items=ownerReferenceCatalog({events:publicReferenceEvents(refCatalog)});
+ $("#references-grid").innerHTML=items.map(e=>{
   const url=safeUrl(e.posterUrl);
   const tone=/^#[a-f0-9]{6}$/i.test(e.accent)?e.accent:"#d7efb8";
   const img=url?'<img src="'+esc(url)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Afiche promocional real: '+esc(e.title)+'">':'';
@@ -84,7 +87,8 @@ function renderReferences(){
 }
 function render(){
  renderOverview();renderEvents();renderOrders();renderPartners();renderReferences();
- $(".ref-art img").forEach(img=>img.addEventListener("error",()=>img.remove(),{once:true}));
+ document.querySelectorAll(".ref-art img").forEach(img=>img.addEventListener("error",()=>img.remove(),{once:true}));
+ renderOperations?.();
 }
 
 async function initialize(){
@@ -92,6 +96,13 @@ async function initialize(){
   const [a,b]=await Promise.all([fetch("./data/eventos-clientes-demo.json",{cache:"no-cache"}),fetch("./data/eventos-reales-referencia.json",{cache:"no-cache"})]);
   if(!a.ok||!b.ok)throw Error("Falta cargar datos DEMO");
   catalog=await a.json();refCatalog=await b.json();store=loadCommerce(catalog);
+  renderOperations=initOperationsDashboard(()=>({store,references:refCatalog}),eventId=>{
+   try{
+    const event=store.events.find(e=>e.id===eventId);
+    if(!event)throw Error("Solo se pueden modificar eventos ficticios");
+    ownerSetEventState(store,eventId,event.status==="published"?"paused":"published");remember();
+   }catch(err){alert(err.message);}
+  });
   render();
  }catch(err){
   $("#events-body").innerHTML='<tr><td colspan="6">No se pudo cargar el centro de control: '+esc(err.message)+'</td></tr>';return;
