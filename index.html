@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171719">
+<meta name="description" content="PaseListo, plataforma digital de venta de entradas para productores y recintos. Versión demostrativa sin pagos reales.">
+<meta name="robots" content="noindex,nofollow">
+<title>PaseListo — Los mejores eventos comienzan aquí</title>
+<link rel="icon" href="./favicon.svg?v=20261111-ticket-mark" type="image/svg+xml">
+<link rel="stylesheet" href="./src/portal.css">
+<link rel="stylesheet" href="./src/commerce.css">
+<script type="module" src="./src/marketplace.mjs?v=20261114-hosting-auth-status"></script>
+<link rel="stylesheet" href="./src/brand-system.css">
+<link rel="stylesheet" href="./src/hero-carousel.css">
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="site-head">
+<div class="head-inner">
+<a class="brand" href="#inicio" aria-label="PaseListo inicio"><span class="brand-icon" aria-hidden="true">✳</span><span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span></a>
+<nav class="head-nav" aria-label="Navegación"><a href="#cartelera">Eventos</a></nav>
+<div class="head-actions"><button type="button" id="buyer-account-trigger" class="buyer-account-trigger">Iniciar sesión</button><a class="organizer-link" href="./admin.html">Centro de Control <span aria-hidden="true">↗</span></a></div>
+</div>
+</header>
+<main id="contenido">
+<div class="demo-ribbon" role="note"><strong>Cartelera de referencia.</strong> Eventos reales utilizados para mostrar el diseño de PaseListo. No hay venta de entradas ni pagos habilitados.</div>
+<section class="hero hero-carousel" id="inicio" aria-label="Carrusel de eventos destacados" aria-roledescription="carrusel">
+ <div class="hero-visual">
+  <div class="hero-poster" id="hero-poster"><a class="hero-art-link" href="./evento.html?id=ref-creamfields-2026" aria-label="Ver Creamfields Chile"><div class="poster-frame real-poster loaded"><img class="poster-img reference-poster" src="./assets/event-art/creamfields-2026.svg" alt="Ilustración original de Creamfields Chile; no es el afiche oficial" width="900" height="1150"></div></a></div>
+ </div>
+ <div class="hero-inner">
+  <div class="hero-text" id="hero-feature-content">
+   <div class="hero-kicker"><span class="pulse-dot" aria-hidden="true"></span><span id="hero-feature-kicker">EVENTOS DESTACADOS</span></div>
+   <h1 id="hero-feature-title"><span id="hero-title-main">Creamfields</span><em id="hero-title-accent">Chile.</em></h1>
+   <p class="hero-feature-summary" id="hero-feature-summary">Explora los destacados y prueba cómo sería comprar entradas en PaseListo.</p>
+   <div class="hero-feature-facts"><span id="hero-feature-date">14–15 de noviembre de 2026</span><span class="hero-facts-divider" aria-hidden="true">·</span><span id="hero-feature-venue">Club Hípico de Santiago</span></div>
+   <div class="hero-feature-actions">
+    <a class="hero-cta" id="hero-feature-link" href="./evento.html?id=ref-creamfields-2026">Ver evento <span aria-hidden="true">↗</span></a>
+    <span class="hero-feature-notice" id="hero-feature-notice">REFERENCIA · SIN VENTA</span>
+   </div>
+   <div class="hero-carousel-controls" id="hero-carousel-controls" role="group" aria-label="Elegir evento destacado">
+    <div class="hero-carousel-dots" id="hero-carousel-dots"></div>
+   </div>
+   <span class="hero-carousel-live sr-only" id="hero-carousel-live" aria-live="polite" aria-atomic="true"></span>
+  </div>
+ </div>
+</section>
+<section id="cartelera" class="catalog section-wrap">
+<div class="section-eyebrow"><span class="eyebrow-line"></span> ESPECTÁCULOS EN CHILE</div>
+<div class="section-heading"><div><h2>Próximos <em>eventos.</em></h2><p>Explora los espectáculos y abre su ficha tocando cualquier parte de la tarjeta.</p></div><span class="count-pill" id="event-count">10 eventos</span></div>
+<div class="filter-surface"><div class="search-row">
+<label class="search-field" for="event-search"><span aria-hidden="true">⌕</span><input type="search" id="event-search" placeholder="Buscar eventos, ciudad o recinto…"><kbd>/</kbd></label>
+<label class="select-wrap"><span>Ciudad</span><select id="city-filter"><option value="all">Todas las ciudades</option></select></label>
+<label class="select-wrap"><span>Fecha</span><select id="date-filter"><option value="all">Todas las próximas fechas</option><option value="month">Este mes</option><option value="thirty">Próximos 30 días</option><option value="later">Más adelante</option></select></label>
+</div><div class="category-list" id="category-list" role="group" aria-label="Filtrar por categoría"></div></div>
+<div class="catalog-toolbar"><span id="results-description" aria-live="polite">10 eventos reales de referencia</span><button type="button" id="clear-filters" hidden>Limpiar filtros ↗</button></div>
+<div class="listing-head"><div><h3>Eventos reales</h3><p>Explora conciertos, festivales y espectáculos reales como ejemplos visuales de la plataforma.</p></div><span class="status-example">SOLO REFERENCIA</span></div>
+<div id="real-events-grid" class="events-grid" data-static-fallback="true">
+<article class="event-card reference-event" data-static-reference="ref-cypress-hill-2026-11-11">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#54776b">
+ <img class="poster-img reference-poster" src="./assets/event-art/cypress-hill-2026.svg" alt="Arte conceptual original de Cypress Hill; no es un afiche oficial" width="900" height="1150" loading="eager" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Música<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Cypress Hill</h3><p class="event-subtitle">Concierto en Chile</p>
+ <p class="event-description">Cypress Hill llega a Santiago con un concierto de hip-hop programado para el 11 de noviembre de 2026 en el Teatro Caupolicán. Esta ficha es una referencia de diseño, no una oferta de entradas.</p>
+ <div class="event-meta"><span>11 nov</span><span class="meta-dot">·</span><span>Teatro Caupolicán</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-cypress-hill-2026-11-11" aria-label="Abrir la ficha de Cypress Hill y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-feria-sanguche-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#dbaa78">
+ <img class="poster-img reference-poster" src="./assets/event-art/feria-sanguche-2026.svg" alt="Arte conceptual original de Feria del Sanguche; no es un afiche oficial" width="900" height="1150" loading="eager" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Experiencias<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Feria del Sanguche</h3><p class="event-subtitle">Edición 2026 · 13 al 15 de noviembre</p>
+ <p class="event-description">La Feria del Sanguche reúne propuestas gastronómicas en Parque Padre Hurtado, Santiago, del 13 al 15 de noviembre de 2026. Los precios y sectores que muestra PaseListo son exclusivamente simulados.</p>
+ <div class="event-meta"><span>13 nov</span><span class="meta-dot">·</span><span>Parque Padre Hurtado</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-feria-sanguche-2026" aria-label="Abrir la ficha de Feria del Sanguche y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-creamfields-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#8f83b3">
+ <img class="poster-img reference-poster" src="./assets/event-art/creamfields-2026.svg" alt="Arte conceptual original de Creamfields Chile; no es un afiche oficial" width="900" height="1150" loading="eager" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Festivales<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Creamfields Chile</h3><p class="event-subtitle">Festival electrónico · 14 y 15 de noviembre</p>
+ <p class="event-description">Creamfields Chile reúne actuaciones de música electrónica y espectáculos audiovisuales durante el 14 y 15 de noviembre en el Club Hípico de Santiago. Consulta la programación y accesos oficiales antes de asistir.</p>
+ <div class="event-meta"><span>14 nov</span><span class="meta-dot">·</span><span>Club Hípico de Santiago</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-creamfields-2026" aria-label="Abrir la ficha de Creamfields Chile y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-leon-gieco-conce-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#7a937f">
+ <img class="poster-img reference-poster" src="./assets/event-art/leon-gieco-2026.svg" alt="Arte conceptual original de León Gieco; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Música<span>✳</span>Concepción</div>
+ <h3 class="card-heading">León Gieco</h3><p class="event-subtitle">En Concepción</p>
+ <p class="event-description">León Gieco tiene una presentación anunciada en el Teatro Universidad de Concepción para el 15 de noviembre de 2026. Esta ficha permite explorar el recinto y probar una compra ficticia sin pagos reales.</p>
+ <div class="event-meta"><span>15 nov</span><span class="meta-dot">·</span><span>Teatro Universidad de Concepción</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-leon-gieco-conce-2026" aria-label="Abrir la ficha de León Gieco y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-camila-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#6b3f64">
+ <img class="poster-img reference-poster" src="./assets/event-art/camila-2026.svg" alt="Arte conceptual original de Camila; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Música<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Camila</h3><p class="event-subtitle">Tour Adiós</p>
+ <p class="event-description">Camila presenta su Tour Adiós en Santander Arena, Santiago, el 20 de noviembre de 2026. Esta ficha muestra los datos anunciados como referencia visual.</p>
+ <div class="event-meta"><span>20 nov</span><span class="meta-dot">·</span><span>Santander Arena</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-camila-2026" aria-label="Abrir la ficha de Camila y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-fauna-primavera-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#e7bb9b">
+ <img class="poster-img reference-poster" src="./assets/event-art/fauna-primavera-2026.svg" alt="Arte conceptual original de Fauna Primavera; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Festivales<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Fauna Primavera</h3><p class="event-subtitle">Festival 2026 · 26–28 nov.</p>
+ <p class="event-description">Fauna Primavera reúne propuestas de música independiente y rock en Parque Ciudad Empresarial, Santiago, entre el 26 y el 28 de noviembre de 2026.</p>
+ <div class="event-meta"><span>26 nov</span><span class="meta-dot">·</span><span>Parque Ciudad Empresarial</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-fauna-primavera-2026" aria-label="Abrir la ficha de Fauna Primavera y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-gorillaz-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#f8af41">
+ <img class="poster-img reference-poster" src="./assets/event-art/gorillaz-2026.svg" alt="Arte conceptual original de Gorillaz; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Música<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Gorillaz</h3><p class="event-subtitle">The Mountain Tour 2026</p>
+ <p class="event-description">Gorillaz presenta The Mountain Tour 2026 en el Estadio Bicentenario de La Florida, en Santiago. Fecha y recinto a comprobar con el organizador antes de asistir.</p>
+ <div class="event-meta"><span>4 dic</span><span class="meta-dot">·</span><span>Estadio Bicentenario La Florida</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-gorillaz-2026" aria-label="Abrir la ficha de Gorillaz y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-deep-purple-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#33373e">
+ <img class="poster-img reference-poster" src="./assets/event-art/deep-purple-2026.svg" alt="Arte conceptual original de Deep Purple; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Música<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Deep Purple</h3><p class="event-subtitle">En vivo en Chile</p>
+ <p class="event-description">Deep Purple visita Santiago con su espectáculo de hard rock en Santander Arena, previsto para el 8 de diciembre de 2026.</p>
+ <div class="event-meta"><span>8 dic</span><span class="meta-dot">·</span><span>Santander Arena</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-deep-purple-2026" aria-label="Abrir la ficha de Deep Purple y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-31-minutos-2026">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#f4793f">
+ <img class="poster-img reference-poster" src="./assets/event-art/31-minutos-2026.svg" alt="Arte conceptual original de 31 Minutos; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Familia<span>✳</span>Santiago</div>
+ <h3 class="card-heading">31 Minutos</h3><p class="event-subtitle">Radio Guaripolo</p>
+ <p class="event-description">31 Minutos presenta Radio Guaripolo en Claro Arena, Santiago, el 20 de diciembre de 2026, como espectáculo familiar.</p>
+ <div class="event-meta"><span>20 dic</span><span class="meta-dot">·</span><span>Claro Arena</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-31-minutos-2026" aria-label="Abrir la ficha de 31 Minutos y simular la selección de entradas"></a>
+ </article>
+<article class="event-card reference-event" data-static-reference="ref-alegria-2027">
+ <div class="poster-button"><div class="poster-frame real-poster loaded" style="--poster-accent:#3c6d61">
+ <img class="poster-img reference-poster" src="./assets/event-art/alegria-2027.svg" alt="Arte conceptual original de Alegría; no es un afiche oficial" width="900" height="1150" loading="lazy" decoding="async">
+ </div></div>
+ <div class="event-information"><div class="event-taxonomy">Familia<span>✳</span>Santiago</div>
+ <h3 class="card-heading">Alegría</h3><p class="event-subtitle">Cirque du Soleil</p>
+ <p class="event-description">Alegría, de Cirque du Soleil, tiene funciones anunciadas en la Gran Carpa de Espacio Riesco, Santiago, durante enero de 2027.</p>
+ <div class="event-meta"><span>6 ene</span><span class="meta-dot">·</span><span>Gran Carpa, Espacio Riesco</span></div>
+ <div class="event-bottom real-bottom"><span>Referencia · compra DEMO</span><span aria-hidden="true">↗</span></div></div>
+ <a class="card-hitbox" href="./evento.html?id=ref-alegria-2027" aria-label="Abrir la ficha de Alegría y simular la selección de entradas"></a>
+ </article>
+</div>
+
+<!-- Mantener el anclaje interno para las pruebas del flujo DEMO; no se publican eventos ficticios. -->
+<div id="events-grid" hidden aria-hidden="true"></div>
+<div id="empty-state" class="empty-state" hidden><div aria-hidden="true">✳</div><h3>Sin resultados.</h3><p>No hay eventos reales de referencia que coincidan con estos filtros.</p><button type="button" data-clear-filters>Ver todos los eventos</button></div>
+<p class="catalog-footnote">Los espectáculos reales se muestran únicamente como referencias, sin contrato de venta ni permisos comerciales de afiches acreditados. No se procesan pagos reales.</p>
+</section>
+</main>
+<footer class="site-footer">
+<div class="footer-top"><a class="footer-brand" href="#inicio">paselisto<span>.</span></a><p>Eventos que se viven.</p></div>
+<div class="footer-bottom"><span>© PaseListo · 2026</span><span>Cartelera informativa · Sin venta de entradas</span><a href="./admin.html">Centro de Control ↗</a></div>
+<div class="footer-disclaimer">Los espectáculos y afiches de terceros son referencias visuales; los derechos comerciales y acuerdos de venta no están acreditados.</div>
+</footer>
+<div class="detail-backdrop" id="detail-backdrop" hidden>
+<section class="detail-dialog marketplace-dialog" id="event-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" tabindex="-1">
+<button class="detail-close" type="button" data-close-detail aria-label="Cerrar ficha">✕</button>
+<div id="detail-content"></div>
+</section></div>
+<div class="detail-backdrop" id="login-backdrop" hidden>
+<section class="checkout-dialog buyer-login-dialog" role="dialog" aria-modal="true" aria-labelledby="login-title" id="login-dialog" tabindex="-1">
+<button class="detail-close" type="button" data-close-login aria-label="Cerrar acceso">✕</button>
+<div class="detail-kicker">CUENTA PASELISTO</div>
+<h2 id="login-title">Accede para continuar.</h2>
+<p class="login-description">Para comprar entradas es obligatorio ingresar con tu correo electrónico y contraseña.</p>
+<div id="buyer-auth-content"></div>
+<p class="buyer-login-note">La página pública es una demostración. El registro y el inicio de sesión solo funcionan en el servidor local de desarrollo; no introduzcas credenciales personales reales.</p>
+</section></div>
+<div class="detail-backdrop" id="checkout-backdrop" hidden>
+<section class="checkout-dialog" id="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title" tabindex="-1">
+<button class="detail-close" type="button" data-close-checkout aria-label="Cerrar selección">✕</button>
+<div id="checkout-content"></div>
+</section></div>
+<div class="detail-backdrop" id="orders-backdrop" hidden>
+<section class="checkout-dialog buyer-orders-dialog" id="orders-dialog" role="dialog" aria-modal="true" aria-labelledby="orders-title" tabindex="-1">
+<button class="detail-close" type="button" data-close-orders aria-label="Cerrar mis pedidos">✕</button>
+<div class="detail-kicker">CUENTA DE DEMOSTRACIÓN</div>
+<h2 id="orders-title">Mis pedidos.</h2>
+<p class="orders-intro">Consulta tus operaciones ficticias. No representan cobros, reservas ni entradas válidas.</p>
+<div id="buyer-orders-content" aria-live="polite"></div>
+<button type="button" id="buyer-logout" class="checkout-submit">Cerrar sesión</button>
+</section></div>
+</body>
+</html>

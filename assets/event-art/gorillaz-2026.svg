@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1150" role="img" aria-label="Imagen conceptual de GORILLAZ; no es afiche oficial">
+<defs><linearGradient id="bg" x2=".95" y2="1"><stop stop-color="#07282d"/><stop offset=".58" stop-color="#145f63"/><stop offset="1" stop-color="#f9ca69"/></linearGradient><radialGradient id="glow"><stop stop-color="#f9ca69" stop-opacity=".85"/><stop offset="1" stop-color="#f9ca69" stop-opacity="0"/></radialGradient></defs>
+<rect width="900" height="1150" fill="url(#bg)"/><circle cx="700" cy="560" r="445" fill="url(#glow)"/>
+<path d="M0 240H900" stroke="#fff" stroke-opacity=".16"/><text x="60" y="76" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="800" letter-spacing="4" fill="white" opacity=".9">PASELISTO  /  CARTELERA</text>
+<text x="58" y="180" font-family="Arial,Helvetica,sans-serif" font-size="105" font-weight="900" letter-spacing="-3" fill="#fff6e2">GORILLAZ</text>
+<g fill="#08242b" opacity=".95"><path d="M0 785L145 690L230 740L360 602L470 684L602 540L780 700L900 630V1020H0Z"/><path d="M0 850L130 780L265 900L408 810L565 934L760 807L900 865V1050H0Z" fill="#0a1d27"/></g>
+<circle cx="660" cy="585" r="180" fill="#ffd584" opacity=".76"/><path d="M250 920Q450 730 720 920" stroke="#fbd887" stroke-width="18" fill="none"/>
+<rect y="995" width="900" height="155" fill="#101b22" opacity=".96"/>
+<text x="55" y="1056" fill="white" font-family="Arial,sans-serif" font-size="29" font-weight="800">THE MOUNTAIN TOUR · DIC 2026</text>
+<text x="55" y="1105" fill="#ccf59b" font-family="Arial,sans-serif" font-size="20" letter-spacing="2">ARTE CONCEPTUAL · NO OFICIAL · SIN VENTA</text>
+</svg>

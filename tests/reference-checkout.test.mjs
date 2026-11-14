@@ -1,0 +1,76 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import {
+ DEMO_REFERENCE_TIERS,REFERENCE_CHECKOUT_MAX_QUANTITY,referenceQuote,referenceOrderReceipt
+} from "../src/reference-checkout.mjs";
+
+test("precios y cargos de prueba se calculan sin alterar el catálogo real",()=>{
+ const event={id:"ref-camila-2026"};
+ const sample=referenceQuote(event,"preferente",2);
+ assert.deepEqual(sample,{
+  eventId:"ref-camila-2026",tierId:"preferente",tierName:"Preferente · DEMO",
+  quantity:2,unitClp:35000,subtotalClp:70000,serviceFeeClp:7000,totalClp:77000,demo:true
+ });
+ assert.equal(DEMO_REFERENCE_TIERS.length,3);
+ assert.equal(REFERENCE_CHECKOUT_MAX_QUANTITY,7);
+ assert.equal(referenceQuote(event,"vip",7).quantity,7);
+ assert.equal(referenceQuote(event,"general","1").totalClp,22000);
+ assert.equal(referenceQuote(event,"vip",6).totalClp,396000);
+});
+test("la simulación nunca genera pagos, reservas ni entradas reales",()=>{
+ const quote=referenceQuote({id:"ref-gorillaz-2026"},"general",1);
+ const receipt=referenceOrderReceipt(quote,"f3bc56f0-7c68-48de-a191-9a1b76aee435");
+ assert.equal(receipt.status,"simulated_only");
+ assert.equal(receipt.paymentProcessed,false);
+ assert.equal(receipt.ticketIssued,false);
+ assert.equal(receipt.id,"SIM-F3BC56F0-7C6");
+ assert.equal(receipt.totalClp,22000);
+ for(const input of [0,8,-1,2.4,Infinity,"muchas",null]){
+  assert.throws(()=>referenceQuote({id:"ref-camila-2026"},"general",input));
+ }
+ assert.throws(()=>referenceQuote({id:"demo-noches-aurora"},"general",1),/referencia no válido/);
+ assert.throws(()=>referenceQuote({id:"ref-camila-2026"},"inventado",1),/Categoría de prueba inválida/);
+ assert.throws(()=>referenceOrderReceipt(quote,"???"),/Identificador/);
+});
+test("las fichas reales tienen imágenes y descripción pero precios oficiales no atribuidos",async()=>{
+ const catalog=JSON.parse(await readFile(new URL("../data/eventos-reales-referencia.json",import.meta.url),"utf8"));
+ const examples=catalog.events.filter(e=>Boolean(e.posterUrl));
+ assert.equal(examples.length,10);
+ assert.ok(examples.every(e=>e.description?.length>=40));
+ assert.ok(examples.every(e=>!e.ticketTypes && !e.priceClp && !e.saleEnabled));
+ const page=await readFile(new URL("../src/event-page.mjs",import.meta.url),"utf8");
+ assert.ok(page.includes("DEMO_REFERENCE_TIERS"));
+ assert.ok(page.includes("renderReferenceCheckout(event)"));
+ assert.ok(page.includes("changeDemoTier?.(target.dataset.zoneSelect)"));
+ assert.ok(page.includes("No solicitamos datos bancarios ni personales."));
+});
+
+test("un evento puede configurar un límite menor o mayor que siete",()=>{
+ assert.equal(referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:4},"general",4).quantity,4);
+ assert.throws(()=>referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:4},"general",5),/fuera de rango/);
+ assert.equal(referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:15},"general",15).quantity,15);
+ assert.throws(()=>referenceQuote({id:"ref-camila-2026",maxTicketsPerPerson:0},"general",1),/inválido/);
+});
+
+test("recibo visual rechaza cotizaciones alteradas y eventos ajenos al catálogo de referencia",()=>{
+ const quote=referenceQuote({id:"ref-demo-2026"},"general",2);
+ const nonce="f3bc56f0-7c68-48de-a191-9a1b76aee435";
+ const receipt=referenceOrderReceipt(quote,nonce);
+ assert.equal(receipt.demo,undefined);
+ assert.equal(receipt.ticketIssued,false);
+ assert.equal(receipt.paymentProcessed,false);
+ for(const changed of [
+  {eventId:"real-event"},
+  {tierId:"vip"},
+  {tierName:"VIP"},
+  {quantity:3},
+  {unitClp:500},
+  {subtotalClp:1},
+  {serviceFeeClp:1},
+  {totalClp:1},
+  {demo:false},
+ ]) assert.throws(()=>referenceOrderReceipt({...quote,...changed},nonce),/Resumen de demostración inválido/);
+ assert.throws(()=>referenceOrderReceipt({demo:true,eventId:"ref-falso",tierId:"general",quantity:999,totalClp:1},nonce),/inválido/);
+});
+

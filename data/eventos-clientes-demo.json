@@ -1,0 +1,317 @@
+{
+  "version": "2026-11-10-b2b2c-v1",
+  "notice": "EVENTOS 100% FICTICIOS PARA DEMOSTRACIÓN. No existen ofertas reales ni entradas comercializables. Cada organizador y recinto es simulado. Los afiches son composiciones tipográficas internas, NO oficiales.",
+  "organizers": [
+    {
+      "id": "org-aurora",
+      "name": "Aurora Producciones · DEMO",
+      "email": "",
+      "venueShareBps": 1500
+    },
+    {
+      "id": "org-escena",
+      "name": "Escena Sur · DEMO",
+      "email": "",
+      "venueShareBps": 2000
+    },
+    {
+      "id": "org-nexo",
+      "name": "Nexo Eventos · DEMO",
+      "email": "",
+      "venueShareBps": 0
+    }
+  ],
+  "contractExample": {
+    "buyerFeeBps": 1000,
+    "buyerFeeFixedClp": 500,
+    "venueShareOfFeeBps": 1500,
+    "paymentProcessingBps": 0,
+    "currency": "CLP",
+    "notes": "Valores ilustrativos, no tarifas contratadas. Tarifas de terceros e impuestos aún no modelados ni validados."
+  },
+  "events": [
+    {
+      "id": "demo-noches-aurora",
+      "organizerId": "org-aurora",
+      "title": "Noches Aurora",
+      "subtitle": "Música independiente bajo las estrellas",
+      "category": "Música",
+      "genre": "Indie / Pop",
+      "city": "Santiago",
+      "venue": "Foro Primavera · DEMO",
+      "date": "2027-01-23",
+      "time": "20:30",
+      "description": "Un encuentro ficticio de sonidos emergentes. El nombre, artistas y recinto son inventados para probar el flujo comercial de PaseListo.",
+      "accent": "#EB654B",
+      "visual": "01",
+      "featured": true,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 15000,
+          "capacity": 120
+        },
+        {
+          "id": "premium",
+          "name": "Experiencia",
+          "priceClp": 28000,
+          "capacity": 32
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-luces-del-sur",
+      "organizerId": "org-escena",
+      "title": "Luces del Sur",
+      "subtitle": "Festival de temporada · edición de prueba",
+      "category": "Festivales",
+      "genre": "Electrónica / Alternativo",
+      "city": "Concepción",
+      "venue": "Parque Ribera · DEMO",
+      "date": "2027-02-06",
+      "time": "17:00",
+      "description": "Festival ficticio de dos escenarios creado como ejemplo para productoras, ventas por tramo y categorías.",
+      "accent": "#9F8CEB",
+      "visual": "02",
+      "featured": true,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 24000,
+          "capacity": 250
+        },
+        {
+          "id": "vip",
+          "name": "VIP",
+          "priceClp": 45000,
+          "capacity": 50
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-escena-de-humor",
+      "organizerId": "org-nexo",
+      "title": "La Gran Risa",
+      "subtitle": "Comedia en vivo",
+      "category": "Comedia",
+      "genre": "Stand-up",
+      "city": "Valparaíso",
+      "venue": "Sala Mirador · DEMO",
+      "date": "2027-02-13",
+      "time": "21:00",
+      "description": "Función ficticia para ensayar la selección de entradas, el pago y la emisión en la futura plataforma.",
+      "accent": "#FFE18B",
+      "visual": "03",
+      "featured": true,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "platea",
+          "name": "Platea",
+          "priceClp": 18000,
+          "capacity": 90
+        },
+        {
+          "id": "balcon",
+          "name": "Balcón",
+          "priceClp": 12000,
+          "capacity": 60
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-orbita",
+      "organizerId": "org-aurora",
+      "title": "Órbita",
+      "subtitle": "Experiencia sonora e inmersiva",
+      "category": "Experiencias",
+      "genre": "Inmersivo",
+      "city": "Santiago",
+      "venue": "Espacio Cero · DEMO",
+      "date": "2027-03-12",
+      "time": "19:00",
+      "description": "Instalación audiovisual ficticia para presentar el recorrido desde la ficha hasta el checkout.",
+      "accent": "#A8D7BA",
+      "visual": "04",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "ingreso",
+          "name": "Ingreso general",
+          "priceClp": 20000,
+          "capacity": 100
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-escena-infantil",
+      "organizerId": "org-escena",
+      "title": "Bosque de Colores",
+      "subtitle": "Teatro para toda la familia",
+      "category": "Familia",
+      "genre": "Teatro infantil",
+      "city": "Concepción",
+      "venue": "Teatro del Río · DEMO",
+      "date": "2027-03-27",
+      "time": "16:00",
+      "description": "Espectáculo familiar inventado para simular el catálogo de productoras y recintos de Chile.",
+      "accent": "#F5AC70",
+      "visual": "05",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "adulto",
+          "name": "General",
+          "priceClp": 12000,
+          "capacity": 140
+        },
+        {
+          "id": "ninos",
+          "name": "Menores",
+          "priceClp": 8000,
+          "capacity": 50
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-jazz-puerto",
+      "organizerId": "org-nexo",
+      "title": "Jazz de Puerto",
+      "subtitle": "Sesiones frente al mar",
+      "category": "Música",
+      "genre": "Jazz",
+      "city": "Valparaíso",
+      "venue": "Club Marea · DEMO",
+      "date": "2027-04-10",
+      "time": "20:00",
+      "description": "Evento de prueba sin relación con artistas reales. Simula la venta por secciones.",
+      "accent": "#83B8D8",
+      "visual": "06",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "mesas",
+          "name": "Mesa",
+          "priceClp": 22000,
+          "capacity": 80
+        },
+        {
+          "id": "barra",
+          "name": "Barra",
+          "priceClp": 13000,
+          "capacity": 45
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-norte-vivo",
+      "organizerId": "org-aurora",
+      "title": "Norte Vivo",
+      "subtitle": "Cultura y música al aire libre",
+      "category": "Festivales",
+      "genre": "Folclor / Rock",
+      "city": "Antofagasta",
+      "venue": "Explanada Norte · DEMO",
+      "date": "2027-02-20",
+      "time": "18:00",
+      "description": "Festival totalmente ficticio destinado a mostrar cobertura nacional y contratos B2B.",
+      "accent": "#D8AE6D",
+      "visual": "07",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 16000,
+          "capacity": 180
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-travesia",
+      "organizerId": "org-escena",
+      "title": "Travesía Escénica",
+      "subtitle": "Danza contemporánea",
+      "category": "Teatro",
+      "genre": "Artes escénicas",
+      "city": "La Serena",
+      "venue": "Sala Horizonte · DEMO",
+      "date": "2027-04-24",
+      "time": "20:00",
+      "description": "Función ficticia para probar filtros de ciudades, recintos y compra transparente.",
+      "accent": "#D2ABD8",
+      "visual": "08",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 14000,
+          "capacity": 110
+        }
+      ],
+      "maxTicketsPerPerson": 7
+    },
+    {
+      "id": "demo-festival-masivo-2027",
+      "organizerId": "org-escena",
+      "title": "Festival de Alta Demanda · DEMO",
+      "subtitle": "Prueba de sala de espera virtual y compra regulada",
+      "category": "Festivales",
+      "genre": "Música / Experiencias",
+      "city": "Concepción",
+      "venue": "Recinto masivo ficticio · DEMO",
+      "date": "2027-05-15",
+      "time": "17:00",
+      "description": "Evento completamente ficticio con seis mil cupos para verificar listas de espera, turnos de compra, seguridad y máximos de entradas por usuario en un servidor de demostración.",
+      "accent": "#83B887",
+      "visual": "M",
+      "featured": false,
+      "status": "published",
+      "posterUrl": null,
+      "posterRights": "demo",
+      "maxTicketsPerPerson": 7,
+      "waitlistEnabled": true,
+      "ticketTypes": [
+        {
+          "id": "general",
+          "name": "General",
+          "priceClp": 22000,
+          "capacity": 6000
+        }
+      ]
+    }
+  ]
+}

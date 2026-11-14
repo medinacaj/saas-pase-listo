@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es-CL">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#191d21"><meta name="description" content="Demostración del centro de administración central de PaseListo. No es un panel empresarial ni permite acceso seguro.">
+<title>Centro de Control · PaseListo (DEMO)</title>
+<link rel="icon" href="./favicon.svg?v=20261111-ticket-mark" type="image/svg+xml">
+<link rel="stylesheet" href="./src/control.css?v=20261114-control-ops">
+<link rel="stylesheet" href="./src/operations.css?v=20261114-control-ops">
+<script type="module" src="./src/control.mjs?v=20261114-control-ops"></script>
+<link rel="stylesheet" href="./src/brand-system.css">
+</head>
+<body>
+<a href="#main" class="skip">Saltar al contenido</a>
+<div class="admin-layout">
+<aside class="sidebar" aria-label="Panel administrativo">
+<a href="./index.html" class="brand"><span class="brand-icon">✳</span><span>pase<strong>listo.</strong><small>CONTROL CENTRAL</small></span></a>
+<div class="sidebar-caption">OPERACIÓN DE LA TICKETERA</div>
+<nav aria-label="Secciones del control central">
+<a href="#resumen" class="nav-current">◈ <span>Resumen general</span></a>
+<a href="#inventario">▦ <span>Catálogo unificado</span></a>
+<a href="#eventos">▣ <span>Eventos internos DEMO</span></a>
+<a href="#analitica">◴ <span>Analítica y gráficos</span></a>
+<a href="#clientes">♙ <span>Clientes / compradores</span></a>
+<a href="#empresas">▤ <span>Empresas</span></a>
+<a href="#proveedores">♧ <span>Proveedores</span></a>
+<a href="#datos">▥ <span>Base de datos y fuentes</span></a>
+<a href="#pedidos">▤ <span>Pedidos y entradas</span></a>
+<a href="#productores">▥ <span>Productores y recintos</span></a>
+<a href="#comisiones">◉ <span>Comisiones y liquidaciones</span></a>
+<a href="#referencias">▧ <span>Ejemplos reales</span></a>
+<a href="#seguridad">⛨ <span>Seguridad y accesos</span></a>
+</nav>
+<div class="sidebar-foot"><div class="owner-dot"></div><div><strong>Operador de PaseListo</strong><small>Acceso público de demostración</small></div></div>
+</aside>
+<main class="main" id="main">
+<header class="top">
+<div><p class="eyebrow">ADMINISTRACIÓN DE LA PLATAFORMA · 2026</p><h1>Centro de Control <span class="admin-pill">DEMO</span></h1><p>Visión de toda la operación de PaseListo, no un panel de una empresa cliente.</p></div>
+<div class="top-tools"><a href="./index.html">Ver tienda <span aria-hidden="true">↗</span></a><button id="reset-demo" type="button" class="ghost-btn">Restablecer demo</button></div>
+</header>
+<div class="security-ribbon" role="note"><strong>VERSIÓN PÚBLICA Y SIN LOGIN.</strong> Cualquier persona puede consultar o modificar esta simulación en su propio navegador. No utilizar cuentas, datos personales, contratos ni eventos reales para vender.</div>
+<section id="resumen" class="region">
+<div class="section-head"><div><div class="micro">VISIÓN DE TODO PASELISTO</div><h2>Resumen de operación</h2></div><span class="note-chip">Valores simulados en CLP</span></div>
+<div id="metrics" class="metrics"></div>
+<div class="overview-grid">
+<div class="panel overview-metrics"><h3>Distribución de ingresos simulados</h3><p>Separación entre valor base del evento, cargo por servicio y participación acordada.</p><div id="money-breakdown"></div></div>
+<div class="panel"><h3>Actividad central</h3><p>Últimas acciones sobre eventos, ventas y comisiones de todas las empresas.</p><div id="activity-feed"></div></div>
+</div>
+</section>
+
+<section id="inventario" class="region ops-region">
+<div class="section-head"><div><div class="micro">UNA MISMA CUENTA PARA TIENDA Y CONTROL</div><h2>Catálogo unificado</h2></div><span class="note-chip">Comparación de fuentes · sin ventas</span></div>
+<p class="ops-subnote">La tienda muestra únicamente referencias futuras con imagen HTTPS y descripción completa. Los eventos ficticios internos no se ofrecen al público. Aquí puedes revisar todos los estados sin confundirlos.</p>
+<div class="ops-reconciliation" id="ops-reconciliation" aria-live="polite"></div>
+<div class="panel ops-catalog-panel">
+<div class="ops-toolbar">
+<label>Buscar evento, ciudad o empresa<input id="ops-search" type="search" placeholder="Buscar por evento, ID, recinto…" autocomplete="off"></label>
+<label>Origen<select id="ops-type"><option value="all">Todos los orígenes</option><option value="reference">Referencias externas</option><option value="demo">Inventario interno DEMO</option></select></label>
+<label>Estado<select id="ops-status">
+<option value="all">Todos los estados</option><option value="instore">Visibles en tienda</option><option value="offstore">No visibles en tienda</option>
+<option value="ended">Referencia finalizada</option><option value="incomplete">Ficha incompleta</option><option value="visible">Referencia visible</option><option value="demo_published">DEMO publicada internamente</option><option value="paused">DEMO pausada</option><option value="demo_ended">DEMO finalizada</option></select></label>
+<label>Ordenar<select id="ops-sort"><option value="date">Fecha (ascendente)</option><option value="title">Título (A–Z)</option><option value="status">Estado</option></select></label>
+</div>
+<div class="ops-view-toolbar"><span id="ops-list-count" role="status">Cargando registros…</span><div id="ops-view-buttons" class="ops-view-switch" role="group" aria-label="Tipo de vista"><button type="button" class="active" data-ops-view="table" aria-pressed="true">Tabla</button><button type="button" data-ops-view="cards" aria-pressed="false">Tarjetas</button><button type="button" data-ops-view="calendar" aria-pressed="false">Calendario</button></div></div>
+<div id="ops-view" aria-live="polite"></div>
+</div>
+</section>
+<section id="analitica" class="region ops-region"><div class="section-head"><div><div class="micro">INDICADORES RECONCILIADOS</div><h2>Analítica y gráficos</h2></div><span class="note-chip">Sin ingresos reales</span></div><div id="ops-charts"></div></section>
+<section id="clientes" class="region ops-region"><div class="section-head"><div><div class="micro">RELACIÓN CON EL COMPRADOR</div><h2>Clientes y compradores</h2></div><span class="note-chip warning">Solo datos de simulación</span></div><div class="panel" id="ops-clients"></div></section>
+<section id="empresas" class="region ops-region"><div class="section-head"><div><div class="micro">PERSONAS JURÍDICAS / PRODUCTORES</div><h2>Empresas y contratos</h2></div><span class="note-chip warning">Sin contratos verificados</span></div><div class="panel" id="ops-companies"></div></section>
+<section id="proveedores" class="region ops-region"><div class="section-head"><div><div class="micro">OPERACIÓN Y TERCEROS</div><h2>Proveedores y servicios</h2></div><span class="note-chip warning">Pendiente de contratación</span></div><div class="panel" id="ops-providers"></div></section>
+<section id="datos" class="region ops-region"><div class="section-head"><div><div class="micro">TRAZABILIDAD Y PERSISTENCIA</div><h2>Base de datos y fuentes</h2></div><span class="note-chip warning">Sin PostgreSQL conectado</span></div><div class="panel" id="ops-database"></div></section>
+<section id="eventos" class="region">
+<div class="section-head"><div><div class="micro">INVENTARIO DE TODA LA TICKETERA</div><h2>Inventario de eventos ficticios</h2></div><a class="inline-link" href="#crear-evento">+ Registrar evento</a></div>
+<p class="ops-subnote">Estos eventos son pruebas internas guardadas en el navegador; no se muestran como ofertas de venta en la tienda.</p><div class="panel"><div class="table-overflow"><table><thead><tr><th>Evento</th><th>Organización vinculada</th><th>Ciudad / fecha</th><th>Entradas simuladas</th><th>Estado</th><th>Control</th></tr></thead><tbody id="events-body"></tbody></table></div></div>
+<div id="crear-evento" class="panel form-panel"><div><div class="micro">OPERACIÓN INTERNA DE PASELISTO</div><h3>Registrar evento bajo un productor</h3><p>En producción, el equipo autorizado de PaseListo debe comprobar contrato, titularidad y derechos promocionales antes de habilitar venta.</p></div>
+<form id="event-form" class="admin-form">
+<label>Productor o recinto contratado (DEMO)<select name="organizerId" id="event-org" required></select></label>
+<label>Nombre del espectáculo<input name="title" required minlength="3" maxlength="90" placeholder="Evento de prueba"></label>
+<label>Descripción<input name="description" required minlength="10" maxlength="750" placeholder="Detalle del espectáculo ficticio"></label>
+<div class="pair"><label>Ciudad<input name="city" required minlength="2" maxlength="50" placeholder="Concepción"></label><label>Recinto<input name="venue" required minlength="3" maxlength="100" placeholder="Recinto de demostración"></label></div>
+<div class="pair"><label>Fecha<input type="date" name="date" required></label><label>Hora<input type="time" name="time" required></label></div>
+<div class="pair"><label>Tipo de espectáculo<select name="category"><option>Música</option><option>Festivales</option><option>Comedia</option><option>Teatro</option><option>Familia</option><option>Experiencias</option></select></label><label>Color de cartel de prueba<input type="color" name="accent" value="#CFF47A"></label></div>
+<div class="pair"><label>Precio base DEMO (CLP)<input type="number" min="0" max="5000000" step="1" name="priceClp" value="15000" required></label><label>Cupos de prueba<input type="number" min="1" max="100000" step="1" name="capacity" value="100" required></label></div>
+<div class="pair"><label for="event-max-tickets">Máximo de boletos por persona<input id="event-max-tickets" type="number" min="1" max="100" step="1" name="maxTicketsPerPerson" value="7" required aria-describedby="event-max-tickets-help"></label><div><p class="helper" id="event-max-tickets-help">Predeterminado: 7. Limita la cantidad total que puede adquirir una misma persona para este evento, incluso si realiza varios pedidos DEMO. Valores permitidos: 1 a 100.</p></div></div>
+<fieldset class="waitlist-settings" aria-describedby="waitlist-policy-help">
+ <legend>Acceso y lista de espera</legend>
+ <label class="waitlist-switch"><input id="event-waitlist-enabled" type="checkbox" name="waitlistEnabled" value="on"><span><strong>Activar lista de espera virtual</strong><small>Organiza por turno a los compradores registrados antes de permitir pedidos DEMO.</small></span></label>
+ <p class="helper" id="waitlist-policy-help">Para eventos masivos (5.000 cupos o más), la lista de espera se activa de forma obligatoria. En eventos menores es opcional. La posición, la admisión y el límite por comprador los valida el servidor; esta versión pública solo demuestra la configuración y no realiza ventas reales.</p>
+ <p class="helper" id="waitlist-capacity-status" role="status">Lista de espera opcional para el aforo indicado.</p>
+</fieldset>
+<p class="helper">Se utilizará un cartel gráfico de ejemplo. Para afiches reales de un productor se requerirá licencia y revisión; no se habilita carga de imágenes de terceros desde esta demo.</p>
+<button class="primary-btn" type="submit">Registrar publicación DEMO ↗</button><p role="status" id="event-feedback"></p>
+</form></div>
+</section>
+<section id="pedidos" class="region"><div class="section-head"><div><div class="micro">TODOS LOS ORGANIZADORES</div><h2>Pedidos y entradas</h2></div><span class="note-chip">Sin fondos recibidos</span></div><div class="panel"><div class="table-overflow"><table><thead><tr><th>Pedido</th><th>Espectáculo</th><th>Productor</th><th>Cantidad</th><th>Valor base</th><th>Servicio</th><th>Total teórico</th><th>Estado</th><th></th></tr></thead><tbody id="orders-body"></tbody></table></div></div></section>
+<section id="productores" class="region"><div class="section-head"><div><div class="micro">CONTRATACIÓN B2B GESTIONADA POR PASELISTO</div><h2>Productores y recintos</h2></div></div><div class="panel"><div class="table-overflow"><table><thead><tr><th>Empresa de demostración</th><th>Eventos</th><th>Pedidos</th><th>Participación del recinto</th><th>Contrato</th><th>Modificar ejemplo</th></tr></thead><tbody id="partners-body"></tbody></table></div></div>
+<div class="panel form-panel"><h3>Registrar nuevo productor ficticio</h3><form class="compact-form" id="partner-form"><label>Nombre del productor<input name="name" minlength="3" maxlength="90" placeholder="Productora de prueba" required></label><label>Participación en comisión (%)<input name="sharePercent" type="number" min="0" max="100" step="1" value="15" required></label><button class="primary-btn" type="submit">Registrar vínculo DEMO</button></form><p class="helper">Esto no crea una cuenta ni un contrato jurídico. El alta real se hará desde el centro de control con verificación y documentos.</p><p id="partner-feedback" role="status"></p></div>
+</section>
+<section id="comisiones" class="region"><div class="section-head"><div><div class="micro">MODELO DE INGRESOS DE LA TICKETERA</div><h2>Cargos de servicio y liquidación</h2></div></div>
+<div class="overview-grid"><div class="panel"><h3>Tarifa de servicio del operador</h3><p>Ejemplo editable para las próximas órdenes simuladas. La tarifa real podrá depender de evento, recinto y contrato.</p><form id="fee-form" class="compact-form"><label>Porcentaje de servicio (%)<input type="number" min="0" max="40" step="1" name="percent" required></label><label>Cargo fijo por entrada (CLP)<input type="number" min="0" max="20000" step="1" name="fixed" required></label><button class="primary-btn" type="submit">Actualizar tarifa DEMO</button></form><p id="fee-feedback" role="status"></p></div>
+<div class="panel"><h3>Liquidación y reparto</h3><div id="settlement-summary"></div><p class="helper">Todas las cifras son teóricas y antes de costos externos, retenciones, impuestos, devoluciones y pagos bancarios. No se realiza ninguna liquidación.</p></div></div>
+</section>
+<section id="referencias" class="region"><div class="section-head"><div><div class="micro">AFICHES Y ESPECTÁCULOS REALES</div><h2>Referencias visuales</h2></div><span class="note-chip warning">Sin contratos PaseListo</span></div><p class="explain">Estas fichas reales sirven exclusivamente para comprobar el diseño con afiches promocionales publicados por sus promotores o medios. <strong>No están autorizadas para vender por PaseListo</strong> y no existen órdenes, cupos, precios o liquidaciones asociados a ellas.</p><div id="references-grid" class="reference-grid"></div></section>
+<section id="seguridad" class="region"><div class="section-head"><div><div class="micro">PUERTAS DE LANZAMIENTO</div><h2>Accesos y seguridad</h2></div></div><div class="panel gate-grid"><div><strong>Acceso exclusivo de propietario</strong><span class="pending">Pendiente</span><p>Autenticación real, MFA, sesiones, revocación, usuarios y permisos del equipo de PaseListo.</p></div><div><strong>Backend y base de datos</strong><span class="pending">Pendiente</span><p>Servicio autenticado y PostgreSQL con transacciones, auditoría persistente, backups y controles contra sobreventa.</p></div><div><strong>Recaudación y liquidaciones</strong><span class="pending">Pendiente</span><p>Pasarela autorizada, conciliación, devoluciones, distribución entre productores y impuestos.</p></div><div><strong>Emisión y acceso</strong><span class="pending">Pendiente</span><p>Boletos firmados, QR verificables y validación atómica para dispositivos de acceso.</p></div></div></section>
+<footer>Centro de Control PaseListo · Prototipo de propietario · Datos 100% sintéticos · Panel solo demostrativo: no hay autenticación de administradores ni backend comercial activo.</footer>
+</main></div>
+</body></html>

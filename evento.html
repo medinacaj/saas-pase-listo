@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171719">
+<!-- Optional: browser-restricted Google Maps Embed API key; leave blank in the static DEMO. -->
+<meta name="google-maps-embed-key" content="">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Ficha individual de evento en PaseListo: fecha, recinto, categorías de entradas y previsión meteorológica cuando esté disponible.">
+<title>Detalle de evento · PaseListo</title>
+<link rel="icon" href="./favicon.svg?v=20261111-ticket-mark" type="image/svg+xml">
+<link rel="stylesheet" href="./src/portal.css">
+<link rel="stylesheet" href="./src/commerce.css">
+<link rel="stylesheet" href="./src/brand-system.css">
+<link rel="stylesheet" href="./src/event-page.css?v=20261110-zones">
+<script type="module" src="./src/event-page.mjs?v=20261111-waitlist7"></script>
+</head>
+<body>
+<a class="skip" href="#event-content">Saltar al detalle del evento</a>
+<header class="site-head">
+ <div class="head-inner">
+  <a class="brand" href="./index.html" aria-label="PaseListo inicio"><span class="brand-icon" aria-hidden="true">✳</span><span>pase<span class="brand-light">listo</span><span class="brand-dot">.</span></span></a>
+  <nav class="head-nav" aria-label="Navegación principal"><a href="./index.html#cartelera">Explorar eventos</a></nav>
+  <div class="head-actions"><a class="event-header-link" href="./index.html#cartelera">Volver a la cartelera <span aria-hidden="true">↗</span></a></div>
+ </div>
+</header>
+<main id="event-content" class="event-page-main">
+ <div class="demo-ribbon" role="note"><strong>Versión demostrativa.</strong> Explora eventos reales y prueba el proceso de compra con tarifas ficticias. No se realizan pagos, reservas ni se emiten entradas válidas.</div>
+ <div class="event-page-wrap">
+  <nav class="event-breadcrumb" aria-label="Ruta de navegación"><a href="./index.html#cartelera">Cartelera</a><span aria-hidden="true">/</span><span id="event-breadcrumb-name">Evento</span></nav>
+  <div id="event-page-status" class="event-page-loading" role="status">Preparando la ficha del evento…</div>
+  <article id="event-page-view" hidden>
+   <div class="event-hero-layout">
+    <div class="event-page-art" id="event-poster"></div>
+    <div class="event-page-intro">
+     <div class="event-page-tag" id="event-category"></div>
+     <h1 id="event-title"></h1>
+     <p class="event-page-subtitle" id="event-subtitle"></p>
+     <p class="event-page-summary" id="event-description"></p>
+     <div class="event-page-facts">
+      <div><span class="event-page-fact-icon" aria-hidden="true">◷</span><div><small>FECHA Y HORARIO</small><strong id="event-when"></strong></div></div>
+      <div><span class="event-page-fact-icon" aria-hidden="true">⌖</span><div><small>RECINTO</small><strong id="event-venue"></strong><span id="event-city"></span></div></div>
+      <div><span class="event-page-fact-icon" aria-hidden="true">✳</span><div><small>ORGANIZACIÓN</small><strong id="event-organizer"></strong></div></div>
+     </div>
+    </div>
+   </div>
+   <div class="event-page-grid">
+    <div class="event-page-primary">
+     <section class="event-page-section venue-map-section" aria-labelledby="venue-map-heading">
+      <div class="event-page-section-label">01 / DISTRIBUCIÓN POR SECTORES</div>
+      <h2 id="venue-map-heading">Mapa de zonas.</h2>
+      <p class="venue-map-intro" id="venue-map-intro">Explora las categorías de entrada y sus colores.</p>
+      <div class="venue-map-panel">
+       <div id="venue-zone-map" class="venue-map-art" aria-label="Plano de sectores del evento"></div>
+       <div id="venue-zone-legend" class="venue-map-legend" aria-label="Clasificación de entradas"></div>
+      </div>
+      <p id="venue-zone-selection" class="venue-map-selection" role="status" aria-live="polite"></p>
+      <p id="venue-map-accuracy" class="venue-map-disclaimer"></p>
+     </section>
+     <section class="event-page-section" aria-labelledby="venue-heading">
+      <div class="event-page-section-label">02 / INFORMACIÓN ÚTIL</div>
+      <h2 id="venue-heading">Sobre el recinto.</h2>
+      <p id="venue-description"></p>
+      <div class="event-page-location"><span aria-hidden="true">⌖</span><span id="venue-location"></span></div>
+      <div class="venue-geolocation" aria-labelledby="venue-geolocation-heading">
+       <div class="venue-geolocation-head">
+        <h3 id="venue-geolocation-heading">Ubicación geográfica</h3>
+        <span id="venue-geolocation-status" class="venue-geolocation-status">Verificando mapa</span>
+       </div>
+       <div id="venue-geolocation-map" class="venue-geolocation-map" role="region" aria-label="Ubicación del recinto en Google Maps"></div>
+       <p id="venue-geolocation-note" class="venue-geolocation-note"></p>
+       <div class="venue-geolocation-actions">
+        <a id="venue-geolocation-link" class="venue-geolocation-link" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" hidden>Abrir ubicación en Google Maps <span aria-hidden="true">↗</span></a>
+        <a id="venue-geolocation-search" class="venue-geolocation-search" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" hidden>Buscar recinto en Google Maps <span aria-hidden="true">↗</span></a>
+       </div>
+       <p class="venue-geolocation-credit">Mapa: Google Maps. Coordenadas de referencia: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">colaboradores de OpenStreetMap</a>.</p>
+      </div>
+      <div class="venue-details-grid" aria-label="Información práctica del recinto">
+       <div><small>DIRECCIÓN EXACTA</small><strong id="venue-address"></strong></div>
+       <div><small>APERTURA DE PUERTAS</small><strong id="venue-doors"></strong></div>
+       <div><small>ACCESIBILIDAD</small><strong id="venue-accessibility"></strong></div>
+       <div><small>TRANSPORTE Y ESTACIONAMIENTO</small><strong id="venue-transport"></strong></div>
+       <div><small>EDAD MÍNIMA</small><strong id="venue-age"></strong></div>
+       <div><small>CONDICIONES DE INGRESO</small><strong id="venue-entry"></strong></div>
+      </div>
+      <p class="event-page-note" id="venue-note"></p>
+     </section>
+     <section class="event-page-section event-weather-section" aria-labelledby="weather-heading">
+      <div class="event-page-section-label">03 / PLANIFICA TU VISITA</div>
+      <div class="event-weather-title"><h2 id="weather-heading">El clima ese día.</h2><span class="weather-soft-dot" aria-hidden="true"></span></div>
+      <div id="event-weather" class="event-weather-content" role="status" aria-live="polite">Comprobando disponibilidad del pronóstico…</div>
+     </section>
+     <section class="event-page-section" aria-labelledby="conditions-heading">
+      <div class="event-page-section-label">04 / ANTES DE ASISTIR</div>
+      <h2 id="conditions-heading">Lo que debes saber.</h2>
+      <p id="event-conditions"></p>
+     </section>
+    </div>
+    <aside class="event-page-side" aria-labelledby="tickets-heading">
+     <div class="event-page-tickets">
+      <div class="event-page-section-label">ENTRADAS Y VALORES</div>
+      <h2 id="tickets-heading">Elige tu entrada.</h2>
+      <div id="event-ticket-list"></div>
+      <p class="event-page-ticket-note" id="ticket-disclaimer"></p>
+      <section id="reference-checkout" class="reference-checkout" aria-label="Simulador de compra integrado" hidden>
+       <p class="reference-checkout-step" id="reference-checkout-step">PASO 1 DE 3 · SELECCIÓN</p>
+       <div id="reference-checkout-select">
+        <label class="reference-checkout-field">Cantidad de entradas ficticias
+         <select id="reference-ticket-quantity" aria-label="Cantidad de entradas de prueba"><option value="1">1 entrada</option><option value="2">2 entradas</option><option value="3">3 entradas</option><option value="4">4 entradas</option><option value="5">5 entradas</option><option value="6">6 entradas</option></select>
+        </label>
+        <p id="reference-checkout-preview" role="status" aria-live="polite"></p>
+        <button id="reference-checkout-next" type="button" class="reference-checkout-action">Continuar al resumen</button>
+       </div>
+       <div id="reference-checkout-review" hidden>
+        <h3>Revisa tu simulación</h3>
+        <div id="reference-checkout-summary" class="reference-checkout-summary"></div>
+        <p class="reference-checkout-notice">No introduzcas datos personales ni bancarios. Esta prueba no cobra ni reserva entradas del evento real.</p>
+        <div class="reference-checkout-buttons">
+         <button id="reference-checkout-back" type="button" class="reference-checkout-secondary">Modificar selección</button>
+         <button id="reference-checkout-confirm" type="button" class="reference-checkout-action">Confirmar simulación</button>
+        </div>
+       </div>
+       <div id="reference-checkout-complete" hidden role="status" aria-live="polite"></div>
+      </section>
+     </div>
+    </aside>
+   </div>
+ </article>
+ </div>
+</main>
+<footer class="site-footer event-page-footer">
+ <div class="footer-top"><a class="footer-brand" href="./index.html">paselisto<span>.</span></a><p>Eventos que se viven.</p></div>
+ <div class="footer-bottom"><span>© PaseListo · 2026</span><a href="./index.html#cartelera">Volver a eventos</a><span>Sin pagos ni entradas válidas en esta demo</span></div>
+ <div class="footer-disclaimer">La información de eventos reales es referencial. La autorización de venta, los derechos de afiches y las condiciones comerciales requieren verificación.</div>
+</footer>
+</body>
+</html>

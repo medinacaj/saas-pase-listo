@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1150" role="img" aria-label="Imagen conceptual de ALEGRÍA; no es afiche oficial">
+<defs><linearGradient id="bg" x2=".95" y2="1"><stop stop-color="#1d204d"/><stop offset=".58" stop-color="#b56a5d"/><stop offset="1" stop-color="#f3cc7b"/></linearGradient><radialGradient id="glow"><stop stop-color="#f3cc7b" stop-opacity=".85"/><stop offset="1" stop-color="#f3cc7b" stop-opacity="0"/></radialGradient></defs>
+<rect width="900" height="1150" fill="url(#bg)"/><circle cx="700" cy="560" r="445" fill="url(#glow)"/>
+<path d="M0 240H900" stroke="#fff" stroke-opacity=".16"/><text x="60" y="76" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="800" letter-spacing="4" fill="white" opacity=".9">PASELISTO  /  CARTELERA</text>
+<text x="58" y="180" font-family="Arial,Helvetica,sans-serif" font-size="105" font-weight="900" letter-spacing="-3" fill="#fff6e2">ALEGRÍA</text>
+<path d="M80 985L450 355L820 985Z" fill="#ffe1ad" stroke="#f6be8e" stroke-width="16"/>
+<path d="M205 990L450 492L695 990Z" fill="#c4697b" opacity=".9"/>
+<path d="M450 355V975" stroke="#ffd783" stroke-width="15"/>
+<g fill="#ffeac1"><circle cx="8" cy="45" r="3"/><circle cx="121" cy="112" r="4"/><circle cx="234" cy="179" r="5"/><circle cx="347" cy="246" r="6"/><circle cx="460" cy="313" r="7"/><circle cx="573" cy="380" r="3"/><circle cx="686" cy="447" r="4"/><circle cx="799" cy="514" r="5"/><circle cx="37" cy="581" r="6"/><circle cx="150" cy="648" r="7"/><circle cx="263" cy="715" r="3"/><circle cx="376" cy="782" r="4"/><circle cx="489" cy="849" r="5"/><circle cx="602" cy="86" r="6"/><circle cx="715" cy="153" r="7"/><circle cx="828" cy="220" r="3"/><circle cx="66" cy="287" r="4"/><circle cx="179" cy="354" r="5"/><circle cx="292" cy="421" r="6"/><circle cx="405" cy="488" r="7"/><circle cx="518" cy="555" r="3"/><circle cx="631" cy="622" r="4"/><circle cx="744" cy="689" r="5"/><circle cx="857" cy="756" r="6"/><circle cx="95" cy="823" r="7"/><circle cx="208" cy="60" r="3"/></g>
+<ellipse cx="450" cy="978" rx="360" ry="58" fill="#263251"/>
+<rect y="995" width="900" height="155" fill="#101b22" opacity=".96"/>
+<text x="55" y="1056" fill="white" font-family="Arial,sans-serif" font-size="29" font-weight="800">ENERO 2027 · SANTIAGO</text>
+<text x="55" y="1105" fill="#ccf59b" font-family="Arial,sans-serif" font-size="20" letter-spacing="2">ARTE CONCEPTUAL · NO OFICIAL · SIN VENTA</text>
+</svg>
