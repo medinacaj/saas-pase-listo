@@ -3,6 +3,7 @@ import { createCheckoutState, canSubmitCheckout } from "./checkout-state.mjs";
 import { eventDetailHref } from "./event-page-domain.mjs";
 import { selectHeroEvents, splitHeroTitle, hasHeroPoster, hasEventDescription } from "./hero-carousel.mjs";
 import { weekBounds } from "./week-events.mjs";
+import { publicReferenceEvents } from "./catalog-ops.mjs";
 import { eventRequiresWaitingRoom } from "./waiting-room.mjs";
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
@@ -49,7 +50,7 @@ async function refreshInventory(){
  }
 }
 function allEvents(){return publishedEvents(store).filter(e=>e.date>=current()).sort((a,b)=>a.date.localeCompare(b.date));}
-function realEvents(){return realSamples.filter(e=>(e.endDate||e.date)>=current()&&hasHeroPoster(e,"reference")&&hasEventDescription(e)).sort((a,b)=>a.date.localeCompare(b.date));}
+function realEvents(){return publicReferenceEvents(realSamples,current());}
 function allCatalogEvents(){return realEvents();} // Home: real references only; DEMO sales remain in internal tests.
 function org(id){return store.organizers.find(o=>o.id===id);}
 function minPrice(event){return Math.min(...event.ticketTypes.map(t=>quoteOrPrice(event,t)));}
