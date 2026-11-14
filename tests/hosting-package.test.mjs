@@ -50,7 +50,7 @@ test('all local HTML styles, scripts and module imports resolve in the package',
       const path=decodeURIComponent(ref.split(/[?#]/,1)[0]);
       const target=resolvePath(dirname(file),path);
       assert.ok(target.startsWith(dest+sep),'Asset escapes public directory: '+ref);
-      await assert.doesNotRejects(stat(target),'Missing asset: '+file+' -> '+ref);
+      await assert.doesNotReject(stat(target),'Missing asset: '+file+' -> '+ref);
     }
   }
 });
