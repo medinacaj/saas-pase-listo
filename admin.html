@@ -3,8 +3,9 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#191d21"><meta name="description" content="Demostración del centro de administración central de PaseListo. No es un panel empresarial ni permite acceso seguro.">
 <title>Centro de Control · PaseListo (DEMO)</title>
 <link rel="icon" href="./favicon.svg?v=20261111-ticket-mark" type="image/svg+xml">
-<link rel="stylesheet" href="./src/control.css?v=20261111-waitlist7">
-<script type="module" src="./src/control.mjs?v=20261111-waitlist7"></script>
+<link rel="stylesheet" href="./src/control.css?v=20261114-control-ops">
+<link rel="stylesheet" href="./src/operations.css?v=20261114-control-ops">
+<script type="module" src="./src/control.mjs?v=20261114-control-ops"></script>
 <link rel="stylesheet" href="./src/brand-system.css">
 </head>
 <body>
@@ -15,7 +16,13 @@
 <div class="sidebar-caption">OPERACIÓN DE LA TICKETERA</div>
 <nav aria-label="Secciones del control central">
 <a href="#resumen" class="nav-current">◈ <span>Resumen general</span></a>
-<a href="#eventos">▣ <span>Todos los eventos</span></a>
+<a href="#inventario">▦ <span>Catálogo unificado</span></a>
+<a href="#eventos">▣ <span>Eventos internos DEMO</span></a>
+<a href="#analitica">◴ <span>Analítica y gráficos</span></a>
+<a href="#clientes">♙ <span>Clientes / compradores</span></a>
+<a href="#empresas">▤ <span>Empresas</span></a>
+<a href="#proveedores">♧ <span>Proveedores</span></a>
+<a href="#datos">▥ <span>Base de datos y fuentes</span></a>
 <a href="#pedidos">▤ <span>Pedidos y entradas</span></a>
 <a href="#productores">▥ <span>Productores y recintos</span></a>
 <a href="#comisiones">◉ <span>Comisiones y liquidaciones</span></a>
@@ -38,9 +45,32 @@
 <div class="panel"><h3>Actividad central</h3><p>Últimas acciones sobre eventos, ventas y comisiones de todas las empresas.</p><div id="activity-feed"></div></div>
 </div>
 </section>
+
+<section id="inventario" class="region ops-region">
+<div class="section-head"><div><div class="micro">UNA MISMA CUENTA PARA TIENDA Y CONTROL</div><h2>Catálogo unificado</h2></div><span class="note-chip">Comparación de fuentes · sin ventas</span></div>
+<p class="ops-subnote">La tienda muestra únicamente referencias futuras con imagen HTTPS y descripción completa. Los eventos ficticios internos no se ofrecen al público. Aquí puedes revisar todos los estados sin confundirlos.</p>
+<div class="ops-reconciliation" id="ops-reconciliation" aria-live="polite"></div>
+<div class="panel ops-catalog-panel">
+<div class="ops-toolbar">
+<label>Buscar evento, ciudad o empresa<input id="ops-search" type="search" placeholder="Buscar por evento, ID, recinto…" autocomplete="off"></label>
+<label>Origen<select id="ops-type"><option value="all">Todos los orígenes</option><option value="reference">Referencias externas</option><option value="demo">Inventario interno DEMO</option></select></label>
+<label>Estado<select id="ops-status">
+<option value="all">Todos los estados</option><option value="instore">Visibles en tienda</option><option value="offstore">No visibles en tienda</option>
+<option value="ended">Referencia finalizada</option><option value="incomplete">Ficha incompleta</option><option value="visible">Referencia visible</option><option value="demo_published">DEMO publicada internamente</option><option value="paused">DEMO pausada</option><option value="demo_ended">DEMO finalizada</option></select></label>
+<label>Ordenar<select id="ops-sort"><option value="date">Fecha (ascendente)</option><option value="title">Título (A–Z)</option><option value="status">Estado</option></select></label>
+</div>
+<div class="ops-view-toolbar"><span id="ops-list-count" role="status">Cargando registros…</span><div id="ops-view-buttons" class="ops-view-switch" role="group" aria-label="Tipo de vista"><button type="button" class="active" data-ops-view="table" aria-pressed="true">Tabla</button><button type="button" data-ops-view="cards" aria-pressed="false">Tarjetas</button><button type="button" data-ops-view="calendar" aria-pressed="false">Calendario</button></div></div>
+<div id="ops-view" aria-live="polite"></div>
+</div>
+</section>
+<section id="analitica" class="region ops-region"><div class="section-head"><div><div class="micro">INDICADORES RECONCILIADOS</div><h2>Analítica y gráficos</h2></div><span class="note-chip">Sin ingresos reales</span></div><div id="ops-charts"></div></section>
+<section id="clientes" class="region ops-region"><div class="section-head"><div><div class="micro">RELACIÓN CON EL COMPRADOR</div><h2>Clientes y compradores</h2></div><span class="note-chip warning">Solo datos de simulación</span></div><div class="panel" id="ops-clients"></div></section>
+<section id="empresas" class="region ops-region"><div class="section-head"><div><div class="micro">PERSONAS JURÍDICAS / PRODUCTORES</div><h2>Empresas y contratos</h2></div><span class="note-chip warning">Sin contratos verificados</span></div><div class="panel" id="ops-companies"></div></section>
+<section id="proveedores" class="region ops-region"><div class="section-head"><div><div class="micro">OPERACIÓN Y TERCEROS</div><h2>Proveedores y servicios</h2></div><span class="note-chip warning">Pendiente de contratación</span></div><div class="panel" id="ops-providers"></div></section>
+<section id="datos" class="region ops-region"><div class="section-head"><div><div class="micro">TRAZABILIDAD Y PERSISTENCIA</div><h2>Base de datos y fuentes</h2></div><span class="note-chip warning">Sin PostgreSQL conectado</span></div><div class="panel" id="ops-database"></div></section>
 <section id="eventos" class="region">
-<div class="section-head"><div><div class="micro">INVENTARIO DE TODA LA TICKETERA</div><h2>Eventos publicados y pausados</h2></div><a class="inline-link" href="#crear-evento">+ Registrar evento</a></div>
-<div class="panel"><div class="table-overflow"><table><thead><tr><th>Evento</th><th>Organización vinculada</th><th>Ciudad / fecha</th><th>Entradas simuladas</th><th>Estado</th><th>Control</th></tr></thead><tbody id="events-body"></tbody></table></div></div>
+<div class="section-head"><div><div class="micro">INVENTARIO DE TODA LA TICKETERA</div><h2>Inventario de eventos ficticios</h2></div><a class="inline-link" href="#crear-evento">+ Registrar evento</a></div>
+<p class="ops-subnote">Estos eventos son pruebas internas guardadas en el navegador; no se muestran como ofertas de venta en la tienda.</p><div class="panel"><div class="table-overflow"><table><thead><tr><th>Evento</th><th>Organización vinculada</th><th>Ciudad / fecha</th><th>Entradas simuladas</th><th>Estado</th><th>Control</th></tr></thead><tbody id="events-body"></tbody></table></div></div>
 <div id="crear-evento" class="panel form-panel"><div><div class="micro">OPERACIÓN INTERNA DE PASELISTO</div><h3>Registrar evento bajo un productor</h3><p>En producción, el equipo autorizado de PaseListo debe comprobar contrato, titularidad y derechos promocionales antes de habilitar venta.</p></div>
 <form id="event-form" class="admin-form">
 <label>Productor o recinto contratado (DEMO)<select name="organizerId" id="event-org" required></select></label>
