@@ -325,7 +325,7 @@ async function refreshBuyer(){
 function renderLoginForm(mode="login",message=""){
  const root=$("#buyer-auth-content");
  if(!buyerApiReady){
-  root.innerHTML='<div class="reference-disclaimer" role="status"><strong>Inicio de sesión no disponible en GitHub Pages.</strong><p>La compra está bloqueada hasta conectar el servidor de autenticación. No ingreses contraseñas en esta página.</p></div>';
+  root.innerHTML='<div class="reference-disclaimer" role="status"><strong>Inicio de sesión todavía no habilitado en TodoTicket.</strong><p>Este alojamiento todavía no tiene conectada una API de compradores segura. Por ahora solo puedes explorar eventos y probar simulaciones sin pago. No ingreses contraseñas ni datos personales.</p></div>';
   return;
  }
  root.innerHTML='<form id="buyer-auth-form" class="buyer-auth-form" data-mode="'+esc(mode)+'">'+
