@@ -65,3 +65,8 @@
 @media(max-width:860px){.sidebar{overflow-y:visible}.ops-reconciliation{grid-template-columns:repeat(2,minmax(0,1fr))}.ops-chart-grid,.ops-calendar{grid-template-columns:1fr}.ops-info-grid,.ops-kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){.ops-catalog-panel{padding:12px}.ops-toolbar{grid-template-columns:1fr}.ops-view-toolbar{flex-wrap:wrap}.ops-view-switch{width:100%}.ops-view-switch button{flex:1}.ops-cards,.ops-reconciliation{grid-template-columns:1fr 1fr}.ops-reconciliation article{padding:13px}.ops-reconciliation strong{font-size:24px}.ops-cards{grid-template-columns:1fr}.ops-calendar-item{flex-wrap:wrap}.ops-calendar-item .ops-chip{max-width:none}.ops-kpi-strip strong{font-size:18px}.ops-info-grid strong{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.ops-track>span{transition:none}}
+
+/* Five distinct metrics: public references vs internal DEMO remain explicit. */
+.metrics{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:1200px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
