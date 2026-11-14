@@ -24,3 +24,33 @@ test('hosting package contains only public demo files and no backend',async()=>{
   const assets=await readdir(join(dest,'assets/event-art'));
   assert.ok(assets.length>=8,'missing event artwork for the demo');
 });
+
+test('all local HTML styles, scripts and module imports resolve in the package',async()=>{
+  const { stat }=await import('node:fs/promises');
+  const { dirname, resolve:resolvePath, sep }=await import('node:path');
+  const pages=['index.html','evento.html','admin.html','organizador.html','laboratorio.html'];
+  const modules=async(dirnamePath)=>{
+    let list=[];
+    for(const entry of await readdir(dirnamePath,{withFileTypes:true})){
+      const full=join(dirnamePath,entry.name);
+      if(entry.isDirectory())list.push(...await modules(full));
+      else if(entry.name.endsWith('.mjs'))list.push(full);
+    }
+    return list;
+  };
+  const files=[...pages.map(p=>join(dest,p)),...await modules(join(dest,'src'))];
+  for(const file of files){
+    const content=await readFile(file,'utf8');
+    const refs=file.endsWith('.html')?
+      [...content.matchAll(/\b(?:src|href)\s*=\s*["']([^"']+)["']/g)].map(x=>x[1]):
+      [...content.matchAll(/\b(?:from|import)\s*["']([^"']+)["']/g)].map(x=>x[1])
+        .concat([...content.matchAll(/\bimport\s*\(\s*["']([^"']+)["']\s*\)/g)].map(x=>x[1]));
+    for(const ref of refs){
+      if(!ref.startsWith('./')&&!ref.startsWith('../'))continue;
+      const path=decodeURIComponent(ref.split(/[?#]/,1)[0]);
+      const target=resolvePath(dirname(file),path);
+      assert.ok(target.startsWith(dest+sep),'Asset escapes public directory: '+ref);
+      await assert.doesNotRejects(stat(target),'Missing asset: '+file+' -> '+ref);
+    }
+  }
+});
