@@ -1,5 +1,5 @@
 import {loadCommerce, saveCommerce, clearCommerce} from "./commerce-domain.mjs";
-import { catalogReconciliation } from "./catalog-ops.mjs";
+import { catalogReconciliation, publicReferenceEvents } from "./catalog-ops.mjs";
 import { initOperationsDashboard } from "./operations-dashboard.mjs";
 import {ownerOverview,ownerEvents,ownerOrders,ownerRegisterPartner,ownerPublishEvent,ownerSetEventState,ownerSetFeePolicy,ownerSetShare,ownerCancelDemo,ownerReferenceCatalog} from "./control-domain.mjs";
 const $=(s,root=document)=>root.querySelector(s);
@@ -74,9 +74,8 @@ function renderPartners(){
  setOrgSelect();
 }
 function renderReferences(){
- const items=ownerReferenceCatalog(refCatalog);
- const now=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Santiago",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- $("#references-grid").innerHTML=items.filter(e=>(e.endDate||e.date)>=now).map(e=>{
+ const items=ownerReferenceCatalog({events:publicReferenceEvents(refCatalog)});
+ $("#references-grid").innerHTML=items.map(e=>{
   const url=safeUrl(e.posterUrl);
   const tone=/^#[a-f0-9]{6}$/i.test(e.accent)?e.accent:"#d7efb8";
   const img=url?'<img src="'+esc(url)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Afiche promocional real: '+esc(e.title)+'">':'';
